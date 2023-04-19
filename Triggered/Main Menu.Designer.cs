@@ -55,10 +55,16 @@ namespace Triggered
             this.SideMenu_Panel_Logo = new System.Windows.Forms.Panel();
             this.SideMenu_Image_Logo = new System.Windows.Forms.PictureBox();
             this.SideMenu_Panel_Viewpane = new System.Windows.Forms.Panel();
-            this.SideMenu_Panel_BottomLog = new System.Windows.Forms.Panel();
             this.SideMenu_Panel_LogTextbox = new System.Windows.Forms.Panel();
-            this.TestButton = new System.Windows.Forms.Button();
             this.SideMenu_Log_Textbox = new System.Windows.Forms.RichTextBox();
+            this.Titlebar = new System.Windows.Forms.Panel();
+            this.Panel_Window_Buttons = new System.Windows.Forms.Panel();
+            this.Window_Button_Min = new System.Windows.Forms.Button();
+            this.WindowButtons = new System.Windows.Forms.ImageList(this.components);
+            this.Window_Button_Max = new System.Windows.Forms.Button();
+            this.Window_Button_Close = new System.Windows.Forms.Button();
+            this.SideMenu_Panel_BottomLog = new System.Windows.Forms.Panel();
+            this.TestButton = new System.Windows.Forms.Button();
             this.SideMenu_Panel_Main.SuspendLayout();
             this.SideMenu_Panel_ThirdMenu.SuspendLayout();
             this.SideMenu_Panel_SecondMenu.SuspendLayout();
@@ -66,8 +72,10 @@ namespace Triggered
             this.SideMenu_Panel_Logo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SideMenu_Image_Logo)).BeginInit();
             this.SideMenu_Panel_Viewpane.SuspendLayout();
-            this.SideMenu_Panel_BottomLog.SuspendLayout();
             this.SideMenu_Panel_LogTextbox.SuspendLayout();
+            this.Titlebar.SuspendLayout();
+            this.Panel_Window_Buttons.SuspendLayout();
+            this.SideMenu_Panel_BottomLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // SideMenu_Panel_Main
@@ -82,9 +90,9 @@ namespace Triggered
             this.SideMenu_Panel_Main.Controls.Add(this.SideMenu_Button_FirstMenu_Submenu);
             this.SideMenu_Panel_Main.Controls.Add(this.SideMenu_Panel_Logo);
             this.SideMenu_Panel_Main.Dock = System.Windows.Forms.DockStyle.Left;
-            this.SideMenu_Panel_Main.Location = new System.Drawing.Point(0, 0);
+            this.SideMenu_Panel_Main.Location = new System.Drawing.Point(10, 10);
             this.SideMenu_Panel_Main.Name = "SideMenu_Panel_Main";
-            this.SideMenu_Panel_Main.Size = new System.Drawing.Size(147, 692);
+            this.SideMenu_Panel_Main.Size = new System.Drawing.Size(147, 672);
             this.SideMenu_Panel_Main.TabIndex = 0;
             // 
             // SideMenu_Panel_ThirdMenu
@@ -443,6 +451,7 @@ namespace Triggered
             this.SideMenu_Image_Logo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.SideMenu_Image_Logo.TabIndex = 0;
             this.SideMenu_Image_Logo.TabStop = false;
+            this.SideMenu_Image_Logo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panelTitleBar_MouseDown);
             // 
             // SideMenu_Panel_Viewpane
             // 
@@ -450,43 +459,20 @@ namespace Triggered
             this.SideMenu_Panel_Viewpane.Controls.Add(this.SideMenu_Panel_LogTextbox);
             this.SideMenu_Panel_Viewpane.Controls.Add(this.SideMenu_Panel_BottomLog);
             this.SideMenu_Panel_Viewpane.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SideMenu_Panel_Viewpane.Location = new System.Drawing.Point(147, 0);
+            this.SideMenu_Panel_Viewpane.Location = new System.Drawing.Point(157, 10);
             this.SideMenu_Panel_Viewpane.Name = "SideMenu_Panel_Viewpane";
-            this.SideMenu_Panel_Viewpane.Size = new System.Drawing.Size(1053, 692);
+            this.SideMenu_Panel_Viewpane.Size = new System.Drawing.Size(1033, 672);
             this.SideMenu_Panel_Viewpane.TabIndex = 1;
-            // 
-            // SideMenu_Panel_BottomLog
-            // 
-            this.SideMenu_Panel_BottomLog.Controls.Add(this.TestButton);
-            this.SideMenu_Panel_BottomLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.SideMenu_Panel_BottomLog.Location = new System.Drawing.Point(0, 592);
-            this.SideMenu_Panel_BottomLog.Name = "SideMenu_Panel_BottomLog";
-            this.SideMenu_Panel_BottomLog.Size = new System.Drawing.Size(1053, 100);
-            this.SideMenu_Panel_BottomLog.TabIndex = 0;
             // 
             // SideMenu_Panel_LogTextbox
             // 
             this.SideMenu_Panel_LogTextbox.Controls.Add(this.SideMenu_Log_Textbox);
+            this.SideMenu_Panel_LogTextbox.Controls.Add(this.Titlebar);
             this.SideMenu_Panel_LogTextbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SideMenu_Panel_LogTextbox.Location = new System.Drawing.Point(0, 0);
             this.SideMenu_Panel_LogTextbox.Name = "SideMenu_Panel_LogTextbox";
-            this.SideMenu_Panel_LogTextbox.Size = new System.Drawing.Size(1053, 592);
-            this.SideMenu_Panel_LogTextbox.TabIndex = 1;
-            // 
-            // TestButton
-            // 
-            this.TestButton.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.TestButton.FlatAppearance.BorderSize = 0;
-            this.TestButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.TestButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.TestButton.Location = new System.Drawing.Point(14, 16);
-            this.TestButton.Name = "TestButton";
-            this.TestButton.Size = new System.Drawing.Size(186, 72);
-            this.TestButton.TabIndex = 0;
-            this.TestButton.Tag = "Test Button";
-            this.TestButton.Text = "Click Me!";
-            this.TestButton.UseVisualStyleBackColor = false;
-            this.TestButton.Click += new System.EventHandler(this.CatchAll);
+            this.SideMenu_Panel_LogTextbox.Size = new System.Drawing.Size(1033, 612);
+            this.SideMenu_Panel_LogTextbox.TabIndex = 0;
             // 
             // SideMenu_Log_Textbox
             // 
@@ -494,11 +480,111 @@ namespace Triggered
             this.SideMenu_Log_Textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.SideMenu_Log_Textbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SideMenu_Log_Textbox.ForeColor = System.Drawing.SystemColors.MenuBar;
-            this.SideMenu_Log_Textbox.Location = new System.Drawing.Point(0, 0);
+            this.SideMenu_Log_Textbox.Location = new System.Drawing.Point(0, 32);
             this.SideMenu_Log_Textbox.Name = "SideMenu_Log_Textbox";
-            this.SideMenu_Log_Textbox.Size = new System.Drawing.Size(1053, 592);
+            this.SideMenu_Log_Textbox.ReadOnly = true;
+            this.SideMenu_Log_Textbox.Size = new System.Drawing.Size(1033, 580);
             this.SideMenu_Log_Textbox.TabIndex = 0;
             this.SideMenu_Log_Textbox.Text = "";
+            // 
+            // Titlebar
+            // 
+            this.Titlebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(44)))), ((int)(((byte)(44)))));
+            this.Titlebar.Controls.Add(this.Panel_Window_Buttons);
+            this.Titlebar.Dock = System.Windows.Forms.DockStyle.Top;
+            this.Titlebar.Location = new System.Drawing.Point(0, 0);
+            this.Titlebar.Name = "Titlebar";
+            this.Titlebar.Size = new System.Drawing.Size(1033, 32);
+            this.Titlebar.TabIndex = 2;
+            this.Titlebar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panelTitleBar_MouseDown);
+            // 
+            // Panel_Window_Buttons
+            // 
+            this.Panel_Window_Buttons.Controls.Add(this.Window_Button_Min);
+            this.Panel_Window_Buttons.Controls.Add(this.Window_Button_Max);
+            this.Panel_Window_Buttons.Controls.Add(this.Window_Button_Close);
+            this.Panel_Window_Buttons.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Panel_Window_Buttons.Location = new System.Drawing.Point(937, 0);
+            this.Panel_Window_Buttons.Name = "Panel_Window_Buttons";
+            this.Panel_Window_Buttons.Size = new System.Drawing.Size(96, 32);
+            this.Panel_Window_Buttons.TabIndex = 1;
+            // 
+            // Window_Button_Min
+            // 
+            this.Window_Button_Min.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Window_Button_Min.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Window_Button_Min.ImageIndex = 2;
+            this.Window_Button_Min.ImageList = this.WindowButtons;
+            this.Window_Button_Min.Location = new System.Drawing.Point(0, 0);
+            this.Window_Button_Min.Name = "Window_Button_Min";
+            this.Window_Button_Min.Size = new System.Drawing.Size(32, 32);
+            this.Window_Button_Min.TabIndex = 2;
+            this.Window_Button_Min.Tag = "Minimize";
+            this.Window_Button_Min.UseVisualStyleBackColor = true;
+            this.Window_Button_Min.Click += new System.EventHandler(this.Window_Button_Clicks);
+            // 
+            // WindowButtons
+            // 
+            this.WindowButtons.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("WindowButtons.ImageStream")));
+            this.WindowButtons.TransparentColor = System.Drawing.Color.Transparent;
+            this.WindowButtons.Images.SetKeyName(0, "Close.png");
+            this.WindowButtons.Images.SetKeyName(1, "Maximize.png");
+            this.WindowButtons.Images.SetKeyName(2, "Minimize.png");
+            this.WindowButtons.Images.SetKeyName(3, "Restore.png");
+            // 
+            // Window_Button_Max
+            // 
+            this.Window_Button_Max.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Window_Button_Max.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Window_Button_Max.ImageIndex = 1;
+            this.Window_Button_Max.ImageList = this.WindowButtons;
+            this.Window_Button_Max.Location = new System.Drawing.Point(32, 0);
+            this.Window_Button_Max.Name = "Window_Button_Max";
+            this.Window_Button_Max.Size = new System.Drawing.Size(32, 32);
+            this.Window_Button_Max.TabIndex = 1;
+            this.Window_Button_Max.Tag = "Maximize";
+            this.Window_Button_Max.UseVisualStyleBackColor = true;
+            this.Window_Button_Max.Click += new System.EventHandler(this.Window_Button_Clicks);
+            // 
+            // Window_Button_Close
+            // 
+            this.Window_Button_Close.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Window_Button_Close.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Window_Button_Close.ImageIndex = 0;
+            this.Window_Button_Close.ImageList = this.WindowButtons;
+            this.Window_Button_Close.Location = new System.Drawing.Point(64, 0);
+            this.Window_Button_Close.Name = "Window_Button_Close";
+            this.Window_Button_Close.Size = new System.Drawing.Size(32, 32);
+            this.Window_Button_Close.TabIndex = 0;
+            this.Window_Button_Close.Tag = "Close";
+            this.Window_Button_Close.UseVisualStyleBackColor = true;
+            this.Window_Button_Close.Click += new System.EventHandler(this.Window_Button_Clicks);
+            // 
+            // SideMenu_Panel_BottomLog
+            // 
+            this.SideMenu_Panel_BottomLog.Controls.Add(this.TestButton);
+            this.SideMenu_Panel_BottomLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.SideMenu_Panel_BottomLog.Location = new System.Drawing.Point(0, 612);
+            this.SideMenu_Panel_BottomLog.MaximumSize = new System.Drawing.Size(0, 60);
+            this.SideMenu_Panel_BottomLog.Name = "SideMenu_Panel_BottomLog";
+            this.SideMenu_Panel_BottomLog.Size = new System.Drawing.Size(1033, 60);
+            this.SideMenu_Panel_BottomLog.TabIndex = 1;
+            // 
+            // TestButton
+            // 
+            this.TestButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TestButton.FlatAppearance.BorderSize = 0;
+            this.TestButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.TestButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.TestButton.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.TestButton.Location = new System.Drawing.Point(0, 0);
+            this.TestButton.Name = "TestButton";
+            this.TestButton.Size = new System.Drawing.Size(1033, 60);
+            this.TestButton.TabIndex = 0;
+            this.TestButton.Tag = "Test Button";
+            this.TestButton.Text = "Click Me";
+            this.TestButton.UseVisualStyleBackColor = true;
+            this.TestButton.Click += new System.EventHandler(this.CatchAll);
             // 
             // App_ParentFrame
             // 
@@ -511,8 +597,10 @@ namespace Triggered
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MinimumSize = new System.Drawing.Size(500, 300);
             this.Name = "App_ParentFrame";
+            this.Padding = new System.Windows.Forms.Padding(10);
             this.Text = "Main Menu";
             this.Load += new System.EventHandler(this.App_ParentFrame_Load);
+            this.Resize += new System.EventHandler(this.App_ParentFrame_Resize);
             this.SideMenu_Panel_Main.ResumeLayout(false);
             this.SideMenu_Panel_ThirdMenu.ResumeLayout(false);
             this.SideMenu_Panel_SecondMenu.ResumeLayout(false);
@@ -520,8 +608,10 @@ namespace Triggered
             this.SideMenu_Panel_Logo.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SideMenu_Image_Logo)).EndInit();
             this.SideMenu_Panel_Viewpane.ResumeLayout(false);
-            this.SideMenu_Panel_BottomLog.ResumeLayout(false);
             this.SideMenu_Panel_LogTextbox.ResumeLayout(false);
+            this.Titlebar.ResumeLayout(false);
+            this.Panel_Window_Buttons.ResumeLayout(false);
+            this.SideMenu_Panel_BottomLog.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -553,9 +643,15 @@ namespace Triggered
         private System.Windows.Forms.Button SideMenu_Button_ThirdMenu_Submenu;
         private System.Windows.Forms.Button SideMenu_Button_SecondMenu_Opt5;
         private System.Windows.Forms.Panel SideMenu_Panel_BottomLog;
-        private System.Windows.Forms.Panel SideMenu_Panel_LogTextbox;
         private System.Windows.Forms.Button TestButton;
+        private System.Windows.Forms.Panel SideMenu_Panel_LogTextbox;
         private System.Windows.Forms.RichTextBox SideMenu_Log_Textbox;
+        private System.Windows.Forms.Panel Panel_Window_Buttons;
+        private System.Windows.Forms.Button Window_Button_Min;
+        private System.Windows.Forms.ImageList WindowButtons;
+        private System.Windows.Forms.Button Window_Button_Max;
+        private System.Windows.Forms.Button Window_Button_Close;
+        private System.Windows.Forms.Panel Titlebar;
     }
 }
 

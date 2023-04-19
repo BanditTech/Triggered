@@ -83,14 +83,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JSON.cs" />
     <Compile Include="FirstOpt2.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FirstOpt2.Designer.cs">
       <DependentUpon>FirstOpt2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="JSONify.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Main Menu.cs">
       <SubType>Form</SubType>
@@ -114,6 +112,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Main Menu.resx">
       <DependentUpon>Main Menu.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
