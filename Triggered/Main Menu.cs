@@ -9,10 +9,10 @@ namespace Triggered
 {
     public partial class App_ParentFrame : Form
     {
-        #region Init
         private static Logger log;
         private int borderSize = 2;
         private Size formSize;
+        #region Init
         public App_ParentFrame()
         {
             InitializeComponent();
@@ -324,6 +324,7 @@ namespace Triggered
             switch (str)
             {
                 case "Minimize":
+                    formSize = this.ClientSize;
                     WindowState = FormWindowState.Minimized;
                     break;
                 case "Maximize":
@@ -342,6 +343,7 @@ namespace Triggered
             if (WindowState == FormWindowState.Maximized)
             {
                 WindowState = FormWindowState.Normal;
+                this.Size = formSize;
             }
             else
             {
