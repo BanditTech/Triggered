@@ -83,6 +83,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Group Selector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Group Selector.Designer.cs">
+      <DependentUpon>Group Selector.cs</DependentUpon>
+    </Compile>
     <Compile Include="JSON.cs" />
     <Compile Include="FirstOpt2.cs">
       <SubType>Form</SubType>
@@ -104,6 +110,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Group Selector.resx">
+      <DependentUpon>Group Selector.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Program_Settings.resx">
       <DependentUpon>Program_Settings.cs</DependentUpon>
     </EmbeddedResource>
@@ -123,6 +132,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="example.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="libOpenCvSharpExtern.so" />
     <None Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

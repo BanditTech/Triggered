@@ -209,8 +209,8 @@ namespace Triggered
             }
             base.WndProc(ref m);
         }
-        // Adjust the form when Maximizing and Restoring
 
+        // Adjust the form when Maximizing and Restoring
         private void AdjustForm()
         {
             switch (this.WindowState)
@@ -224,6 +224,7 @@ namespace Triggered
                     break;
             }
         }
+
         private string Get_Tag_or_Text(object sender)
         {
             // Cast the sender object to a Button, assuming it is a Button
@@ -249,7 +250,7 @@ namespace Triggered
                 return "";
         }
 
-        private void CatchAll(object sender, EventArgs e)
+        private void Button_Handler(object sender, EventArgs e)
         {
             string str = Get_Tag_or_Text(sender);
             if (str == "")
@@ -297,8 +298,11 @@ namespace Triggered
                 case "Abilities":
                     // Do something when the "Abilities" button is clicked
                     break;
-                case "Option":
-                    // Do something when the "Option" button is clicked
+                case "Stash Filters":
+                    OpenChildForm(new GroupSelector());
+                    break;
+                case "Vendor Filters":
+                    OpenChildForm(new GroupSelector());
                     break;
                 case "Test Button":
                     log.Trace("Test Message - This is a test"); // lowest level, detailed message for debugging purposes
@@ -351,6 +355,7 @@ namespace Triggered
             }
             ToggleMaximizeRestoreButton();
         }
+
         private void ToggleMaximizeRestoreButton()
         {
             if (WindowState == FormWindowState.Maximized)

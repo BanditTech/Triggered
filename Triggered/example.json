@@ -1,0 +1,23 @@
+[
+	{ "GroupName": "Count Example", "StashTab": 11, "GroupType": "Count", "TypeValue": 2, "~ElementList": [
+		{ "Keyname": "Prefix1",   "Eval": ">=",   "Min": 1,   "Type": "Affix",   "Weight": 1 },
+		{ "Keyname": "Prefix2",   "Eval": ">=",   "Min": 1,   "Type": "Affix",   "Weight": 1 },
+		{ "Keyname": "Suffix",   "Eval": ">=",   "Min": 1,   "Type": "Affix",   "Weight": 2 },
+		{ "GroupType": "And", "Weight": 1, "~ElementList": [
+			{ "Keyname": "Veiled",   "Eval": ">=",   "Min": 1,   "Type": "Prop" },
+			{ "Keyname": "Fractured",   "Eval": ">=",   "Min": 1,   "Type": "Prop" }
+		]}
+	]},
+	{ "GroupName": "Not Example", "StashTab": 11, "GroupType": "Not", "~ElementList": [
+		{ "Keyname": "Veiled",   "Eval": ">=",   "Min": 1,   "Type": "Prop" }
+	]},
+	{ "GroupName": "And Example", "StashTab": 11, "GroupType": "And", "~ElementList": [
+		{ "Keyname": "ItemClass",   "Eval": "~",   "Min": "PluralClassNames",   "Type": "Prop" },
+		{ "Keyname": "SpecialType",   "Eval": "~=",   "Min": "\\w",   "Type": "Prop" }
+	]},
+	{ "GroupName": "Weight Example", "StashTab": 11, "GroupType": "Weight", "TypeValue": 300, "~ElementList": [
+		{ "Keyname": "Prefix1",   "Eval": ">=",   "Min": 1,   "Type": "Affix",   "Weight": 12 },
+		{ "Keyname": "Prefix2",   "Eval": ">=",   "Min": 1,   "Type": "Affix",   "Weight": 12 },
+		{ "Keyname": "Suffix",   "Eval": ">=",   "Min": 1,   "Type": "Affix",   "Weight": 15 }
+	]}
+]
