@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Forms;
-using NLog;
+using static Triggered.Our;
 
 namespace Triggered
 {
     public partial class GroupSelector : Form
     {
-        private static Logger log;
-
         public GroupSelector()
         {
             InitializeComponent();
-            log = LogManager.GetCurrentClassLogger();
         }
 
         public List<string> GetGroups()

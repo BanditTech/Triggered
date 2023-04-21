@@ -2,14 +2,13 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using NLog;
 using NLog.Windows.Forms;
+using static Triggered.Our;
 
 namespace Triggered
 {
     public partial class App_ParentFrame : Form
     {
-        private static Logger log;
         private int borderSize = 2;
         private Size formSize;
         #region Init
@@ -19,9 +18,8 @@ namespace Triggered
             DesignAdjustment();
             this.Padding = new Padding(borderSize); //Border size 
             this.BackColor = Color.FromArgb(20, 20, 20);
-            // Get the logger instance
-            log = LogManager.GetCurrentClassLogger();
-            log.Info("App Initiated\n----------------------------------------------------------------------");
+            // Show our App Loaded and Logging is opperational
+            Log("App Initiated\n----------------------------------------------------------------------");
         }
         private void App_ParentFrame_Load(object sender, EventArgs e)
         {
@@ -305,17 +303,17 @@ namespace Triggered
                     OpenChildForm(new GroupSelector());
                     break;
                 case "Test Button":
-                    log.Trace("Test Message - This is a test"); // lowest level, detailed message for debugging purposes
-                    log.Debug("Test Message - This is a test"); // message for debugging purposes
-                    log.Info("Test Message - This is a test"); // informational message
-                    log.Warn("Test Message - This is a test"); // warning message
-                    log.Error("Test Message - This is a test"); // error message
-                    log.Fatal("Test Message - This is a test"); // highest level, critical error message
+                    Log("Test Message - This is a test", "Trace"); // lowest level, detailed message for debugging purposes
+                    Log("Test Message - This is a test", "Debug"); // message for debugging purposes
+                    Log("Test Message - This is a test", "Info"); // informational message (default value)
+                    Log("Test Message - This is a test", "Warn"); // warning message
+                    Log("Test Message - This is a test", "Error"); // error message
+                    Log("Test Message - This is a test", "Fatal"); // highest level, critical error message
                     break;
                 default:
                     break;
             }
-            log.Debug(str);
+            Log(str,"debug");
         }
 
         private void Window_Button_Clicks(object sender, EventArgs e)

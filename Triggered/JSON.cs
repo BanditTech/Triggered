@@ -5,7 +5,7 @@ namespace Triggered
 {
     public class JSON
     {
-        private readonly JsonSerializerOptions options = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions options = new JsonSerializerOptions
         {
             WriteIndented = true,
             IgnoreNullValues = true
