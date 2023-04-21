@@ -1,41 +1,42 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
-using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
+using System.Windows.Forms;
 using NLog;
-using System;
-using Newtonsoft.Json.Linq;
 
 namespace Triggered
 {
     public partial class GroupSelector : Form
     {
         private static Logger log;
+
         public GroupSelector()
         {
             InitializeComponent();
             log = LogManager.GetCurrentClassLogger();
         }
+
         public List<string> GetGroups()
         {
             List<object> jsonData;
             List<string> availableGroups = new List<string>();
             // Deserialize the JSON data into a list of objects
             string content = File.ReadAllText("C:\\Users\\thebb\\Desktop\\example.json");
-            jsonData = JsonConvert.DeserializeObject<List<object>>(content);
+            jsonData = JSON.Obj(content);
             // Iterate through each object and check if it has a GroupName attribute
             foreach (object item in jsonData)
             {
-                if (item is JObject jObject && jObject.ContainsKey("GroupName"))
+                if (item is JsonElement jsonElement && jsonElement.TryGetProperty("GroupName", out JsonElement groupName))
                 {
-                    string groupName = jObject["GroupName"].ToString();
-                    availableGroups.Add(groupName);
+                    availableGroups.Add(groupName.ToString());
                 }
             }
             // Now you have a list of available groups that you can use to create the menu
             MessageBox.Show("Resulting Groups: " + string.Join(",", availableGroups));
             return availableGroups;
         }
+
         public void PopulateList()
         {
             List<string> groups = GetGroups();
@@ -46,7 +47,7 @@ namespace Triggered
             }
         }
 
-        private void GroupSelector_Load(object sender, System.EventArgs e)
+        private void GroupSelector_Load(object sender, EventArgs e)
         {
             PopulateList();
         }

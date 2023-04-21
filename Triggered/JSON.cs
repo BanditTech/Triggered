@@ -1,22 +1,25 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Triggered
 {
     public class JSON
     {
-        private readonly JsonSerializerSettings settings = new JsonSerializerSettings
+        private readonly JsonSerializerOptions options = new JsonSerializerOptions
         {
-            Formatting = Formatting.Indented,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            WriteIndented = true,
+            IgnoreNullValues = true
         };
-        public string Str(object obj)
+
+        public static string Str(object obj)
         {
-            string json = JsonConvert.SerializeObject(obj, settings);
+            string json = JsonSerializer.Serialize(obj, options);
             return json;
         }
-        public object Obj(string json)
+
+        public static List<object> Obj(string json)
         {
-            object obj = JsonConvert.DeserializeObject(json);
+            List<object> obj = JsonSerializer.Deserialize<List<object>>(json, options);
             return obj;
         }
     }
