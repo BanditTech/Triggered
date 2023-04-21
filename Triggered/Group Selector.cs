@@ -19,7 +19,7 @@ namespace Triggered
             List<object> jsonData;
             List<string> availableGroups = new List<string>();
             // Deserialize the JSON data into a list of objects
-            string content = File.ReadAllText("C:\\Users\\thebb\\Desktop\\example.json");
+            string content = File.ReadAllText("example.json");
             jsonData = JSON.Obj(content);
             // Iterate through each object and check if it has a GroupName attribute
             foreach (object item in jsonData)
