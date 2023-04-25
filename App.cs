@@ -1,5 +1,7 @@
 ﻿namespace Triggered
 {
+    using NLog;
+    using NLog.Config;
     using System.Diagnostics;
     internal class App
     {
@@ -9,16 +11,14 @@
         public bool IsRunning = true;
         public int LogicTickDelayInMilliseconds = 10;
         public ExampleAppLog log;
+        public Logger logger;
 
         public App()
         {
+            LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             log = new ExampleAppLog();
-        }
-
-        public void Log(string message)
-        {
-            this.log.AddLog(message);
-            return;
+            logger = LogManager.GetCurrentClassLogger();
+            LogManager.ReconfigExistingLoggers();
         }
     }
 }

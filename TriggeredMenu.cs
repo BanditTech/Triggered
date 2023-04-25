@@ -52,8 +52,8 @@
 
             if (app.MenuDisplay_Log)
             {
-                app.log.AddLog("Hello world [c=red]{0}[/c] [c=green]{1}[/c]", app.Watch.ElapsedMilliseconds, app.Watch.ElapsedTicks);
-                app.log.AddLog("[c=blue]-Debug-[/c]: [c=coral]{0}[/c] [c=#00FF00]green[/c] [c=coral]Extra[/c]", "This is the inserted message");
+                app.logger.Info("Hello world [c=red]{0}[/c] [c=green]{1}[/c]", app.Watch.ElapsedMilliseconds, app.Watch.ElapsedTicks);
+                app.log.AddLog("The {0} is not what {1} is.", "anticipation", "hunger");
                 app.log.Draw("Log Window", true);
             }
             return;
