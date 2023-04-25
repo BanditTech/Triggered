@@ -10,6 +10,7 @@
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
+    using NLog;
 
     public class TriggeredMenu :  Overlay
     {
@@ -29,9 +30,13 @@
 
             logicThread.Start();
         }
+        private LogLevel[] logLevels = { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error, LogLevel.Fatal };
+        private int logLevelIndex = 0;
         private void LogicUpdate()
         {
             Thread.Sleep(app.LogicTickDelayInMilliseconds);
+            app.Log("test Message", logLevels[logLevelIndex]);
+            logLevelIndex = (logLevelIndex + 1) % logLevels.Length;
         }
         protected override void Render()
         {
@@ -52,8 +57,6 @@
 
             if (app.MenuDisplay_Log)
             {
-                app.logger.Info("Hello world [c=red]{0}[/c] [c=green]{1}[/c]", app.Watch.ElapsedMilliseconds, app.Watch.ElapsedTicks);
-                app.log.AddLog("The {0} is not what {1} is.", "anticipation", "hunger");
                 app.log.Draw("Log Window", true);
             }
             return;

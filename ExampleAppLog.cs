@@ -19,44 +19,23 @@ namespace Triggered
 
         private readonly Dictionary<string, string> colorMap = new Dictionary<string, string>
         {
-            // Primary colors
-            {"red", "#FF0000"},
-            {"green", "#00FF00"},
-            {"blue", "#0000FF"},
-    
-            // Secondary colors
-            {"orange", "#FFA500"},
-            {"purple", "#800080"},
-            {"greenish", "#00FF7F"},
-            {"pink", "#FF69B4"},
-            {"orange-red", "#FF4500"},
-            {"turquoise", "#40E0D0"},
-    
-            // Neutrals
-            {"black", "#000000"},
-            {"white", "#FFFFFF"},
-            {"gray", "#808080"},
-            {"beige", "#F5F5DC"},
-            {"silver", "#C0C0C0"},
-    
-            // Other colors
-            {"yellow", "#FFFF00"},
-            {"teal", "#008080"},
-            {"navy", "#000080"},
-            {"maroon", "#800000"},
-            {"olive", "#808000"},
-            {"lime", "#00FF00"},
-            {"aqua", "#00FFFF"},
-            {"indigo", "#4B0082"},
-            {"coral", "#FF7F50"},
-            {"crimson", "#DC143C"},
-            {"chocolate", "#D2691E"},
-            {"orchid", "#DA70D6"},
-            {"plum", "#DDA0DD"},
-            {"khaki", "#F0E68C"},
-            {"salmon", "#FA8072"}
+            // LogLevel Color Assignments
+            {"trace", "#808080"},
+            {"debug", "#000080"},
+            {"info", "#FFFFFF"},
+            {"warn", "#FFA500"},
+            {"error", "#FF0000"},
+            {"fatal", "#8B0000"},
+
+            // Text Color Assignments
+            {"tracetext", "#D4D4D4"},
+            {"debugtext", "#569CD6"},
+            {"infotext", "#1E8089"},
+            {"warntext", "#CE9178"},
+            {"errortext", "#FF0000"},
+            {"fataltext", "#8B0000"},
         };
-        private readonly Regex colorRegex = new Regex(@"\[(c|color)=(red|green|blue|black|white|orange|purple|gold|brown|yellow|teal|navy|maroon|olive|lime|aqua|indigo|coral|crimson|chocolate|orchid|plum|khaki|salmon)\](.*?)\[\/(c|color)\]");
+        private readonly Regex colorRegex = new Regex(@"\[(c|color)=(trace|debug|info|warn|error|fatal|tracetext|debugtext|infotext|warntext|errortext|fataltext)\](.*?)\[\/(c|color)\]");
         public void Clear()
         {
             lock (locker)
@@ -64,11 +43,8 @@ namespace Triggered
                 items.Clear();
             }
         }
-
-        public void AddLog(string fmt, params object[] args)
+        public void AddLog(string log)
         {
-            var log = string.Format(fmt, args);
-
             lock (locker)
             {
                 var sentence = new List<(string text, string color)>();
@@ -104,7 +80,6 @@ namespace Triggered
                 items.RemoveRange(0, items.Count - MaxLines);
             }
         }
-
         public void Draw(string title, bool autoScroll)
         {
             if (!ImGui.Begin(title))
@@ -172,14 +147,6 @@ namespace Triggered
                 var r = Convert.ToInt32(color.Substring(1, 2), 16);
                 var g = Convert.ToInt32(color.Substring(3, 2), 16);
                 var b = Convert.ToInt32(color.Substring(5, 2), 16);
-                return new Vector4(r / 255f, g / 255f, b / 255f, 1f);
-            }
-            else if (color.Length == 6)
-            {
-                // Parse hex color code like RRGGBB
-                var r = Convert.ToInt32(color.Substring(0, 2), 16);
-                var g = Convert.ToInt32(color.Substring(2, 2), 16);
-                var b = Convert.ToInt32(color.Substring(4, 2), 16);
                 return new Vector4(r / 255f, g / 255f, b / 255f, 1f);
             }
             else
