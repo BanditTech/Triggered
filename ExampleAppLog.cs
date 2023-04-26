@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using ImGuiNET;
 using System.Numerics;
-using static System.Net.Mime.MediaTypeNames;
+using ImGuiNET;
+using NLog;
 
 namespace Triggered
 {
     public class ExampleAppLog
     {
-        private const int BufSize = 2 * 1024;
-        private readonly byte[] buffer = new byte[BufSize];
-        private readonly List<List<(string text, string color)>> items = new List<List<(string text, string color)>>();
+        private readonly List<(string text, Vector4 color)> items = new List<(string text, Vector4 color)>();
         private readonly object locker = new object();
 
         public bool AutoScroll { get; set; } = true;
@@ -26,16 +23,7 @@ namespace Triggered
             {"warn", "#FFA500"},
             {"error", "#FF0000"},
             {"fatal", "#8B0000"},
-
-            // Text Color Assignments
-            {"tracetext", "#D4D4D4"},
-            {"debugtext", "#569CD6"},
-            {"infotext", "#1E8089"},
-            {"warntext", "#CE9178"},
-            {"errortext", "#FF0000"},
-            {"fataltext", "#8B0000"},
         };
-        private readonly Regex colorRegex = new Regex(@"\[(c|color)=(trace|debug|info|warn|error|fatal|tracetext|debugtext|infotext|warntext|errortext|fataltext)\](.*?)\[\/(c|color)\]");
         public void Clear()
         {
             lock (locker)
@@ -43,36 +31,14 @@ namespace Triggered
                 items.Clear();
             }
         }
-        public void AddLog(string log)
+        public void AddLog(string log, LogLevel level)
         {
+            var levelStr = level.ToString().ToLowerInvariant();
+            Vector4 color = ParseColor(levelStr);
+
             lock (locker)
             {
-                var sentence = new List<(string text, string color)>();
-                var matches = colorRegex.Matches(log);
-                if (matches.Count > 0)
-                {
-                    var lastEndIndex = 0;
-                    foreach (Match match in matches)
-                    {
-                        var color = match.Groups[2].Value.ToLowerInvariant();
-                        var text = match.Groups[3].Value;
-
-                        if (colorMap.TryGetValue(color, out var hexColor))
-                        {
-                            var startIndex = match.Index - lastEndIndex;
-                            var endIndex = startIndex + text.Length;
-                            sentence.Add((log.Substring(lastEndIndex, startIndex), null));
-                            sentence.Add((text, hexColor));
-                            lastEndIndex = match.Index + match.Length;
-                        }
-                    }
-                    sentence.Add((log.Substring(lastEndIndex), null));
-                }
-                else
-                {
-                    sentence.Add((log, null));
-                }
-                items.Add(sentence);
+                items.Add((log, color));
             }
 
             if (items.Count > MaxLines)
@@ -104,22 +70,9 @@ namespace Triggered
 
             lock (locker)
             {
-                foreach (var sentence in items)
+                foreach (var (text, color) in items)
                 {
-                    foreach (var (text, color) in sentence)
-                    {
-                        ImGui.SameLine();
-                        var vecColor = ParseColor(color);
-                        if (color != null)
-                        {
-                            ImGui.TextColored(vecColor, text);
-                        }
-                        else
-                        {
-                            ImGui.TextUnformatted(text);
-                        }
-                    }
-                    ImGui.TextUnformatted("\n");
+                    ImGui.TextColored(color, text);
                 }
             }
 
@@ -134,7 +87,7 @@ namespace Triggered
         {
             if (color == null)
             {
-                return new Vector4(0f, 0f, 0f, 1f);
+                return new Vector4(1f, 1f, 1f, 1f);
             }
             else if (colorMap.TryGetValue(color.ToLowerInvariant(), out var hexColor))
             {
@@ -151,9 +104,10 @@ namespace Triggered
             }
             else
             {
-                // Default to black
-                return new Vector4(0f, 0f, 0f, 1f);
+                // Default to white
+                return new Vector4(1f, 1f, 1f, 1f);
             }
         }
+
     }
 }

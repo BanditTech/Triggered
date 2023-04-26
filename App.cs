@@ -19,15 +19,13 @@
             log = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
         }
-        private string LogRegexPattern = "[c={0}]{2}:[/c] [c={0}text]{1}[/c]";
-        //Wrapper for our two logging systems
+        #region Log(string log, LogLevel level)
         public void Log(string log, LogLevel level)
         {
-            // Only send message to the log window above info level
-            if (level.Ordinal >= LogLevel.Trace.Ordinal)
+            // Only send message to the log window above Debug level
+            if (level.Ordinal >= LogLevel.Debug.Ordinal)
             {
-                string lString = level.ToString();
-                this.log.AddLog(string.Format(LogRegexPattern,lString.ToLowerInvariant(),log,lString));
+                this.log.AddLog(string.Format("{0}: {1}", level.ToString(), log),level);
             }
             this.logger.Log(level,log);
         }
@@ -35,5 +33,6 @@
         {
             this.Log(log, LogLevel.Info);
         }
+        #endregion
     }
 }
