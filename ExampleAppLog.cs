@@ -9,16 +9,11 @@ namespace Triggered
 {
     public class ExampleAppLog
     {
-        private Dictionary<string, object> data;
         private readonly List<(string text, Vector4 color)> items = new List<(string text, Vector4 color)>();
         private readonly object locker = new object();
         public static LogLevel[] logLevels = { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error, LogLevel.Fatal };
         public static string[] logLevelNames = { "Trace", "Debug", "Info", "Warn", "Error", "Fatal" };
         public static int logLevelIndex = 0;
-        public ExampleAppLog()
-        {
-            data = I.O.Data;
-        }
         public bool AutoScroll { get; set; } = true;
         public int MaxLines { get; set; } = 1000;
 
@@ -73,14 +68,13 @@ namespace Triggered
             ImGui.Checkbox("Auto-scroll", ref shouldAutoScroll);
             AutoScroll = shouldAutoScroll;
             ImGui.SameLine();
-            if (ImGui.Combo("Minimum Log Level", ref App.selectedLogLevelIndex, logLevelNames, logLevels.Length))
+            if (ImGui.Combo("Minimum Log Level", ref App.SelectedLogLevelIndex, logLevelNames, logLevels.Length))
             {
                 // here is a breakpoint
-                LogLevel selectedLogLevel = logLevels[App.selectedLogLevelIndex];
+                LogLevel selectedLogLevel = logLevels[App.SelectedLogLevelIndex];
                 App.Log($"Changing minimum log level to {selectedLogLevel}", LogLevel.Fatal);
-                data["LogWindowMinimumLogLevel"] = selectedLogLevel;
+                App.LogWindowMinimumLogLevel = selectedLogLevel;
             }
-
 
             ImGui.Separator();
             ImGui.BeginChild("scrolling", new System.Numerics.Vector2(0, 0), false, ImGuiWindowFlags.HorizontalScrollbar);

@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Numerics;
     using System.Threading;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
@@ -24,7 +25,7 @@
 
             logicThread = new Thread(() =>
             {
-                while ((bool)data["IsRunning"])
+                while (App.IsRunning)
                 {
                     LogicUpdate();
                 }
@@ -33,7 +34,7 @@
         }
         private void LogicUpdate()
         {
-            Thread.Sleep((int)data["LogicTickDelayInMilliseconds"]);
+            Thread.Sleep(App.LogicTickDelayInMilliseconds);
             App.Log("test Message", ExampleAppLog.logLevels[ExampleAppLog.logLevelIndex]);
             ExampleAppLog.logLevelIndex = (ExampleAppLog.logLevelIndex + 1) % ExampleAppLog.logLevels.Length;
         }
@@ -41,20 +42,20 @@
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
             {
-                data["MenuDisplay_Main"] = !(bool)data["MenuDisplay_Main"];
+                App.MenuDisplay_Main = !App.MenuDisplay_Main;
             }
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
             {
-                data["MenuDisplay_Log"] = !(bool)data["MenuDisplay_Log"];
+                App.MenuDisplay_Log = !App.MenuDisplay_Log;
             }
 
-            if ((bool)data["MenuDisplay_Main"])
+            if (App.MenuDisplay_Main)
             {
                 RenderMainMenu();
             }
 
-            if ((bool)data["MenuDisplay_Log"])
+            if (App.MenuDisplay_Log)
             {
                 App.logimgui.Draw("Log Window", true);
             }
@@ -66,14 +67,14 @@
             bool isRunning = (bool)data["IsRunning"];
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
-                ref isRunning,
+                ref App.IsRunning,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize);
             data["IsRunning"] = isRunning;
             // Determine if we need to draw the menu
-            if (!(bool)data["IsRunning"] || isCollapsed)
+            if (!App.IsRunning || isCollapsed)
             {
                 ImGui.End();
-                if (!(bool)data["IsRunning"])
+                if (!App.IsRunning)
                 {
                     Close();
                 }
@@ -91,9 +92,7 @@
                 });
                 thread.Start();
             }
-            bool menuDisplay_Log = (bool)data["MenuDisplay_Log"];
-            ImGui.Checkbox("Show/Hide the Log", ref menuDisplay_Log);
-            data["MenuDisplay_Log"] = menuDisplay_Log;
+            ImGui.Checkbox("Show/Hide the Log", ref App.MenuDisplay_Log);
             
             // Menu definition complete
             ImGui.End();
