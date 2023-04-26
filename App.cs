@@ -10,6 +10,7 @@
         public static ExampleAppLog logimgui;
         public static Logger logger;
         public static int selectedLogLevelIndex;
+        public static Stopwatch Watch = Stopwatch.StartNew();
 
         static App()
         {
