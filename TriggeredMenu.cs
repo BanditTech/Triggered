@@ -1,78 +1,85 @@
 ﻿namespace Triggered
 {
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Threading;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
     using NLog;
 
-    public class TriggeredMenu :  Overlay
+    public class TriggeredMenu : Overlay
     {
-        private volatile App app;
+        private Dictionary<string, object> data;
         private readonly Thread logicThread;
-        public TriggeredMenu() 
+        public TriggeredMenu()
         {
-            app = new App();
+            data = I.O.Data;
+            data["Watch"] = Stopwatch.StartNew();
+            data["MenuDisplay_Main"] = true;
+            data["MenuDisplay_Log"] = true;
+            data["IsRunning"] = true;
+            data["LogicTickDelayInMilliseconds"] = 100;
+            data["selectedLogLevelIndex"] = 0;
+            data["LogWindowMinimumLogLevel"] = LogLevel.Debug;
+
             logicThread = new Thread(() =>
             {
-
-                while (app.IsRunning)
+                while ((bool)data["IsRunning"])
                 {
                     LogicUpdate();
                 }
             });
-
             logicThread.Start();
         }
-        private LogLevel[] logLevels = { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error, LogLevel.Fatal };
-        private int logLevelIndex = 0;
         private void LogicUpdate()
         {
-            Thread.Sleep(app.LogicTickDelayInMilliseconds);
-            app.Log("test Message", logLevels[logLevelIndex]);
-            logLevelIndex = (logLevelIndex + 1) % logLevels.Length;
+            Thread.Sleep((int)data["LogicTickDelayInMilliseconds"]);
+            App.Log("test Message", ExampleAppLog.logLevels[ExampleAppLog.logLevelIndex]);
+            ExampleAppLog.logLevelIndex = (ExampleAppLog.logLevelIndex + 1) % ExampleAppLog.logLevels.Length;
         }
         protected override void Render()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
             {
-                app.MenuDisplay_Main = !app.MenuDisplay_Main;
+                data["MenuDisplay_Main"] = !(bool)data["MenuDisplay_Main"];
             }
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
             {
-                app.MenuDisplay_Log = !app.MenuDisplay_Log;
+                data["MenuDisplay_Log"] = !(bool)data["MenuDisplay_Log"];
             }
 
-            if (app.MenuDisplay_Main)
+            if ((bool)data["MenuDisplay_Main"])
             {
                 RenderMainMenu();
             }
 
-            if (app.MenuDisplay_Log)
+            if ((bool)data["MenuDisplay_Log"])
             {
-                app.log.Draw("Log Window", true);
+                App.logimgui.Draw("Log Window", true);
             }
             return;
         }
+        // Define the menu to render
         private void RenderMainMenu()
         {
+            bool isRunning = (bool)data["IsRunning"];
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
-                ref app.IsRunning,
+                ref isRunning,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize);
+            data["IsRunning"] = isRunning;
             // Determine if we need to draw the menu
-            if (!app.IsRunning || isCollapsed)
+            if (!(bool)data["IsRunning"] || isCollapsed)
             {
                 ImGui.End();
-                if (!app.IsRunning)
+                if (!(bool)data["IsRunning"])
                 {
                     Close();
                 }
-
                 return;
             }
-
             // Menu definition area
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Log.");
@@ -85,8 +92,10 @@
                 });
                 thread.Start();
             }
-            ImGui.Checkbox("Show/Hide the Log", ref app.MenuDisplay_Log);
-
+            bool menuDisplay_Log = (bool)data["MenuDisplay_Log"];
+            ImGui.Checkbox("Show/Hide the Log", ref menuDisplay_Log);
+            data["MenuDisplay_Log"] = menuDisplay_Log;
+            
             // Menu definition complete
             ImGui.End();
         }
