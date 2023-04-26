@@ -1,28 +1,16 @@
 ﻿namespace Triggered
 {
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Numerics;
     using System.Threading;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
-    using NLog;
 
     public class TriggeredMenu : Overlay
     {
-        private Dictionary<string, object> data;
         private readonly Thread logicThread;
         public TriggeredMenu()
         {
-            data = I.O.Data;
-            data["MenuDisplay_Main"] = true;
-            data["MenuDisplay_Log"] = true;
-            data["IsRunning"] = true;
-            data["LogicTickDelayInMilliseconds"] = 100;
-            data["selectedLogLevelIndex"] = 1;
-            data["LogWindowMinimumLogLevel"] = LogLevel.Debug;
-
             logicThread = new Thread(() =>
             {
                 while (App.IsRunning)
@@ -31,6 +19,7 @@
                 }
             });
             logicThread.Start();
+
         }
         private void LogicUpdate()
         {
@@ -50,6 +39,16 @@
                 App.MenuDisplay_Log = !App.MenuDisplay_Log;
             }
 
+            if (Utils.IsKeyPressedAndNotTimeout(VK.F10)) //F10.
+            {
+                App.ShowTransparentViewport = !App.ShowTransparentViewport;
+            }
+
+            if (App.ShowTransparentViewport)
+            {
+                ShowExampleAppDockSpace(ref App.DockSpaceOpen);
+            }
+
             if (App.MenuDisplay_Main)
             {
                 RenderMainMenu();
@@ -64,12 +63,10 @@
         // Define the menu to render
         private void RenderMainMenu()
         {
-            bool isRunning = (bool)data["IsRunning"];
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
                 ref App.IsRunning,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize);
-            data["IsRunning"] = isRunning;
             // Determine if we need to draw the menu
             if (!App.IsRunning || isCollapsed)
             {
@@ -83,6 +80,7 @@
             // Menu definition area
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Log.");
+            ImGui.Text("Try pressing F10 button to show/hide the Transparent Overlay.");
             if (ImGui.Button("Launch AHK Demo"))
             {
                 Thread thread = new Thread(() =>
@@ -97,5 +95,35 @@
             // Menu definition complete
             ImGui.End();
         }
-    }
+        private void ShowExampleAppDockSpace(ref bool p_open)
+        {
+            ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None;
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
+            window_flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
+            window_flags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
+            var viewport = ImGui.GetMainViewport();
+            ImGui.SetNextWindowPos(viewport.WorkPos);
+            ImGui.SetNextWindowSize(viewport.WorkSize);
+            ImGui.SetNextWindowViewport(viewport.ID);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0.0f, 0.0f));
+            ImGui.SetNextWindowBgAlpha(0.0f);
+            ImGui.Begin("DockSpace Demo", ref p_open, window_flags);
+            ImGui.PopStyleVar(3);
+            ImGui.PopStyleColor();
+            var dockspace_id = ImGui.GetID("MyDockSpace");
+            ImGui.DockSpace(dockspace_id, new Vector2(0.0f, 0.0f), dockspace_flags);
+
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.BeginMenu("Options"))
+                {
+                    ImGui.Separator();
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMenuBar();
+            }
+        }
+    }   
 }
