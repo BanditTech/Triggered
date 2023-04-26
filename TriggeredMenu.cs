@@ -15,12 +15,11 @@
         public TriggeredMenu()
         {
             data = I.O.Data;
-            data["Watch"] = Stopwatch.StartNew();
             data["MenuDisplay_Main"] = true;
             data["MenuDisplay_Log"] = true;
             data["IsRunning"] = true;
             data["LogicTickDelayInMilliseconds"] = 100;
-            data["selectedLogLevelIndex"] = 0;
+            data["selectedLogLevelIndex"] = 1;
             data["LogWindowMinimumLogLevel"] = LogLevel.Debug;
 
             logicThread = new Thread(() =>
