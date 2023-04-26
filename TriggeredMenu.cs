@@ -66,7 +66,7 @@
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
                 ref App.IsRunning,
-                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize);
+                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.MenuBar);
             // Determine if we need to draw the menu
             if (!App.IsRunning || isCollapsed)
             {
@@ -91,7 +91,28 @@
                 thread.Start();
             }
             ImGui.Checkbox("Show/Hide the Log", ref App.MenuDisplay_Log);
-            
+
+            // This is to show the menu bar that will change the config settings at runtime.
+            // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
+            // you should remove the below if-statement as well.
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.BeginMenu("Options"))
+                {
+                    // Disabling fullscreen would allow the window to be moved to the front of other windows,
+                    // which we can't undo at the moment without finer window depth/z control.
+                    ImGui.MenuItem("Fullscreen", null, ref App.fullscreen);
+                    ImGui.MenuItem("Padding", null, ref App.padding);
+                    ImGui.Separator();
+
+                    // Display a menu item to close this example.
+                    if (ImGui.MenuItem("Close", null, false, App.IsRunning != null))
+                        if (App.IsRunning != null) // Remove MSVC warning C6011 (null dereference) - the `p_open != null` in MenuItem() does prevent null derefs, but IntelliSense doesn't analyze that deep so we need to add this in ourselves.
+                            App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMenuBar();
+            }
             // Menu definition complete
             ImGui.End();
         }
@@ -108,7 +129,7 @@
             // Dockspace, but it is here to provide a way to change the configuration flags interactively.
             // You can remove the MenuBar flag if you don't want it in your app, but also remember to remove the code which actually
             // renders the menu bar, found at the end of this function.
-            ImGuiWindowFlags window_flags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags.NoDocking;
 
             // Is the example in Fullscreen mode?
             if (App.fullscreen)
@@ -130,7 +151,7 @@
 
                 // Manipulate the window flags to make it inaccessible to the user (no titlebar, resize/move, or navigation)
                 window_flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
-                window_flags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoBackground;
+                window_flags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.DockNodeHost;
             }
             else
             {
@@ -181,27 +202,6 @@
             {
                 // Docking is DISABLED - Show a warning message
                 App.Log("Docking is disabled!");
-            }
-            // This is to show the menu bar that will change the config settings at runtime.
-            // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
-            // you should remove the below if-statement as well.
-            if (ImGui.BeginMenuBar())
-            {
-                if (ImGui.BeginMenu("Options"))
-                {
-                    // Disabling fullscreen would allow the window to be moved to the front of other windows,
-                    // which we can't undo at the moment without finer window depth/z control.
-                    ImGui.MenuItem("Fullscreen", null, ref App.fullscreen);
-                    ImGui.MenuItem("Padding", null, ref App.padding);
-                    ImGui.Separator();
-
-                    // Display a menu item to close this example.
-                    if (ImGui.MenuItem("Close", null, false, App.IsRunning != null))
-                        if (App.IsRunning != null) // Remove MSVC warning C6011 (null dereference) - the `p_open != null` in MenuItem() does prevent null derefs, but IntelliSense doesn't analyze that deep so we need to add this in ourselves.
-                            App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
-                    ImGui.EndMenu();
-                }
-                ImGui.EndMenuBar();
             }
             // End the parent window that contains the Dockspace:
             ImGui.End();
