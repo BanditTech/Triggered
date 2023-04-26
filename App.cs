@@ -19,6 +19,8 @@
         public static bool DockSpaceOpen = true;
         public static int LogicTickDelayInMilliseconds = 100;
         public static int SelectedLogLevelIndex = 1;
+        public static bool fullscreen = true;
+        public static bool padding = false;
 
         static App()
         {

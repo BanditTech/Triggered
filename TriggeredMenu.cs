@@ -46,7 +46,7 @@
 
             if (App.ShowTransparentViewport)
             {
-                ShowExampleAppDockSpace(ref App.DockSpaceOpen);
+                ShowExampleAppDockSpace();
             }
 
             if (App.MenuDisplay_Main)
@@ -95,35 +95,116 @@
             // Menu definition complete
             ImGui.End();
         }
-        private void ShowExampleAppDockSpace(ref bool p_open)
+        private void ShowExampleAppDockSpace()
         {
-            ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None;
-            ImGuiWindowFlags window_flags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
-            window_flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
-            window_flags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
-            var viewport = ImGui.GetMainViewport();
-            ImGui.SetNextWindowPos(viewport.WorkPos);
-            ImGui.SetNextWindowSize(viewport.WorkSize);
-            ImGui.SetNextWindowViewport(viewport.ID);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0.0f, 0.0f));
-            ImGui.SetNextWindowBgAlpha(0.0f);
-            ImGui.Begin("DockSpace Demo", ref p_open, window_flags);
-            ImGui.PopStyleVar(3);
-            ImGui.PopStyleColor();
-            var dockspace_id = ImGui.GetID("MyDockSpace");
-            ImGui.DockSpace(dockspace_id, new Vector2(0.0f, 0.0f), dockspace_flags);
+            // Variables to configure the Dockspace example.
+            // Includes App.fullscreen, App.padding
+            ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None | ImGuiDockNodeFlags.PassthruCentralNode;
 
+            // In this example, we're embedding the Dockspace into an invisible parent window to make it more configurable.
+            // We set ImGuiWindowFlags_NoDocking to make sure the parent isn't dockable into because this is handled by the Dockspace.
+            //
+            // ImGuiWindowFlags_MenuBar is to show a menu bar with config options. This isn't necessary to the functionality of a
+            // Dockspace, but it is here to provide a way to change the configuration flags interactively.
+            // You can remove the MenuBar flag if you don't want it in your app, but also remember to remove the code which actually
+            // renders the menu bar, found at the end of this function.
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
+
+            // Is the example in Fullscreen mode?
+            if (App.fullscreen)
+            {
+                // If so, get the main viewport:
+                var viewport = ImGui.GetMainViewport();
+
+                // Set the parent window's position, size, and viewport to match that of the main viewport. This is so the parent window
+                // completely covers the main viewport, giving it a "full-screen" feel.
+                ImGui.SetNextWindowPos(viewport.WorkPos);
+                ImGui.SetNextWindowSize(viewport.WorkSize);
+                ImGui.SetNextWindowViewport(viewport.ID);
+
+                // Set the parent window's styles to match that of the main viewport:
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f); // No corner rounding on the window
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f); // No border around the window
+                // Set the alpha component of the window background color to 0 to make it transparent
+                ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0, 0, 0, 0));
+
+                // Manipulate the window flags to make it inaccessible to the user (no titlebar, resize/move, or navigation)
+                window_flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
+                window_flags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoBackground;
+            }
+            else
+            {
+                // The example is not in Fullscreen mode (the parent window can be dragged around and resized), disable the
+                // ImGuiDockNodeFlags_PassthruCentralNode flag.
+                dockspace_flags &= ~ImGuiDockNodeFlags.PassthruCentralNode;
+            }
+
+            // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+            // and handle the pass-thru hole, so the parent window should not have its own background:
+            if ((dockspace_flags & ImGuiDockNodeFlags.PassthruCentralNode) != 0)
+                window_flags |= ImGuiWindowFlags.NoBackground;
+
+            // If the padding option is disabled, set the parent window's padding size to 0 to effectively hide said padding.
+            if (!App.padding)
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0.0f, 0.0f));
+
+            // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+            // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+            // all active windows docked into it will lose their parent and become undocked.
+            // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+            // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+            ImGui.Begin("DockSpace Demo", ref App.IsRunning, window_flags);
+
+            // Remove the padding configuration - we pushed it, now we pop it:
+            if (!App.padding)
+                ImGui.PopStyleVar();
+
+            // Pop the two style rules set in Fullscreen mode - the corner rounding and the border size.
+            if (App.fullscreen)
+            {
+                ImGui.PopStyleColor();
+                ImGui.PopStyleVar(2);
+            }
+            // Check if Docking is enabled:
+            ImGuiIOPtr io = ImGui.GetIO();
+            if ((io.ConfigFlags & ImGuiConfigFlags.DockingEnable) != 0)
+            {
+                // Set the alpha component of the docking area background color to 0 to make it transparent
+                ImGui.PushStyleColor(ImGuiCol.DockingEmptyBg, new Vector4(0, 0, 0, 0));
+                // If it is, draw the Dockspace with the DockSpace() function.
+                // The GetID() function is to give a unique identifier to the Dockspace - here, it's "MyDockSpace".
+                uint dockspace_id = ImGui.GetID("MyDockSpace");
+                ImGui.DockSpace(dockspace_id, new Vector2(0.0f, 0.0f), dockspace_flags);
+                ImGui.PopStyleColor();
+            }
+            else
+            {
+                // Docking is DISABLED - Show a warning message
+                App.Log("Docking is disabled!");
+            }
+            // This is to show the menu bar that will change the config settings at runtime.
+            // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
+            // you should remove the below if-statement as well.
             if (ImGui.BeginMenuBar())
             {
                 if (ImGui.BeginMenu("Options"))
                 {
+                    // Disabling fullscreen would allow the window to be moved to the front of other windows,
+                    // which we can't undo at the moment without finer window depth/z control.
+                    ImGui.MenuItem("Fullscreen", null, ref App.fullscreen);
+                    ImGui.MenuItem("Padding", null, ref App.padding);
                     ImGui.Separator();
+
+                    // Display a menu item to close this example.
+                    if (ImGui.MenuItem("Close", null, false, App.IsRunning != null))
+                        if (App.IsRunning != null) // Remove MSVC warning C6011 (null dereference) - the `p_open != null` in MenuItem() does prevent null derefs, but IntelliSense doesn't analyze that deep so we need to add this in ourselves.
+                            App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
                     ImGui.EndMenu();
                 }
                 ImGui.EndMenuBar();
             }
+            // End the parent window that contains the Dockspace:
+            ImGui.End();
         }
-    }   
+    }
 }
