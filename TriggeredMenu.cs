@@ -1,12 +1,6 @@
 ﻿namespace Triggered
 {
-    using System;
-    using System.Diagnostics;
-    using System.Drawing;
-    using System.IO;
-    using System.Numerics;
     using System.Threading;
-    using System.Threading.Tasks;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
@@ -82,6 +76,16 @@
             // Menu definition area
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Log.");
+            if (ImGui.Button("Launch AHK Demo"))
+            {
+                Thread thread = new Thread(() =>
+                {
+                    AHK ahk = new AHK();
+                    ahk.Demo();
+                });
+                thread.Start();
+            }
+            ImGui.Checkbox("Show/Hide the Log", ref app.MenuDisplay_Log);
 
             // Menu definition complete
             ImGui.End();
