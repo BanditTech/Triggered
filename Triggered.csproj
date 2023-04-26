@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoHotkey.Interop" Version="1.0.0.1" />
     <PackageReference Include="ClickableTransparentOverlay" Version="8.1.0" />
     <PackageReference Include="ImGui.NET" Version="1.89.5" />
     <PackageReference Include="NLog" Version="5.1.3" />
