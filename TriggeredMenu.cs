@@ -120,7 +120,7 @@
         {
             // Variables to configure the Dockspace example.
             // Includes App.fullscreen, App.padding
-            ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None | ImGuiDockNodeFlags.PassthruCentralNode;
+            ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None | ImGuiDockNodeFlags.PassthruCentralNode | ImGuiDockNodeFlags.AutoHideTabBar;
 
             // In this example, we're embedding the Dockspace into an invisible parent window to make it more configurable.
             // We set ImGuiWindowFlags_NoDocking to make sure the parent isn't dockable into because this is handled by the Dockspace.
