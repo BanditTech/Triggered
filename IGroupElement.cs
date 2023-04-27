@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using TextCopy;
 
 public interface IGroupElement
 {
@@ -22,11 +23,11 @@ public class Group : IGroupElement
     public string StashTab { get; set; }
     public List<IGroupElement> ElementList { get; set; }
 
-    public Group(string groupType, int min, string groupName = null, string stashTab = null)
+    public Group(string groupType, int min = 0, string groupName = null, string stashTab = null)
     {
+        GroupName = groupName;
         GroupType = groupType;
         Min = min;
-        GroupName = groupName;
         StashTab = stashTab;
         ElementList = new List<IGroupElement>();
     }
@@ -41,36 +42,36 @@ public class Group : IGroupElement
         ElementList.Remove(element);
     }
 
-    //public void CopyToClipboard()
-    //{
-    //    var options = new JsonSerializerOptions { WriteIndented = true };
-    //    var groupData = JsonSerializer.Serialize(this, options);
-    //    Clipboard.SetText(groupData);
-    //}
+    public void CopyToClipboard()
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        var groupData = JsonSerializer.Serialize(this, options);
+        ClipboardService.SetText(groupData);
+    }
 
-    //public static Group PasteFromClipboard()
-    //{
-    //    var groupData = Clipboard.GetText();
-    //    return JsonSerializer.Deserialize<Group>(groupData);
-    //}
+    public static Group PasteFromClipboard()
+    {
+        var groupData = ClipboardService.GetText();
+        return JsonSerializer.Deserialize<Group>(groupData);
+    }
 
-    //public void CopyAllElementsToClipboard()
-    //{
-    //    var options = new JsonSerializerOptions { WriteIndented = true };
-    //    var elementsData = JsonSerializer.Serialize(ElementList, options);
-    //    Clipboard.SetText(elementsData);
-    //}
+    public void CopyAllElementsToClipboard()
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        var elementsData = JsonSerializer.Serialize(ElementList, options);
+        ClipboardService.SetText(elementsData);
+    }
 
-    //public void PasteAllElementsFromClipboard()
-    //{
-    //    var elementsData = Clipboard.GetText();
-    //    var options = new JsonSerializerOptions { Converters = { new IGroupElementJsonConverter() } };
-    //    var elements = JsonSerializer.Deserialize<List<IGroupElement>>(elementsData, options);
-    //    foreach (var element in elements)
-    //    {
-    //        AddElement(element);
-    //    }
-    //}
+    public void PasteAllElementsFromClipboard()
+    {
+        var elementsData = ClipboardService.GetText();
+        var options = new JsonSerializerOptions { Converters = { new IGroupElementJsonConverter() } };
+        var elements = JsonSerializer.Deserialize<List<IGroupElement>>(elementsData, options);
+        foreach (var element in elements)
+        {
+            AddElement(element);
+        }
+    }
 }
 
 public class IGroupElementJsonConverter : System.Text.Json.Serialization.JsonConverter<IGroupElement>
