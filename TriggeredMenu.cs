@@ -9,6 +9,7 @@
     public class TriggeredMenu : Overlay
     {
         private readonly Thread logicThread;
+        // Begin the LogicUpdate thread when the frame initiates
         public TriggeredMenu()
         {
             logicThread = new Thread(() =>
@@ -26,6 +27,8 @@
             App.Log("test Message", ExampleAppLog.logLevels[ExampleAppLog.logLevelIndex]);
             ExampleAppLog.logLevelIndex = (ExampleAppLog.logLevelIndex + 1) % ExampleAppLog.logLevels.Length;
         }
+        // Render thread is run every frame
+        // We can piggy back on the render thread for simple keybinds
         protected override void Render()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
@@ -37,22 +40,20 @@
             {
                 App.MenuDisplay_Log = !App.MenuDisplay_Log;
             }
-
-            if (App.ShowTransparentViewport)
-            {
-                RenderViewPort();
-            }
+            // We always render this invisible window
+            // Having no viewport will break the children docks
+            RenderViewPort();
 
             if (App.MenuDisplay_Main)
-            {
                 RenderMainMenu();
-            }
-
             if (App.MenuDisplay_Log)
-            {
-                App.logimgui.Draw("Log Window", true);
-            }
+                RenderLogWindow();
+
             return;
+        }
+        private void RenderLogWindow()
+        {
+            App.logimgui.Draw("Log Window", true);
         }
         private void RenderMainMenu()
         {
@@ -108,9 +109,8 @@
                     ImGui.Separator();
 
                     // Display a menu item to close this example.
-                    if (ImGui.MenuItem("Close", null, false, App.IsRunning != null))
-                        if (App.IsRunning != null) // Remove MSVC warning C6011 (null dereference) - the `p_open != null` in MenuItem() does prevent null derefs, but IntelliSense doesn't analyze that deep so we need to add this in ourselves.
-                            App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
+                    if (ImGui.MenuItem("Close", null, false, true))
+                        App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
                     ImGui.EndMenu();
                 }
                 ImGui.EndMenuBar();
