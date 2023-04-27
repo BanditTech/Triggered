@@ -1,10 +1,115 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using TextCopy;
 
 public interface IGroupElement
 {
+}
+
+public abstract class BaseGroup : IGroupElement
+{
+    public string GroupType { get; set; }
+    public int Min { get; set; }
+    public List<IGroupElement> ElementList { get; set; }
+
+    protected BaseGroup(string groupType)
+    {
+        GroupType = groupType;
+        ElementList = new List<IGroupElement>();
+    }
+    protected BaseGroup(string groupType, List<IGroupElement> elementList)
+    {
+        GroupType = groupType;
+        ElementList = elementList;
+    }
+    protected BaseGroup(string groupType, int min)
+    {
+        GroupType = groupType;
+        Min = min;
+        ElementList = new List<IGroupElement>();
+    }
+    protected BaseGroup(string groupType, int min, List<IGroupElement> elementList)
+    {
+        GroupType = groupType;
+        Min = min;
+        ElementList = elementList;
+    }
+
+    public void AddElement(IGroupElement element)
+    {
+        ElementList.Add(element);
+    }
+    public void RemoveElement(IGroupElement element)
+    {
+        ElementList.Remove(element);
+    }
+
+    [RequiresUnreferencedCode("JSON")]
+    [RequiresDynamicCode("JSON")]
+    public void CopyToClipboard()
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        string groupData = JsonSerializer.Serialize(this, options);
+        ClipboardService.SetText(groupData);
+    }
+}
+public class Group : BaseGroup
+{
+    // Constructor that passes all parameters through to the base constructor
+    public Group(string groupType) : base(groupType)
+    {
+    }
+    public Group(string groupType, List<IGroupElement> elementList) : base(groupType, elementList)
+    {
+    }
+    public Group(string groupType, int min) : base(groupType, min)
+    {
+    }
+    public Group(string groupType, int min, List<IGroupElement> elementList) : base(groupType, min, elementList)
+    {
+    }
+}
+public class TopGroup : Group
+{
+    public string GroupName { get; set; }
+    public int StashTab { get; set; }
+    public int Strictness { get; set; }
+
+    public TopGroup() : base("AND", 0, new List<IGroupElement>())
+    {
+        GroupName = "TopGroup";
+        StashTab = 0;
+        Strictness = -1;
+    }
+
+    public TopGroup(string groupName, int stashTab, int strictness) : base("AND", 0, new List<IGroupElement>())
+    {
+        GroupName = groupName;
+        StashTab = stashTab;
+        Strictness = strictness;
+    }
+
+    public TopGroup(string groupName, int stashTab, int strictness, int min) : base("AND", min, new List<IGroupElement>())
+    {
+        GroupName = groupName;
+        StashTab = stashTab;
+        Strictness = strictness;
+    }
+
+    public TopGroup(string groupName, int stashTab, int strictness, string groupType, int min) : base(groupType, min, new List<IGroupElement>())
+    {
+        GroupName = groupName;
+        StashTab = stashTab;
+        Strictness = strictness;
+    }
+
+    public TopGroup(string groupName, int stashTab, int strictness, string groupType, int min, List<IGroupElement> elementList) : base(groupType, min, elementList)
+    {
+        GroupName = groupName;
+        StashTab = stashTab;
+        Strictness = strictness;
+    }
 }
 
 public class Element : IGroupElement
@@ -13,84 +118,19 @@ public class Element : IGroupElement
     public string Eval { get; set; }
     public int Min { get; set; }
     public int Weight { get; set; }
-}
 
-public class Group : IGroupElement
-{
-    public string GroupType { get; set; }
-    public int Min { get; set; }
-    public string GroupName { get; set; }
-    public string StashTab { get; set; }
-    public List<IGroupElement> ElementList { get; set; }
-
-    public Group(string groupType, int min = 0, string groupName = null, string stashTab = null)
+    public Element(string key, string eval, int min)
     {
-        GroupName = groupName;
-        GroupType = groupType;
+        Key = key;
+        Eval = eval;
         Min = min;
-        StashTab = stashTab;
-        ElementList = new List<IGroupElement>();
+        Weight = 1;
     }
-
-    public void AddElement(IGroupElement element)
+    public Element(string key, string eval, int min, int weight)
     {
-        ElementList.Add(element);
-    }
-
-    public void RemoveElement(IGroupElement element)
-    {
-        ElementList.Remove(element);
-    }
-
-    public void CopyToClipboard()
-    {
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        var groupData = JsonSerializer.Serialize(this, options);
-        ClipboardService.SetText(groupData);
-    }
-
-    public static Group PasteFromClipboard()
-    {
-        var groupData = ClipboardService.GetText();
-        return JsonSerializer.Deserialize<Group>(groupData);
-    }
-
-    public void CopyAllElementsToClipboard()
-    {
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        var elementsData = JsonSerializer.Serialize(ElementList, options);
-        ClipboardService.SetText(elementsData);
-    }
-
-    public void PasteAllElementsFromClipboard()
-    {
-        var elementsData = ClipboardService.GetText();
-        var options = new JsonSerializerOptions { Converters = { new IGroupElementJsonConverter() } };
-        var elements = JsonSerializer.Deserialize<List<IGroupElement>>(elementsData, options);
-        foreach (var element in elements)
-        {
-            AddElement(element);
-        }
-    }
-}
-
-public class IGroupElementJsonConverter : System.Text.Json.Serialization.JsonConverter<IGroupElement>
-{
-    public override IGroupElement Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        // Determine the concrete type of the element based on the "GroupType" property
-        var elementJson = JsonSerializer.Deserialize<JsonElement>(ref reader);
-        var groupType = elementJson.GetProperty("GroupType").GetString();
-        return groupType switch
-        {
-            "Element" => JsonSerializer.Deserialize<Element>(elementJson.GetRawText()),
-            "Group" => JsonSerializer.Deserialize<Group>(elementJson.GetRawText()),
-            _ => throw new JsonException($"Unknown GroupType: {groupType}")
-        };
-    }
-
-    public override void Write(Utf8JsonWriter writer, IGroupElement value, JsonSerializerOptions options)
-    {
-        JsonSerializer.Serialize(writer, value, value.GetType(), options);
+        Key = key;
+        Eval = eval;
+        Min = min;
+        Weight = weight;
     }
 }
