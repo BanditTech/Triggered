@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using TextCopy;
 
 public interface IGroupElement
 {
+    protected virtual JsonSerializerOptions GetJsonSerializerOptions()
+    {
+        return new JsonSerializerOptions { Converters = { new IGroupElementJsonConverter() } };
+    }
 }
 
 public abstract class BaseGroup : IGroupElement
@@ -132,5 +138,30 @@ public class Element : IGroupElement
         Eval = eval;
         Min = min;
         Weight = weight;
+    }
+}
+
+public class IGroupElementJsonConverter : JsonConverter<IGroupElement>
+{
+    public override bool CanConvert(Type objectType)
+    {
+        return typeof(IGroupElement).IsAssignableFrom(objectType);
+    }
+
+    public override IGroupElement Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var jsonDoc = JsonDocument.ParseValue(ref reader);
+        var groupType = jsonDoc.RootElement.GetProperty("GroupType").GetString();
+        if (groupType == null)
+            return JsonSerializer.Deserialize<Element>(jsonDoc.RootElement.GetRawText(), options);
+        var groupName = jsonDoc.RootElement.GetProperty("GroupName").GetString();
+        if (groupName == null)
+            return JsonSerializer.Deserialize<Group>(jsonDoc.RootElement.GetRawText(), options);
+        return JsonSerializer.Deserialize<TopGroup>(jsonDoc.RootElement.GetRawText(), options);
+    }
+
+    public override void Write(Utf8JsonWriter writer, IGroupElement value, JsonSerializerOptions options)
+    {
+        JsonSerializer.Serialize(writer, value, value.GetType(), options);
     }
 }
