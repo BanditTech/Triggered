@@ -19,7 +19,6 @@
                 }
             });
             logicThread.Start();
-
         }
         private void LogicUpdate()
         {
@@ -39,14 +38,9 @@
                 App.MenuDisplay_Log = !App.MenuDisplay_Log;
             }
 
-            if (Utils.IsKeyPressedAndNotTimeout(VK.F10)) //F10.
-            {
-                App.ShowTransparentViewport = !App.ShowTransparentViewport;
-            }
-
             if (App.ShowTransparentViewport)
             {
-                ShowExampleAppDockSpace();
+                RenderViewPort();
             }
 
             if (App.MenuDisplay_Main)
@@ -60,7 +54,6 @@
             }
             return;
         }
-        // Define the menu to render
         private void RenderMainMenu()
         {
             bool isCollapsed = !ImGui.Begin(
@@ -78,9 +71,14 @@
                 return;
             }
             // Menu definition area
+            float delay = App.LogicTickDelayInMilliseconds;
+            ImGui.SliderFloat("Logic MS", ref delay, 10.0f, 1000.0f);
+            App.LogicTickDelayInMilliseconds = (int)delay;
+            ImGui.Checkbox("Show/Hide the Log", ref App.MenuDisplay_Log);
+            ImGui.Separator();
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Log.");
-            ImGui.Text("Try pressing F10 button to show/hide the Transparent Overlay.");
+            ImGui.Separator();
             if (ImGui.Button("Launch AHK Demo"))
             {
                 Thread thread = new Thread(() =>
@@ -90,7 +88,11 @@
                 });
                 thread.Start();
             }
-            ImGui.Checkbox("Show/Hide the Log", ref App.MenuDisplay_Log);
+
+            if (ImGui.CollapsingHeader("Collapsible Group Box Label", ref App.ShowGroupBoxContents))
+            {
+                ImGui.Text("This is inside the collapsible group box.");
+            }
 
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
@@ -116,7 +118,7 @@
             // Menu definition complete
             ImGui.End();
         }
-        private void ShowExampleAppDockSpace()
+        private void RenderViewPort()
         {
             // Variables to configure the Dockspace example.
             // Includes App.fullscreen, App.padding

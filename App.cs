@@ -9,18 +9,18 @@
         public static ExampleAppLog logimgui;
         public static Logger logger;
         public static Stopwatch Watch = Stopwatch.StartNew();
-
         public static LogLevel LogWindowMinimumLogLevel = LogLevel.Debug;
+
+        public static int LogicTickDelayInMilliseconds = 100;
+        public static int SelectedLogLevelIndex = 1;
         public static bool MenuDisplay_Main = true;
         public static bool MenuDisplay_Log = true;
         public static bool IsVisible = true;
         public static bool IsRunning = true;
         public static bool ShowTransparentViewport = true;
-        public static bool DockSpaceOpen = true;
-        public static int LogicTickDelayInMilliseconds = 100;
-        public static int SelectedLogLevelIndex = 1;
         public static bool fullscreen = true;
         public static bool padding = false;
+        public static bool ShowGroupBoxContents = true;
 
         static App()
         {

@@ -68,9 +68,9 @@ namespace Triggered
             ImGui.Checkbox("Auto-scroll", ref shouldAutoScroll);
             AutoScroll = shouldAutoScroll;
             ImGui.SameLine();
-            if (ImGui.Combo("Minimum Log Level", ref App.SelectedLogLevelIndex, logLevelNames, logLevels.Length))
+            ImGui.SetNextItemWidth(100);
+            if (ImGui.Combo(">= Level", ref App.SelectedLogLevelIndex, logLevelNames, logLevels.Length))
             {
-                // here is a breakpoint
                 LogLevel selectedLogLevel = logLevels[App.SelectedLogLevelIndex];
                 App.Log($"Changing minimum log level to {selectedLogLevel}", LogLevel.Fatal);
                 App.LogWindowMinimumLogLevel = selectedLogLevel;
