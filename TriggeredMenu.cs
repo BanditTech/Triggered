@@ -1,6 +1,10 @@
 ﻿namespace Triggered
 {
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
     using System.Numerics;
+    using System.Text.Json;
     using System.Threading;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
@@ -10,8 +14,12 @@
     {
         private readonly Thread logicThread;
         // Begin the LogicUpdate thread when the frame initiates
+        //[RequiresUnreferencedCode("Calls App.UpdateTopGroups()")]
+        //[RequiresDynamicCode("Calls App.UpdateTopGroups()")]
         public TriggeredMenu()
         {
+            //App.UpdateTopGroups();
+            DumpExampleJson();
             logicThread = new Thread(() =>
             {
                 while (App.IsRunning)
@@ -38,7 +46,7 @@
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
             {
-                App.MenuDisplay_Log = !App.MenuDisplay_Log;
+                App.MenuDisplay_StashSorter = !App.MenuDisplay_StashSorter;
             }
             // We always render this invisible window
             // Having no viewport will break the children docks
@@ -46,6 +54,8 @@
 
             if (App.MenuDisplay_Main)
                 RenderMainMenu();
+            if (App.MenuDisplay_StashSorter)
+                RenderStashSorter();
             if (App.MenuDisplay_Log)
                 RenderLogWindow();
 
@@ -78,7 +88,7 @@
             ImGui.Checkbox("Show/Hide the Log", ref App.MenuDisplay_Log);
             ImGui.Separator();
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
-            ImGui.Text("Try pressing F11 button to show/hide the Log.");
+            ImGui.Text("Try pressing F11 button to show/hide the Stash Sorter.");
             ImGui.Separator();
             if (ImGui.Button("Launch AHK Demo"))
             {
@@ -207,6 +217,46 @@
             }
             // End the parent window that contains the Dockspace:
             ImGui.End();
+        }
+        private void RenderStashSorter()
+        {
+            // Create the main window
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(500, 500), ImGuiCond.FirstUseEver);
+            ImGui.Begin("Edit TopGroup");
+
+            // Select the TopGroup
+            ImGui.Combo("Top Group", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
+
+            //// Edit the TopGroup
+            //ImGui.Text("Elements:");
+            //foreach (Element element in App.StashSorterFile)
+            //{
+            //    ImGui.Text(element.Key);
+            //    ImGui.SameLine();
+            //    ImGui.Text(element.Min.ToString());
+            //}
+
+            // End the main window
+            ImGui.End();
+        }
+        private void DumpExampleJson()
+        {
+            Group examplegroup = new Group("AND","0");
+            Element exampleelement = new Element("KeyName to Match",">=","Value to Match with");
+            exampleelement.Dump("element");
+            examplegroup.AddElement(exampleelement);
+            examplegroup.Dump("group");
+
+            TopGroup example1 = new TopGroup("Example 1 AND","AND","1",1,1);
+            example1.AddElement(examplegroup);
+            TopGroup example2 = new TopGroup("Example 2 NOT","NOT","1",1,1);
+            example1.AddElement(examplegroup);
+            List<TopGroup> dumpthis = new List<TopGroup>();
+            dumpthis.Add(example1);
+            dumpthis.Add(example2);
+
+            string jsonString = JSON.Str(dumpthis);
+            File.WriteAllText("example.json", jsonString);
         }
     }
 }

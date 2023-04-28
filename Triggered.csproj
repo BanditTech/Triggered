@@ -19,6 +19,7 @@
     <PackageReference Include="AutoHotkey.Interop" Version="1.0.0.1" />
     <PackageReference Include="ClickableTransparentOverlay" Version="8.1.0" />
     <PackageReference Include="ImGui.NET" Version="1.89.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.1.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="TextCopy" Version="6.2.1" />
@@ -27,9 +28,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="example.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties example_1json__JsonSchema="https://json.schemastore.org/jsconfig.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

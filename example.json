@@ -1,0 +1,103 @@
+[
+  {
+    "GroupName": "Count Example",
+    "StashTab": 11,
+    "Strictness": 11,
+    "GroupType": "Count",
+    "Min": 2,
+    "ElementList": [
+      {
+        "Key": "Prefix1",
+        "Eval": ">=",
+        "Min": 1,
+        "Weight": 1
+      },
+      {
+        "Key": "Prefix2",
+        "Eval": ">=",
+        "Min": 1,
+        "Weight": 1
+      },
+      {
+        "Key": "Suffix",
+        "Eval": ">=",
+        "Min": 1,
+        "Weight": 2
+      },
+      {
+        "GroupType": "And",
+        "Weight": 1,
+        "ElementList": [
+          {
+            "Key": "Veiled",
+            "Eval": ">=",
+            "Min": 1
+          },
+          {
+            "Key": "Fractured",
+            "Eval": ">=",
+            "Min": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "GroupName": "Not Example",
+    "StashTab": 11,
+    "Strictness": 11,
+    "GroupType": "Not",
+    "ElementList": [
+      {
+        "Key": "Veiled",
+        "Eval": ">=",
+        "Min": 1
+      }
+    ]
+  },
+  {
+    "GroupName": "And Example",
+    "StashTab": 11,
+    "Strictness": 11,
+    "GroupType": "And",
+    "ElementList": [
+      {
+        "Key": "ItemClass",
+        "Eval": "~",
+        "Min": "PluralClassNames"
+      },
+      {
+        "Key": "SpecialType",
+        "Eval": "~=",
+        "Min": "\\w"
+      }
+    ]
+  },
+  {
+    "GroupName": "Weight Example",
+    "StashTab": 11,
+    "Strictness": 11,
+    "GroupType": "Weight",
+    "Min": 300,
+    "ElementList": [
+      {
+        "Key": "Prefix1",
+        "Eval": ">=",
+        "Min": 1,
+        "Weight": 12
+      },
+      {
+        "Key": "Prefix2",
+        "Eval": ">=",
+        "Min": 1,
+        "Weight": 12
+      },
+      {
+        "Key": "Suffix",
+        "Eval": ">=",
+        "Min": 1,
+        "Weight": 15
+      }
+    ]
+  }
+]
