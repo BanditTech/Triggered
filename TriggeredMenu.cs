@@ -9,6 +9,7 @@
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
+    using Newtonsoft.Json;
 
     public class TriggeredMenu : Overlay
     {
@@ -241,19 +242,28 @@
         }
         private void DumpExampleJson()
         {
-            Group examplegroup = new Group("AND","0");
+            Group examplegroup = new Group("AND",0);
             Element exampleelement = new Element("KeyName to Match",">=","Value to Match with");
-            exampleelement.Dump("element");
+            //exampleelement.Dump("element");
             examplegroup.AddElement(exampleelement);
-            examplegroup.Dump("group");
+            //examplegroup.Dump("group");
 
-            TopGroup example1 = new TopGroup("Example 1 AND","AND","1",1,1);
+            TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
             example1.AddElement(examplegroup);
             TopGroup example2 = new TopGroup("Example 2 NOT","NOT","1",1,1);
             example1.AddElement(examplegroup);
+            example1.AddElement(exampleelement);
+            TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
+            example2.AddElement(exampleelement);
+            TopGroup example3 = new TopGroup("Example 3 COUNT", "COUNT", default, default, default);
+            example2.AddElement(exampleelement);
+            TopGroup example4 = new TopGroup("Example 4 WEIGHT", "WEIGHT", default, default, default);
+            example2.AddElement(exampleelement);
             List<TopGroup> dumpthis = new List<TopGroup>();
             dumpthis.Add(example1);
             dumpthis.Add(example2);
+            dumpthis.Add(example3);
+            dumpthis.Add(example4);
 
             string jsonString = JSON.Str(dumpthis);
             File.WriteAllText("example.json", jsonString);

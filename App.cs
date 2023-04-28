@@ -61,31 +61,5 @@
             Log(log, LogLevel.Info);
         }
         #endregion
-        [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
-        [RequiresDynamicCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
-        public static void UpdateTopGroups()
-        {
-            // Load the JSON file into a string
-            string jsonString = File.ReadAllText("example.json");
-
-            // Deserialize the JSON into a list of IGroupElement objects
-            var options = new JsonSerializerSettings
-            {
-                Converters = { new IGroupElementJsonConverter() }
-            };
-            List<IGroupElement> StashSorterFile = JsonConvert.DeserializeObject<List<IGroupElement>>(jsonString, options);
-
-            // Fetch the GroupName of each TopGroup and save to a string array in App.TopGroups
-            List<string> topGroupsList = new List<string>();
-            foreach (IGroupElement group in StashSorterFile)
-            {
-                if (group is TopGroup topGroup)
-                {
-                    topGroupsList.Add(topGroup.GroupName);
-                }
-            }
-            App.TopGroups = topGroupsList.ToArray();
-            App.StashSorterFile = StashSorterFile;
-        }
     }
 }
