@@ -1,10 +1,8 @@
 ﻿namespace Triggered
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Numerics;
-    using System.Text.Json;
     using System.Threading;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
@@ -19,8 +17,8 @@
         //[RequiresDynamicCode("Calls App.UpdateTopGroups()")]
         public TriggeredMenu()
         {
-            //App.UpdateTopGroups();
             DumpExampleJson();
+            UpdateTopGroups();
             logicThread = new Thread(() =>
             {
                 while (App.IsRunning)
@@ -250,8 +248,6 @@
 
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
             example1.AddElement(examplegroup);
-            TopGroup example2 = new TopGroup("Example 2 NOT","NOT","1",1,1);
-            example1.AddElement(examplegroup);
             example1.AddElement(exampleelement);
             TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
             example2.AddElement(exampleelement);
@@ -268,5 +264,30 @@
             string jsonString = JSON.Str(dumpthis);
             File.WriteAllText("example.json", jsonString);
         }
+        private void UpdateTopGroups()
+        {
+            // Load the JSON file into a string
+            string jsonString = File.ReadAllText("example.json");
+
+            // Deserialize the JSON into a list of IGroupElement objects
+            var options = new JsonSerializerSettings
+            {
+                Converters = { new IGroupElementJsonConverter() }
+            };
+            List<IGroupElement> StashSorterFile = JsonConvert.DeserializeObject<List<IGroupElement>>(jsonString, options);
+
+            // Fetch the GroupName of each TopGroup and save to a string array in App.TopGroups
+            List<string> topGroupsList = new List<string>();
+            foreach (IGroupElement group in StashSorterFile)
+            {
+                if (group is TopGroup topGroup)
+                {
+                    topGroupsList.Add(topGroup.GroupName);
+                }
+            }
+            App.TopGroups = topGroupsList.ToArray();
+            App.StashSorterFile = StashSorterFile;
+        }
+
     }
 }
