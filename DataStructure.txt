@@ -1,0 +1,22 @@
+public abstract class IGroupElement
+{
+}
+public class Element : IGroupElement
+{
+    public string Key { get; set; }
+    public string Eval { get; set; }
+    public string Min { get; set; }
+    public int Weight { get; set; }
+}
+public class Group : IGroupElement
+{
+    public string GroupType { get; set; }
+    public int Min { get; set; }
+    public List<IGroupElement> ElementList { get; set; }
+}
+public class TopGroup : Group
+{
+    public string GroupName { get; set; }
+    public int StashTab { get; set; }
+    public int Strictness { get; set; }
+}

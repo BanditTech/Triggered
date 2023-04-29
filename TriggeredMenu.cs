@@ -15,9 +15,6 @@
         // Begin the LogicUpdate thread when the frame initiates
         public TriggeredMenu()
         {
-            DumpExampleJson();
-            UpdateStashSorterFile();
-            UpdateTopGroups();
             logicThread = new Thread(() =>
             {
                 while (App.IsRunning)
@@ -27,6 +24,7 @@
             });
             logicThread.Start();
         }
+        // Logic is operated upon based on our timeout
         private void LogicUpdate()
         {
             Thread.Sleep(App.LogicTickDelayInMilliseconds);
@@ -53,7 +51,7 @@
             if (App.MenuDisplay_Main)
                 RenderMainMenu();
             if (App.MenuDisplay_StashSorter)
-                RenderStashSorter();
+                StashSorter.Render();
             if (App.MenuDisplay_Log)
                 RenderLogWindow();
 
@@ -216,71 +214,5 @@
             // End the parent window that contains the Dockspace:
             ImGui.End();
         }
-        private void RenderStashSorter()
-        {
-            // Create the main window
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(500, 500), ImGuiCond.FirstUseEver);
-            ImGui.Begin("Edit TopGroup");
-
-            // Select the TopGroup
-            ImGui.Combo("Top Group", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
-
-            //// Edit the TopGroup
-            //ImGui.Text("Elements:");
-            //foreach (Element element in App.StashSorterFile)
-            //{
-            //    ImGui.Text(element.Key);
-            //    ImGui.SameLine();
-            //    ImGui.Text(element.Min.ToString());
-            //}
-
-            // End the main window
-            ImGui.End();
-        }
-        private void DumpExampleJson()
-        {
-            Group examplegroup = new Group("AND",0);
-            Element exampleelement = new Element("KeyName to Match",">=","Value to Match with");
-            examplegroup.AddElement(exampleelement);
-
-            TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
-            example1.AddElement(examplegroup);
-            example1.AddElement(exampleelement);
-            TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
-            example2.AddElement(exampleelement);
-            TopGroup example3 = new TopGroup("Example 3 COUNT", "COUNT", default, default, default);
-            example2.AddElement(exampleelement);
-            TopGroup example4 = new TopGroup("Example 4 WEIGHT", "WEIGHT", default, default, default);
-            example2.AddElement(exampleelement);
-            List<TopGroup> dumpthis = new List<TopGroup>();
-            dumpthis.Add(example1);
-            dumpthis.Add(example2);
-            dumpthis.Add(example3);
-            dumpthis.Add(example4);
-
-            string jsonString = JSON.Min(dumpthis);
-            File.WriteAllText("example.json", jsonString);
-        }
-        private void UpdateStashSorterFile()
-        {
-            // Load the JSON file into a string
-            string jsonString = File.ReadAllText("example.json");
-            // Deserialize the JSON into a list of IGroupElement objects
-            App.StashSorterFile = JSON.IGroupElementList(jsonString);
-        }
-        private void UpdateTopGroups()
-        {
-            // Fetch the GroupName of each TopGroup and save to a string array in App.TopGroups
-            List<string> topGroupsList = new List<string>();
-            foreach (IGroupElement group in App.StashSorterFile)
-            {
-                if (group is TopGroup topGroup)
-                {
-                    topGroupsList.Add(topGroup.GroupName);
-                }
-            }
-            App.TopGroups = topGroupsList.ToArray();
-        }
-
     }
 }
