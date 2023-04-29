@@ -82,10 +82,20 @@ namespace Triggered
         {
             if (obj == null)
                 return;
+
             if (obj is Group group)
             {
                 if (ImGui.TreeNode(group.GroupType))
                 {
+                    // Allow editing of Group values
+                    ImGui.PushID(group.GetHashCode()); // set unique ID for control
+                    ImGui.InputText("GroupType", ref group.GroupType, 255);
+                    ImGui.PopID(); // reset ID for control
+                    ImGui.SameLine();
+                    ImGui.PushID(group.GetHashCode()); // set unique ID for control
+                    ImGui.InputInt("Min", ref group.Min);
+                    ImGui.PopID(); // reset ID for control
+
                     foreach (Element subElement in group.ElementList)
                     {
                         RecursiveMenu(subElement);
@@ -94,13 +104,31 @@ namespace Triggered
                     {
                         RecursiveMenu(subGroup);
                     }
+
                     ImGui.TreePop();
                 }
             }
             else if (obj is Element leaf)
             {
-                // Display the leaf node using ImGui.Text or ImGui.Selectable, for example
-                ImGui.Selectable($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}");
+                if (ImGui.TreeNode($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}"))
+                {
+                    // Allow editing of Element values
+                    ImGui.PushID(leaf.GetHashCode()); // set unique ID for control
+                    ImGui.InputText("Key", ref leaf.Key, 255);
+                    ImGui.PopID(); // reset ID for control
+                    ImGui.SameLine();
+                    ImGui.PushID(leaf.GetHashCode()+ 1); // set unique ID for control
+                    ImGui.InputText("Eval", ref leaf.Eval, 255);
+                    ImGui.PopID(); // reset ID for control
+                    ImGui.PushID(leaf.GetHashCode()+ 2); // set unique ID for control
+                    ImGui.InputText("Min", ref leaf.Min, 255);
+                    ImGui.PopID(); // reset ID for control
+                    ImGui.SameLine();
+                    ImGui.PushID(leaf.GetHashCode()+ 3); // set unique ID for control
+                    ImGui.InputInt("Weight", ref leaf.Weight);
+                    ImGui.PopID(); // reset ID for control
+                    ImGui.TreePop();
+                }
             }
             else
                 App.Log("This should not display");
