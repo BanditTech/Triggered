@@ -242,9 +242,7 @@
         {
             Group examplegroup = new Group("AND",0);
             Element exampleelement = new Element("KeyName to Match",">=","Value to Match with");
-            //exampleelement.Dump("element");
             examplegroup.AddElement(exampleelement);
-            //examplegroup.Dump("group");
 
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
             example1.AddElement(examplegroup);
@@ -261,7 +259,7 @@
             dumpthis.Add(example3);
             dumpthis.Add(example4);
 
-            string jsonString = JSON.Str(dumpthis);
+            string jsonString = JSON.Min(dumpthis);
             File.WriteAllText("example.json", jsonString);
         }
         private void UpdateTopGroups()
@@ -272,6 +270,7 @@
             // Deserialize the JSON into a list of IGroupElement objects
             var options = new JsonSerializerSettings
             {
+                TypeNameHandling = TypeNameHandling.Auto,
                 Converters = { new IGroupElementJsonConverter() }
             };
             List<IGroupElement> StashSorterFile = JsonConvert.DeserializeObject<List<IGroupElement>>(jsonString, options);
