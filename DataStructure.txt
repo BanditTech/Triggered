@@ -3,20 +3,21 @@ public abstract class IGroupElement
 }
 public class Element : IGroupElement
 {
-    public string Key { get; set; }
-    public string Eval { get; set; }
-    public string Min { get; set; }
-    public int Weight { get; set; }
+    public string Key;
+    public string Eval;
+    public string Min;
+    public int Weight;
 }
 public class Group : IGroupElement
 {
-    public string GroupType { get; set; }
-    public int Min { get; set; }
-    public List<IGroupElement> ElementList { get; set; }
+    public string GroupType;
+    public int Min;
+    public List<Element> ElementList;
+    public List<Group> GroupList;
 }
 public class TopGroup : Group
 {
-    public string GroupName { get; set; }
-    public int StashTab { get; set; }
-    public int Strictness { get; set; }
+    public string GroupName;
+    public int StashTab;
+    public int Strictness;
 }

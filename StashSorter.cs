@@ -23,23 +23,23 @@ namespace Triggered
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
             example1.AddElement(exampleelement);
             example1.AddElement(exampleelement);
-            example1.AddElement(examplegroup);
-            TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
-            example2.AddElement(exampleelement);
-            TopGroup example3 = new TopGroup("Example 3 COUNT", "COUNT", default, default, default);
-            example3.AddElement(exampleelement);
-            TopGroup example4 = new TopGroup("Test Duplicate", "WEIGHT", default, default, default);
-            example4.AddElement(exampleelement);
-            TopGroup example5 = new TopGroup("Test Duplicate", "WEIGHT", default, default, default);
-            example5.AddElement(exampleelement);
+            example1.AddGroup(examplegroup);
+            //TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
+            //example2.AddElement(exampleelement);
+            //TopGroup example3 = new TopGroup("Example 3 COUNT", "COUNT", default, default, default);
+            //example3.AddElement(exampleelement);
+            //TopGroup example4 = new TopGroup("Test Duplicate", "WEIGHT", default, default, default);
+            //example4.AddElement(exampleelement);
+            //TopGroup example5 = new TopGroup("Test Duplicate", "WEIGHT", default, default, default);
+            //example5.AddElement(exampleelement);
             List<TopGroup> dumpthis = new List<TopGroup>();
             dumpthis.Add(example1);
-            dumpthis.Add(example2);
-            dumpthis.Add(example3);
-            dumpthis.Add(example4);
-            dumpthis.Add(example5);
+            //dumpthis.Add(example2);
+            //dumpthis.Add(example3);
+            //dumpthis.Add(example4);
+            //dumpthis.Add(example5);
 
-            string jsonString = JSON.Min(dumpthis);
+            string jsonString = JSON.Str(dumpthis);
             File.WriteAllText("example.json", jsonString);
         }
         static void UpdateStashSorterFile()
@@ -86,23 +86,24 @@ namespace Triggered
             {
                 if (ImGui.TreeNode(group.GroupType))
                 {
-                    App.Log("Open your mind");
-                    foreach (IGroupElement subElement in group.ElementList)
+                    foreach (Element subElement in group.ElementList)
                     {
-                        App.Log("There is no spoon");
                         RecursiveMenu(subElement);
+                    }
+                    foreach (Group subGroup in group.GroupList)
+                    {
+                        RecursiveMenu(subGroup);
                     }
                     ImGui.TreePop();
                 }
             }
             else if (obj is Element leaf)
             {
-                App.Log("This never displays");
                 // Display the leaf node using ImGui.Text or ImGui.Selectable, for example
                 ImGui.Selectable($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}");
             }
             else
-                App.Log("This never displays either");
+                App.Log("This should not display");
         }
     }
 }
