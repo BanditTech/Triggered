@@ -38,13 +38,6 @@
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logimgui = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
-            string[] TopGroups = new string[5];
-            TopGroups[0] = "Lets";
-            TopGroups[1] = "Debug";
-            TopGroups[2] = "This";
-            TopGroups[3] = "Combo";
-            TopGroups[4] = "Box";
-            App.TopGroups = TopGroups;
         }
         #region Log(string log, LogLevel level)
         public static void Log(string log, LogLevel level)

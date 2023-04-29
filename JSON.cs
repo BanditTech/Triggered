@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace Triggered
 {
@@ -23,6 +25,17 @@ namespace Triggered
         {
             object obj = JsonConvert.DeserializeObject(json);
             return obj;
+        }
+        public static List<IGroupElement> IGroupElementList(string json)
+        {
+            // Deserialize the JSON into a list of IGroupElement objects
+            var options = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Converters = { new IGroupElementJsonConverter() }
+            };
+            List<IGroupElement> IGroupElementList = JsonConvert.DeserializeObject<List<IGroupElement>>(json, options);
+            return IGroupElementList;
         }
     }
 }

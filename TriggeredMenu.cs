@@ -13,11 +13,10 @@
     {
         private readonly Thread logicThread;
         // Begin the LogicUpdate thread when the frame initiates
-        //[RequiresUnreferencedCode("Calls App.UpdateTopGroups()")]
-        //[RequiresDynamicCode("Calls App.UpdateTopGroups()")]
         public TriggeredMenu()
         {
             DumpExampleJson();
+            UpdateStashSorterFile();
             UpdateTopGroups();
             logicThread = new Thread(() =>
             {
@@ -262,22 +261,18 @@
             string jsonString = JSON.Min(dumpthis);
             File.WriteAllText("example.json", jsonString);
         }
-        private void UpdateTopGroups()
+        private void UpdateStashSorterFile()
         {
             // Load the JSON file into a string
             string jsonString = File.ReadAllText("example.json");
-
             // Deserialize the JSON into a list of IGroupElement objects
-            var options = new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Converters = { new IGroupElementJsonConverter() }
-            };
-            List<IGroupElement> StashSorterFile = JsonConvert.DeserializeObject<List<IGroupElement>>(jsonString, options);
-
+            App.StashSorterFile = JSON.IGroupElementList(jsonString);
+        }
+        private void UpdateTopGroups()
+        {
             // Fetch the GroupName of each TopGroup and save to a string array in App.TopGroups
             List<string> topGroupsList = new List<string>();
-            foreach (IGroupElement group in StashSorterFile)
+            foreach (IGroupElement group in App.StashSorterFile)
             {
                 if (group is TopGroup topGroup)
                 {
@@ -285,7 +280,6 @@
                 }
             }
             App.TopGroups = topGroupsList.ToArray();
-            App.StashSorterFile = StashSorterFile;
         }
 
     }

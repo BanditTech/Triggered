@@ -100,13 +100,13 @@ public class IGroupElementJsonConverter : JsonConverter<IGroupElement>
         // First we validate the objects and ensure they share a common key.
         if (min == null || min.Type == JTokenType.Null)
             throw new JsonSerializationException("Invalid JSON object format: missing or invalid 'Min' property.");
-        if (jsonObject["Key"] != null && jsonObject["Eval"] != null && min != null)
+        if (jsonObject["Key"] != null && jsonObject["Eval"] != null && min != null && jsonObject["Weight"] != null)
         {
             // Manually create an instance of the Element class and populate its properties
             Element element = new Element((string)jsonObject["Key"], (string)jsonObject["Eval"], (string)min, (int)jsonObject["Weight"]);
             return element;
         }
-        else if (groupName != null && jsonObject["StashTab"] != null && min != null)
+        else if (groupName != null && groupType != null && min != null && jsonObject["StashTab"] != null && jsonObject["Strictness"] != null)
         {
             // Manually create an instance of the TopGroup class and populate its properties
             TopGroup topGroup = new TopGroup((string)groupName, (string)groupType, (int)min, (int)jsonObject["StashTab"], (int)jsonObject["Strictness"]);
@@ -114,7 +114,7 @@ public class IGroupElementJsonConverter : JsonConverter<IGroupElement>
         }
         else if (groupType == null)
             throw new JsonSerializationException("Invalid JSON object format: Does not match with any IGroupElement Member.");
-        // 
+        // Prior logic leaves us with a Group object
         Group group = new Group((string)groupType,(int)min);
         return group;
     }
