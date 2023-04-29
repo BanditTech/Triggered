@@ -85,14 +85,16 @@ namespace Triggered
 
             if (obj is Group group)
             {
-                if (ImGui.TreeNodeEx(group.GroupType, ImGuiTreeNodeFlags.DefaultOpen))
+                ImGui.PushID(group.GetHashCode());
+                if (ImGui.TreeNodeEx(group.GroupType, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick))
                 {
+                    ImGui.PopID();
                     // Allow editing of Group values
-                    ImGui.PushID(group.GetHashCode());
+                    ImGui.PushID(group.GetHashCode() + 1);
                     ImGui.InputText("GroupType", ref group.GroupType, 255);
                     ImGui.PopID();
                     ImGui.SameLine();
-                    ImGui.PushID(group.GetHashCode());
+                    ImGui.PushID(group.GetHashCode() + 2);
                     ImGui.InputInt("Min", ref group.Min);
                     ImGui.PopID();
 
@@ -107,25 +109,31 @@ namespace Triggered
 
                     ImGui.TreePop();
                 }
+                ImGui.PopID();
             }
             else if (obj is Element leaf)
             {
-                ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.Leaf);
                 ImGui.PushID(leaf.GetHashCode());
-                ImGui.InputText("Key", ref leaf.Key, 255);
+                if (ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick))
+                {
+                    ImGui.PopID();
+                    ImGui.PushID(leaf.GetHashCode() + 1);
+                    ImGui.InputText("Key", ref leaf.Key, 255);
+                    ImGui.PopID();
+                    ImGui.SameLine();
+                    ImGui.PushID(leaf.GetHashCode() + 2);
+                    ImGui.InputText("Eval", ref leaf.Eval, 255);
+                    ImGui.PopID();
+                    ImGui.PushID(leaf.GetHashCode() + 3);
+                    ImGui.InputText("Min", ref leaf.Min, 255);
+                    ImGui.PopID();
+                    ImGui.SameLine();
+                    ImGui.PushID(leaf.GetHashCode() + 4);
+                    ImGui.InputInt("Weight", ref leaf.Weight);
+                    ImGui.PopID();
+                    ImGui.TreePop();
+                }
                 ImGui.PopID();
-                ImGui.SameLine();
-                ImGui.PushID(leaf.GetHashCode() + 1);
-                ImGui.InputText("Eval", ref leaf.Eval, 255);
-                ImGui.PopID();
-                ImGui.PushID(leaf.GetHashCode() + 2);
-                ImGui.InputText("Min", ref leaf.Min, 255);
-                ImGui.PopID();
-                ImGui.SameLine();
-                ImGui.PushID(leaf.GetHashCode() + 3);
-                ImGui.InputInt("Weight", ref leaf.Weight);
-                ImGui.PopID();
-                ImGui.TreePop();
             }
             else
                 App.Log("This should not display");
