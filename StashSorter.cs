@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
 
 namespace Triggered
 {
@@ -20,8 +21,9 @@ namespace Triggered
             examplegroup.AddElement(exampleelement);
 
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
-            example1.AddElement(examplegroup);
             example1.AddElement(exampleelement);
+            example1.AddElement(exampleelement);
+            example1.AddElement(examplegroup);
             TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
             example2.AddElement(exampleelement);
             TopGroup example3 = new TopGroup("Example 3 COUNT", "COUNT", default, default, default);
@@ -70,89 +72,37 @@ namespace Triggered
             // Select the TopGroup
             ImGui.Combo("Top Group", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
 
-            // The main program loop would reside here
-            // We need a recursive function to draw the groups and elements
-            RecursiveMenu(App.StashSorterList);
+            // We recurse the Group structure drawing them onto our menu
+            RecursiveMenu(App.StashSorterList[App.SelectedGroup]);
 
             // End the main window
             ImGui.End();
         }
-        static void RecursiveMenu(object obj)
+        static void RecursiveMenu(IGroupElement obj)
         {
             if (obj == null)
                 return;
-
-            if (obj is TopGroup topGroup)
+            if (obj is Group group)
             {
-                // Draw the TopGroup fields
-                ImGui.InputText("Group Name", ref topGroup.GroupName, 256);
-                ImGui.InputInt("Stash Tab", ref topGroup.StashTab);
-                ImGui.InputInt("Strictness", ref topGroup.Strictness);
-
-                // Draw the element list as a drag and drop interface
-                ImGui.Text("Element List:");
-                if (ImGui.BeginDragDropTarget())
+                if (ImGui.TreeNode(group.GroupType))
                 {
-                    if (ImGui.IsDragDropPayloadBeingAccepted())
+                    App.Log("Open your mind");
+                    foreach (IGroupElement subElement in group.ElementList)
                     {
-                        // Handle the dropped element
-                        IGroupElement element = *(IGroupElement*)ImGui.GetDragDropPayload().Data;
-                        if (element is Element)
-                        {
-                            topGroup.ElementList.Add(element);
-                        }
-                        else if (element is Group)
-                        {
-                            topGroup.ElementList.Add(element);
-                        }
+                        App.Log("There is no spoon");
+                        RecursiveMenu(subElement);
                     }
-                    ImGui.EndDragDropTarget();
-                }
-                foreach (IGroupElement element in topGroup.ElementList)
-                {
-                    RecursiveMenu(element);
+                    ImGui.TreePop();
                 }
             }
-            else if (obj is Group)
+            else if (obj is Element leaf)
             {
-                // Draw the Group fields
-                Group group = (Group)obj;
-                ImGui.InputText("Group Type", ref group.GroupType, 256);
-                ImGui.InputInt("Min", ref group.Min);
-
-                // Draw the element list as a drag and drop interface
-                ImGui.Text("Element List:");
-                if (ImGui.BeginDragDropTarget())
-                {
-                    if (ImGui.IsDragDropPayloadBeingAccepted())
-                    {
-                        // Handle the dropped element
-                        IGroupElement element = *(IGroupElement*)ImGui.GetDragDropPayload().Data;
-                        if (element is Element)
-                        {
-                            group.ElementList.Add(element);
-                        }
-                        else if (element is Group)
-                        {
-                            group.ElementList.Add(element);
-                        }
-                    }
-                    ImGui.EndDragDropTarget();
-                }
-                foreach (IGroupElement element in group.ElementList)
-                {
-                    RecursiveMenu(element);
-                }
+                App.Log("This never displays");
+                // Display the leaf node using ImGui.Text or ImGui.Selectable, for example
+                ImGui.Selectable($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}");
             }
-            else if (obj is Element)
-            {
-                // Draw the Element fields
-                Element element = (Element)obj;
-                ImGui.InputText("Key", ref element.Key, 256);
-                ImGui.InputText("Eval", ref element.Eval, 256);
-                ImGui.InputText("Min", ref element.Min, 256);
-                ImGui.InputInt("Weight", ref element.Weight);
-            }
+            else
+                App.Log("This never displays either");
         }
     }
 }

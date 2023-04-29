@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using NLog;
@@ -79,12 +80,16 @@ namespace Triggered
             ImGui.Separator();
             ImGui.BeginChild("scrolling", new System.Numerics.Vector2(0, 0), false, ImGuiWindowFlags.HorizontalScrollbar);
 
+            List<(string text, Vector4 color)> displayItems;
+
             lock (locker)
             {
-                foreach (var (text, color) in items)
-                {
-                    ImGui.TextColored(color, text);
-                }
+                displayItems = items.ToList();
+            }
+
+            foreach (var (text, color) in displayItems)
+            {
+                ImGui.TextColored(color, text);
             }
 
             if (autoScroll && AutoScroll)

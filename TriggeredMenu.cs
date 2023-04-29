@@ -28,8 +28,8 @@
         private void LogicUpdate()
         {
             Thread.Sleep(App.LogicTickDelayInMilliseconds);
-            App.Log("test Message", ExampleAppLog.logLevels[ExampleAppLog.logLevelIndex]);
-            ExampleAppLog.logLevelIndex = (ExampleAppLog.logLevelIndex + 1) % ExampleAppLog.logLevels.Length;
+            //App.Log("test Message", ExampleAppLog.logLevels[ExampleAppLog.logLevelIndex]);
+            //ExampleAppLog.logLevelIndex = (ExampleAppLog.logLevelIndex + 1) % ExampleAppLog.logLevels.Length;
         }
         // Render thread is run every frame
         // We can piggy back on the render thread for simple keybinds
@@ -100,7 +100,7 @@
             {
                 ImGui.Text("This is inside the collapsible group box.");
             }
-
+            ImGui.TreeNode("Lets see how this works");
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
             // you should remove the below if-statement as well.
