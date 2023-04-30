@@ -1,12 +1,17 @@
 ﻿using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
+using System.Reflection;
 
 namespace Triggered
 {
     static class StashSorter
     {
         #region Setup Functions
+        static bool firstRun = true;
+        static string[] groupTypeOptions = { "AND", "NOT", "COUNT", "WEIGHT" };
         static StashSorter()
         {
             DumpExampleJson();
@@ -74,40 +79,46 @@ namespace Triggered
             // We recurse the Group structure drawing them onto our menu
             RecursiveMenu(App.StashSorterList[App.SelectedGroup]);
 
+            if (firstRun)
+                firstRun = false;
             // End the main window
             ImGui.End();
         }
+        private static bool _dragging = false;
+        private static object _draggedObject = null;
+        private static object _dropTarget = null;
+        private static bool _dropTargetIsGroup = false;
         static void RecursiveMenu(IGroupElement obj)
         {
             if (obj == null)
                 return;
-            float w = ImGui.GetContentRegionAvail().X;
-            float s = ImGui.GetTreeNodeToLabelSpacing();
-            float l = ( w - s )  * 0.60f;
-            float r = ( w - s )  * 0.25f;
             if (obj is Group group)
             {
-                ImGui.PushID(group.GetHashCode());
-                int nodeState = ImGui.GetStateStorage().GetInt(ImGui.GetID(group.GetHashCode()));
-                ImGui.SetNextItemOpen(nodeState == 1);
-
-                bool isNodeOpen = ImGui.TreeNodeEx(group.GroupType, ImGuiTreeNodeFlags.OpenOnArrow);
-                ImGui.PopID();
-                if (ImGui.IsItemClicked())
-                    ImGui.GetStateStorage().SetInt(ImGui.GetID(group.GetHashCode()), nodeState == 1 ? 0 : 1);
+                bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
+                if (ImGui.BeginDragDropSource())
+                {
+                    _dragging = true;
+                    _draggedObject = group;
+                    ImGui.SetDragDropPayload("GROUP", IntPtr.Zero, 0);
+                    ImGui.Text($"{group.GroupType} {group.Min}");
+                    ImGui.EndDragDropSource();
+                }
+                if (ImGui.BeginDragDropTarget())
+                {
+                    if (ImGui.AcceptDragDropPayload("GROUP").IsDataType("Group"))
+                    {
+                        _dropTarget = group;
+                        _dropTargetIsGroup = true;
+                    }
+                    else if (ImGui.AcceptDragDropPayload("ELEMENT").IsDataType("Element"))
+                    {
+                        _dropTarget = group;
+                        _dropTargetIsGroup = false;
+                    }
+                    ImGui.EndDragDropTarget();
+                }
                 if (isNodeOpen)
                 {
-                    // Allow editing of Group values
-                    ImGui.PushID(group.GetHashCode() + 1);
-                    ImGui.PushItemWidth(l / 2);
-                    ImGui.InputText("GroupType", ref group.GroupType, 255);
-                    ImGui.PopID();
-                    ImGui.SameLine();
-                    ImGui.PushID(group.GetHashCode() + 2);
-                    ImGui.PushItemWidth(r);
-                    ImGui.InputInt("Min", ref group.Min);
-                    ImGui.PopID();
-
                     foreach (Element subElement in group.ElementList)
                     {
                         RecursiveMenu(subElement);
@@ -116,41 +127,22 @@ namespace Triggered
                     {
                         RecursiveMenu(subGroup);
                     }
-
                     ImGui.TreePop();
                 }
             }
             else if (obj is Element leaf)
             {
-                ImGui.PushID(leaf.GetHashCode());
-                int nodeState = ImGui.GetStateStorage().GetInt(ImGui.GetID(leaf.GetHashCode()));
-                ImGui.SetNextItemOpen(nodeState == 1);
-                bool isNodeOpen = ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow);
-                ImGui.PopID();
-                if (ImGui.IsItemClicked())
-                    ImGui.GetStateStorage().SetInt(ImGui.GetID(leaf.GetHashCode()), nodeState == 1 ? 0 : 1);
+                bool isNodeOpen = ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
+                if (ImGui.BeginDragDropSource())
+                {
+                    _dragging = true;
+                    _draggedObject = leaf;
+                    ImGui.SetDragDropPayload("ELEMENT", IntPtr.Zero, 0);
+                    ImGui.Text($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}");
+                    ImGui.EndDragDropSource();
+                }
                 if (isNodeOpen)
                 {
-                    // Allow editing of Element values
-                    ImGui.PushID(leaf.GetHashCode() + 1);
-                    ImGui.PushItemWidth(l);
-                    ImGui.InputText("Key", ref leaf.Key, 255);
-                    ImGui.PopID();
-                    ImGui.SameLine();
-                    ImGui.PushID(leaf.GetHashCode() + 2);
-                    ImGui.PushItemWidth(r);
-                    ImGui.InputText("Eval", ref leaf.Eval, 255);
-                    ImGui.PopID();
-                    ImGui.PushID(leaf.GetHashCode() + 3);
-                    ImGui.PushItemWidth(l);
-                    ImGui.InputText("Min", ref leaf.Min, 255);
-                    ImGui.PopID();
-                    ImGui.SameLine();
-                    ImGui.PushID(leaf.GetHashCode() + 4);
-                    ImGui.PushItemWidth(r);
-                    ImGui.InputInt("Weight", ref leaf.Weight);
-                    ImGui.PopID();
-
                     ImGui.TreePop();
                 }
             }

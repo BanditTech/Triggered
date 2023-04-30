@@ -65,6 +65,20 @@ public class Group : IGroupElement
     {
         GroupList.Remove(group);
     }
+    public void Remove(IGroupElement item)
+    {
+        if (item is Group group)
+            RemoveGroup(group);
+        else if (item is Element element)
+            RemoveElement(element);
+    }
+    public void Add(IGroupElement item)
+    {
+        if (item is Group group)
+            AddGroup(group);
+        else if (item is Element element)
+            AddElement(element);
+    }
 }
 public class TopGroup : Group
 {
