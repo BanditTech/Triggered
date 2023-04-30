@@ -132,12 +132,13 @@ namespace Triggered
                 bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
                 if (group is not TopGroup && ImGui.BeginDragDropSource())
                 {
-                    //idk?
+                    //idk? ImGui.SetDragDropPayload()
                     ImGui.Text($"{group.GroupType} {group.Min}");
                     ImGui.EndDragDropSource();
                 }
                 if (ImGui.BeginDragDropTarget())
                 {
+                    ImGuiPayloadPtr payload = ImGui.GetDragDropPayload();
                     ImGui.EndDragDropTarget();
                 }
                 if (isNodeOpen)
@@ -162,12 +163,13 @@ namespace Triggered
                 bool isNodeOpen = ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
                 if (ImGui.BeginDragDropSource())
                 {
-                    //idk?
+                    //idk? ImGui.SetDragDropPayload()
                     ImGui.Text($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}");
                     ImGui.EndDragDropSource();
                 }
                 if (ImGui.BeginDragDropTarget())
                 {
+                    ImGuiPayloadPtr payload = ImGui.GetDragDropPayload();
                     ImGui.EndDragDropTarget();
                 }
                 if (isNodeOpen)
