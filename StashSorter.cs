@@ -12,9 +12,9 @@ namespace Triggered
     static class StashSorter
     {
         static string _dragTarget;
-        static string _dragTargetType;
+        static Type _dragTargetType;
         static string _dragSource;
-        static string _dragSourceType;
+        static Type _dragSourceType;
         static bool _dragFinalize;
         #region Setup Functions
         static StashSorter()
@@ -94,6 +94,7 @@ namespace Triggered
 
             // End the main window
             ImGui.End();
+
             // finalize the drag action while the collection is not being looped
             if (_dragFinalize)
             {
@@ -113,26 +114,16 @@ namespace Triggered
                 bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
                 if (ImGui.BeginDragDropTarget())
                 {
-                    bool isDropped = false;
                     _dragTarget = indexer;
-                    _dragTargetType = "GROUP";
+                    _dragTargetType = typeof(Group);
                     if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                    {
-                        isDropped = true;
-                        App.Log($"{_dragSourceType} dropped on {_dragTargetType}");
-                    }
-                    if (isDropped)
-                    {
-                        App.Log($"Pop {_dragSource} and prepare to insert at {_dragTarget}");
                         _dragFinalize = true;
-                        App.Log($"{_dragFinalize} set to true");
-                    }
                     ImGui.EndDragDropTarget();
                 }
                 if (group is not TopGroup && ImGui.BeginDragDropSource())
                 {
                     _dragSource = indexer;
-                    _dragSourceType = "GROUP";
+                    _dragSourceType = typeof(Group);
                     ImGui.SetDragDropPayload("COMPONENT",IntPtr.Zero,0);
                     ImGui.Text($"{indexer}");
                     ImGui.EndDragDropSource();
@@ -161,27 +152,16 @@ namespace Triggered
                 bool isNodeOpen = ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
                 if (ImGui.BeginDragDropTarget())
                 {
-                    bool isDropped = false;
                     _dragTarget = indexer;
-                    _dragTargetType = "ELEMENT";
+                    _dragTargetType = typeof(Element);
                     if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
-                    {
-                        isDropped = true;
-                        App.Log($"{_dragSourceType} dropped on {_dragTargetType}");
-                    }
-                    if (isDropped)
-                    {
-                        App.Log($"Pop {_dragSource} and prepare to insert at {_dragTarget}");
-                        //App.Log($"{GetObjectByIndexer(_dragSource, _dragSourceType, true)}");
                         _dragFinalize = true;
-                        App.Log($"{_dragFinalize} set to true");
-                    }
                     ImGui.EndDragDropTarget();
                 }
                 if (ImGui.BeginDragDropSource())
                 {
                     _dragSource = indexer;
-                    _dragSourceType = "ELEMENT";
+                    _dragSourceType = typeof(Element);
                     ImGui.SetDragDropPayload("COMPONENT", IntPtr.Zero, 0);
                     ImGui.Text($"{indexer}");
                     ImGui.EndDragDropSource();
@@ -193,31 +173,27 @@ namespace Triggered
                 }
             }
             else
-            {
                 App.Log("This should not display",NLog.LogLevel.Error);
-            }
         }
-        static object GetObjectByIndexer(string indexer, string type, bool pop = false)
+        static object GetObjectByIndexer(string indexer, Type type, bool pop = false)
         {
+            if (indexer == "0")
+                throw new ArgumentException("TopGroup should never be a drag source.");
+
             string[] indices = indexer.Split('_');
             int length = indices.Length;
-
-            if (length == 1)
-            {
-                // indexer refers to App.StashSorterList[App.SelectedGroup]
-                return App.StashSorterList[App.SelectedGroup];
-            }
-
             object target = App.StashSorterList[App.SelectedGroup];
             object parent;
 
+            // Iterate over the index keys, skipping the first one (which is always 0)
             for (int i = 1; i < length; i++)
             {
                 int index = int.Parse(indices[i]);
 
+                // If we have not reached the end of the list, its a group
                 if (i == length - 1)
                 {
-                    if (type == "ELEMENT")
+                    if (type == typeof(Element))
                     {
                         // final indexer digit is in ElementList array
                         parent = target;
@@ -225,73 +201,63 @@ namespace Triggered
                         if (pop)
                             ((Group)parent).ElementList.RemoveAt(index);
                     }
-                    else if (type == "GROUP")
+                    else if (type == typeof(Group))
                     {
                         // final indexer digit is in GroupList array
                         parent = target;
                         target = ((Group)target).GroupList[index];
                         if (pop)
                             ((Group)parent).GroupList.RemoveAt(index);
-
                     }
                     else
-                    {
-                        throw new ArgumentException("Invalid _type argument");
-                    }
+                        throw new ArgumentException($"Expecting GROUP or ELEMENT type but received {type}");
                 }
                 else
-                {
-                    // indexer represents a group we need to drill down into
                     target = ((dynamic)target).GroupList[index];
-                }
             }
-            if (type == "GROUP")
+            if (type == typeof(Group))
                 return (Group)target;
-            else if (type == "ELEMENT")
+            else if (type == typeof(Element))
                 return (Element)target;
             return target;
         }
-        static void InsertObjectByIndexer(string indexer, string targetType, string sourceType, object obj)
+        static void InsertObjectByIndexer(string indexer, Type targetType, Type sourceType, object obj)
         {
-            string[] indices = indexer.Split('_');
-            int length = indices.Length;
-
-            if (length == 1)
+            if (indexer == "0")
             {
-                if (sourceType == "GROUP")
-                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).AddGroup((Group)obj);
-                else if (sourceType == "ELEMENT")
-                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).AddElement((Element)obj);
+                if (sourceType == typeof(Group))
+                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add((Group)obj);
+                else if (sourceType == typeof(Element))
+                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add((Element)obj);
                 return;
             }
-            // Set the initial target object to be the StashSorterList at the currently selected group
+
+            string[] indices = indexer.Split('_');
+            int length = indices.Length;
             Group target = (TopGroup)App.StashSorterList[App.SelectedGroup];
+
             // Iterate over the index keys, skipping the first one (which is always 0)
             for (int i = 1; i < length; i++)
             {
                 int key = int.Parse(indices[i]);
+
+                // If we are not at the last key, it is always a group
                 if (i == length - 1)
                 {
-                    if (targetType == "GROUP")
+                    // If the last target key is a group, we finish drilling down
+                    if (targetType == typeof(Group))
                     {
                         target = (target).GroupList[key];
                         key = 0;
                     }
-                    if (sourceType == "ELEMENT")
-                    {
+                    // Depending on our source type, we insert the correct object type
+                    if (sourceType == typeof(Element))
                         target.Insert(key,(Element)obj);
-                    }
-                    else if (sourceType == "GROUP")
-                    {
+                    else if (sourceType == typeof(Group))
                         target.Insert(key,(Group)obj);
-                    }
                 }
                 else
-                {
-                    // indexer represents a group we need to drill down into
                     target = ((dynamic)target).GroupList[key];
-                }
-
             }
         }
     }
