@@ -18,6 +18,7 @@ namespace Triggered
         static string _dragSource;
         static Type _dragSourceType;
         static bool _dragFinalize;
+
         #region Setup Functions
         static StashSorter()
         {
@@ -82,6 +83,7 @@ namespace Triggered
             App.TopGroups = topGroupsList.ToArray();
         }
         #endregion
+
         public static void Render()
         {
             // Create the main window
@@ -181,6 +183,8 @@ namespace Triggered
             else
                 App.Log("This should not display",NLog.LogLevel.Error);
         }
+
+        #region Movement Helpers
         static object GetObjectByIndexer(string indexer, Type type, bool pop = false)
         {
             if (indexer == "0")
@@ -301,5 +305,6 @@ namespace Triggered
 
             return source != target && !IsChildObject(source, target);
         }
+        #endregion
     }
 }
