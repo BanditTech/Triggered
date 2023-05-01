@@ -99,21 +99,19 @@ namespace Triggered
             {
                 ImGui.PushID(group.GetHashCode());
                 bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
-                ImGui.PopID();
                 if (ImGui.BeginDragDropTarget())
                 {
                     bool isDropped = false;
                     _dragTarget = indexer;
                     _dragTargetType = "GROUP";
-                    //App.Log($"{_dragSource} {_dragSourceType} hovering on {_dragTarget} {_dragTargetType}");
-                    if (ImGui.IsItemHovered() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                     {
                         isDropped = true;
-                        App.Log($"{_dragSource} {_dragSourceType} dropped on {_dragTarget} {_dragTargetType}");
+                        App.Log($"{_dragSourceType} dropped on {_dragTargetType}");
                     }
                     if (isDropped)
                     {
-                        App.Log($"Remove {_dragSourceType} {_dragSource} and prepare to insert at {_dragTargetType} {_dragTarget}");
+                        App.Log($"Pop {_dragSource} and prepare to insert at {_dragTarget}");
                     }
                     ImGui.EndDragDropTarget();
                 }
@@ -125,6 +123,7 @@ namespace Triggered
                     ImGui.Text($"{indexer}");
                     ImGui.EndDragDropSource();
                 }
+                ImGui.PopID();
                 if (isNodeOpen)
                 {
                     int i = -1;
@@ -146,21 +145,19 @@ namespace Triggered
             {
                 ImGui.PushID(leaf.GetHashCode());
                 bool isNodeOpen = ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
-                ImGui.PopID();
                 if (ImGui.BeginDragDropTarget())
                 {
                     bool isDropped = false;
                     _dragTarget = indexer;
                     _dragTargetType = "ELEMENT";
-                    //App.Log($"{_dragSource} {_dragSourceType} hovering on {_dragTarget} {_dragTargetType}");
-                    if (ImGui.IsItemHovered() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                     {
                         isDropped = true;
-                        App.Log($"{_dragSource} {_dragSourceType} dropped on {_dragTarget} {_dragTargetType}");
+                        App.Log($"{_dragSourceType} dropped on {_dragTargetType}");
                     }
                     if (isDropped)
                     {
-                        App.Log($"Remove {_dragSourceType} {_dragSource} and prepare to insert at {_dragTargetType} {_dragTarget}");
+                        App.Log($"Pop {_dragSource} and prepare to insert at {_dragTarget}");
                     }
                     ImGui.EndDragDropTarget();
                 }
@@ -172,6 +169,7 @@ namespace Triggered
                     ImGui.Text($"{indexer}");
                     ImGui.EndDragDropSource();
                 }
+                ImGui.PopID();
                 if (isNodeOpen)
                 {
                     ImGui.TreePop();
