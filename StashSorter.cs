@@ -84,10 +84,10 @@ namespace Triggered
         {
             // Create the main window
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(500, 500), ImGuiCond.FirstUseEver);
-            ImGui.Begin("Edit TopGroup");
+            ImGui.Begin("Edit Stash Sorter");
 
             // Select the TopGroup
-            ImGui.Combo("Top Group", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
+            ImGui.Combo("Selected Filter", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
 
             // We recurse the Group structure drawing them onto our menu
             RecursiveMenu(App.StashSorterList[App.SelectedGroup]);
