@@ -4,6 +4,8 @@ using NLog.Targets;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -84,6 +86,7 @@ namespace Triggered
         {
             // Create the main window
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(500, 500), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(500, 200), new Vector2(float.MaxValue, float.MaxValue));
             ImGui.Begin("Edit Stash Sorter");
 
             // Select the TopGroup
@@ -99,6 +102,9 @@ namespace Triggered
             if (_dragFinalize)
             {
                 _dragFinalize = false;
+                App.Log($"Source: {_dragSource} Target: {_dragTarget}");
+                App.Log($"After making adjustment\n" +
+                    $"Source: {StripIndexerElement(_dragSourceType,_dragSource)} Target: {StripIndexerElement(_dragTargetType,_dragTarget)}");
                 object fetch = GetObjectByIndexer(_dragSource, _dragSourceType, true);
                 InsertObjectByIndexer(_dragTarget,_dragTargetType,_dragSourceType,fetch);
                 App.Log($"{fetch} {JSON.Str(fetch)}");
@@ -111,12 +117,12 @@ namespace Triggered
             if (obj is Group group)
             {
                 ImGui.PushID(group.GetHashCode());
-                bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
+                bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
                 if (ImGui.BeginDragDropTarget())
                 {
                     _dragTarget = indexer;
                     _dragTargetType = typeof(Group);
-                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    if (CanDrop() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                         _dragFinalize = true;
                     ImGui.EndDragDropTarget();
                 }
@@ -154,7 +160,7 @@ namespace Triggered
                 {
                     _dragTarget = indexer;
                     _dragTargetType = typeof(Element);
-                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    if (CanDrop() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                         _dragFinalize = true;
                     ImGui.EndDragDropTarget();
                 }
@@ -259,6 +265,41 @@ namespace Triggered
                 else
                     target = ((dynamic)target).GroupList[key];
             }
+        }
+        static bool IsChildObject(string sourceIndexer, string targetIndexer)
+        {
+            string[] sourceKeys = sourceIndexer.Split('_');
+            string[] targetKeys = targetIndexer.Split('_');
+
+            // Check if the target object is a child of the source object
+            for (int i = 1; i < sourceKeys.Length; i++)
+            {
+                // If the source and target have different group keys at the same level, they are not related
+                if (targetKeys.Length <= i || sourceKeys[i] != targetKeys[i])
+                {
+                    return false;
+                }
+            }
+
+            // If the target has more group keys than the source, it is a child of the source
+            return targetKeys.Length > sourceKeys.Length;
+        }
+        static string StripIndexerElement(Type type, string indexer)
+        {
+            if (type == typeof(Element))
+                return indexer.Substring(0, indexer.Length - 2);
+            return indexer;
+        }
+        static bool CanDrop()
+        {
+            string source = StripIndexerElement(_dragSourceType,_dragSource);
+            string target = StripIndexerElement(_dragTargetType,_dragTarget);
+
+            if (_dragSourceType == typeof(Element))
+                return true;
+
+
+            return source != target && !IsChildObject(source, target);
         }
     }
 }
