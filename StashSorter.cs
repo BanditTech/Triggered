@@ -1,7 +1,10 @@
 ﻿using ImGuiNET;
+using Newtonsoft.Json.Linq;
+using NLog.Targets;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Triggered
@@ -12,6 +15,7 @@ namespace Triggered
         static string _dragTargetType;
         static string _dragSource;
         static string _dragSourceType;
+        static bool _dragFinalize;
         #region Setup Functions
         static StashSorter()
         {
@@ -90,6 +94,14 @@ namespace Triggered
 
             // End the main window
             ImGui.End();
+            // finalize the drag action while the collection is not being looped
+            if (_dragFinalize)
+            {
+                _dragFinalize = false;
+                object fetch = GetObjectByIndexer(_dragSource, _dragSourceType, true);
+                InsertObjectByIndexer(_dragTarget,_dragTargetType,_dragSourceType,fetch);
+                App.Log($"{fetch} {JSON.Str(fetch)}");
+            }
         }
         static void RecursiveMenu(IGroupElement obj,string indexer = "0")
         {
@@ -112,6 +124,8 @@ namespace Triggered
                     if (isDropped)
                     {
                         App.Log($"Pop {_dragSource} and prepare to insert at {_dragTarget}");
+                        _dragFinalize = true;
+                        App.Log($"{_dragFinalize} set to true");
                     }
                     ImGui.EndDragDropTarget();
                 }
@@ -158,6 +172,9 @@ namespace Triggered
                     if (isDropped)
                     {
                         App.Log($"Pop {_dragSource} and prepare to insert at {_dragTarget}");
+                        //App.Log($"{GetObjectByIndexer(_dragSource, _dragSourceType, true)}");
+                        _dragFinalize = true;
+                        App.Log($"{_dragFinalize} set to true");
                     }
                     ImGui.EndDragDropTarget();
                 }
@@ -178,6 +195,103 @@ namespace Triggered
             else
             {
                 App.Log("This should not display",NLog.LogLevel.Error);
+            }
+        }
+        static object GetObjectByIndexer(string indexer, string type, bool pop = false)
+        {
+            string[] indices = indexer.Split('_');
+            int length = indices.Length;
+
+            if (length == 1)
+            {
+                // indexer refers to App.StashSorterList[App.SelectedGroup]
+                return App.StashSorterList[App.SelectedGroup];
+            }
+
+            object target = App.StashSorterList[App.SelectedGroup];
+            object parent;
+
+            for (int i = 1; i < length; i++)
+            {
+                int index = int.Parse(indices[i]);
+
+                if (i == length - 1)
+                {
+                    if (type == "ELEMENT")
+                    {
+                        // final indexer digit is in ElementList array
+                        parent = target;
+                        target = ((Group)target).ElementList[index];
+                        if (pop)
+                            ((Group)parent).ElementList.RemoveAt(index);
+                    }
+                    else if (type == "GROUP")
+                    {
+                        // final indexer digit is in GroupList array
+                        parent = target;
+                        target = ((Group)target).GroupList[index];
+                        if (pop)
+                            ((Group)parent).GroupList.RemoveAt(index);
+
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid _type argument");
+                    }
+                }
+                else
+                {
+                    // indexer represents a group we need to drill down into
+                    target = ((dynamic)target).GroupList[index];
+                }
+            }
+            if (type == "GROUP")
+                return (Group)target;
+            else if (type == "ELEMENT")
+                return (Element)target;
+            return target;
+        }
+        static void InsertObjectByIndexer(string indexer, string targetType, string sourceType, object obj)
+        {
+            string[] indices = indexer.Split('_');
+            int length = indices.Length;
+
+            if (length == 1)
+            {
+                if (sourceType == "GROUP")
+                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).AddGroup((Group)obj);
+                else if (sourceType == "ELEMENT")
+                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).AddElement((Element)obj);
+                return;
+            }
+            // Set the initial target object to be the StashSorterList at the currently selected group
+            Group target = (TopGroup)App.StashSorterList[App.SelectedGroup];
+            // Iterate over the index keys, skipping the first one (which is always 0)
+            for (int i = 1; i < length; i++)
+            {
+                int key = int.Parse(indices[i]);
+                if (i == length - 1)
+                {
+                    if (targetType == "GROUP")
+                    {
+                        target = (target).GroupList[key];
+                        key = 0;
+                    }
+                    if (sourceType == "ELEMENT")
+                    {
+                        target.Insert(key,(Element)obj);
+                    }
+                    else if (sourceType == "GROUP")
+                    {
+                        target.Insert(key,(Group)obj);
+                    }
+                }
+                else
+                {
+                    // indexer represents a group we need to drill down into
+                    target = ((dynamic)target).GroupList[key];
+                }
+
             }
         }
     }

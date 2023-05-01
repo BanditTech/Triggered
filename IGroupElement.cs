@@ -35,6 +35,17 @@ public class Group : IGroupElement
         ElementList = new List<Element>();
         GroupList = new List<Group>();
     }
+    public Group(JObject jobj)
+    {
+        if (jobj.TryGetValue("GroupType", out JToken typeToken))
+            GroupType = typeToken.Value<string>();
+        if (jobj.TryGetValue("Min", out JToken minToken))
+            Min = minToken.Value<int>();
+        if (jobj.TryGetValue("ElementList", out JToken elementToken))
+            ElementList = elementToken.ToObject<List<Element>>();
+        if (jobj.TryGetValue("GroupList", out JToken groupToken))
+            GroupList = groupToken.ToObject<List<Group>>();
+    }
     public Group(string groupType, int min)
     {
         GroupType = groupType;
@@ -79,6 +90,13 @@ public class Group : IGroupElement
         else if (item is Element element)
             AddElement(element);
     }
+    public void Insert(int index, IGroupElement item)
+    {
+        if (item is Group group)
+            GroupList.Insert(index,group);
+        else if (item is Element element)
+            ElementList.Insert(index, element);
+    }
 }
 public class TopGroup : Group
 {
@@ -90,6 +108,15 @@ public class TopGroup : Group
         GroupName = "";
         StashTab = 0;
         Strictness = 0;
+    }
+    public TopGroup(JObject jobj) : base(jobj)
+    {
+        if (jobj.TryGetValue("GroupName", out JToken nameToken))
+            GroupName = nameToken.Value<string>();
+        if (jobj.TryGetValue("StashTab", out JToken stashToken))
+            StashTab = stashToken.Value<int>();
+        if (jobj.TryGetValue("Strictness", out JToken strictnessToken))
+            Strictness = strictnessToken.Value<int>();
     }
     public TopGroup(string groupName, string groupType, int min = 1, int stashTab = 0, int strictness = -1) : base(groupType, min)
     {
@@ -117,6 +144,18 @@ public class Element : IGroupElement
         Min = "Some Value";
         Weight = 1;
     }
+    public Element(JObject jobj)
+    {
+        if (jobj.TryGetValue("Key", out JToken keyToken))
+            Key = keyToken.Value<string>();
+        if (jobj.TryGetValue("Eval", out JToken evalToken))
+        Eval = evalToken.Value<string>();
+        if (jobj.TryGetValue("Min", out JToken minToken))
+        Min = minToken.Value<string>();
+        if (jobj.TryGetValue("Weight", out JToken weightToken))
+        Weight = weightToken.Value<int>();
+    }
+    [JsonConstructor]
     public Element(string key, string eval, string min, int weight = 1)
     {
         Key = key;
@@ -131,36 +170,28 @@ public class IGroupElementJsonConverter : JsonConverter<IGroupElement>
     {
         // Load JObject from stream
         JObject jsonObject = JObject.Load(reader);
-        // Validate 'Min' property
         var min = jsonObject["Min"];
         var groupName = jsonObject["GroupName"];
         var groupType = jsonObject["GroupType"];
-        List<Element> elementList;
-        List<Group> groupList;
         // First we validate the objects and ensure they share a common key "Min".
-        // Groups will contain an int Min while elements have a string Min
         if (min == null || min.Type == JTokenType.Null)
             throw new JsonSerializationException("Invalid JSON object format: missing or invalid 'Min' property.");
         if (jsonObject["Key"] != null && jsonObject["Eval"] != null && min != null && jsonObject["Weight"] != null)
         {
             // We have an instance of an Element
-            Element element = new Element((string)jsonObject["Key"], (string)jsonObject["Eval"], (string)min, (int)jsonObject["Weight"]);
+            Element element = new Element(jsonObject);
             return element;
         }
         else if (groupName != null && groupType != null && min != null && jsonObject["StashTab"] != null && jsonObject["Strictness"] != null && jsonObject["ElementList"] != null)
         {
             // We have an instance of a TopGroup
-            elementList = jsonObject["ElementList"].ToObject<List<Element>>();
-            groupList = jsonObject["GroupList"].ToObject<List<Group>>();
-            TopGroup topGroup = new TopGroup(elementList,groupList,(string)groupName, (string)groupType, (int)min, (int)jsonObject["StashTab"], (int)jsonObject["Strictness"]);
+            TopGroup topGroup = new TopGroup(jsonObject);
             return topGroup;
         }
         else if (groupType == null || min == null || jsonObject["ElementList"] == null)
             throw new JsonSerializationException("Invalid JSON object format: Does not match with any IGroupElement Member.");
         // Prior logic leaves us with a Group object
-        elementList = jsonObject["ElementList"].ToObject<List<Element>>();
-        groupList = jsonObject["GroupList"].ToObject<List<Group>>();
-        Group group = new Group(elementList,groupList,(string)groupType,(int)min);
+        Group group = new Group(jsonObject);
         return group;
     }
     public override void WriteJson(JsonWriter writer, IGroupElement value, JsonSerializer serializer)
