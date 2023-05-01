@@ -8,8 +8,11 @@ namespace Triggered
 {
     static class StashSorter
     {
+        static string _dragTarget;
+        static string _dragTargetType;
+        static string _dragSource;
+        static string _dragSourceType;
         #region Setup Functions
-        static bool firstRun = true;
         static StashSorter()
         {
             DumpExampleJson();
@@ -21,10 +24,18 @@ namespace Triggered
             Group examplegroup = new Group();
             Element exampleelement = new Element();
             examplegroup.AddElement(exampleelement);
+            examplegroup.AddElement(exampleelement);
+            examplegroup.AddElement(exampleelement);
+
+            Group demoGroup = new Group();
+            demoGroup.AddGroup(examplegroup);
+            demoGroup.AddElement(exampleelement);
 
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
             example1.AddElement(exampleelement);
             example1.AddElement(exampleelement);
+            example1.AddGroup(demoGroup);
+            example1.AddGroup(examplegroup);
             example1.AddGroup(examplegroup);
             //TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
             //example2.AddElement(exampleelement);
@@ -77,79 +88,52 @@ namespace Triggered
             // We recurse the Group structure drawing them onto our menu
             RecursiveMenu(App.StashSorterList[App.SelectedGroup]);
 
-            if (firstRun)
-                firstRun = false;
             // End the main window
             ImGui.End();
         }
-        static Element FindElementById(Group parentGroup, int id)
-        {
-            foreach (Element element in parentGroup.ElementList)
-            {
-                if (element.GetHashCode() == id)
-                {
-                    return element;
-                }
-            }
-
-            foreach (Group group in parentGroup.GroupList)
-            {
-                Element foundElement = FindElementById(group, id);
-                if (foundElement != null)
-                {
-                    return foundElement;
-                }
-            }
-
-            return null;
-        }
-        static Group FindGroupById(Group parentGroup, int id)
-        {
-            foreach (Group group in parentGroup.GroupList)
-            {
-                if (group.GetHashCode() == id)
-                {
-                    return group;
-                }
-                else
-                {
-                    Group foundGroup = FindGroupById(group, id);
-                    if (foundGroup != null)
-                    {
-                        return foundGroup;
-                    }
-                }
-            }
-            return null;
-        }
-
         static void RecursiveMenu(IGroupElement obj,string indexer = "0")
         {
             if (obj == null)
                 return;
             if (obj is Group group)
             {
+                ImGui.PushID(group.GetHashCode());
                 bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
-                if (group is not TopGroup && ImGui.BeginDragDropSource())
-                {
-                    //idk? ImGui.SetDragDropPayload()
-                    ImGui.Text($"{group.GroupType} {group.Min}");
-                    ImGui.EndDragDropSource();
-                }
+                ImGui.PopID();
                 if (ImGui.BeginDragDropTarget())
                 {
-                    ImGuiPayloadPtr payload = ImGui.GetDragDropPayload();
+                    bool isDropped = false;
+                    _dragTarget = indexer;
+                    _dragTargetType = "GROUP";
+                    //App.Log($"{_dragSource} {_dragSourceType} hovering on {_dragTarget} {_dragTargetType}");
+                    if (ImGui.IsItemHovered() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    {
+                        isDropped = true;
+                        App.Log($"{_dragSource} {_dragSourceType} dropped on {_dragTarget} {_dragTargetType}");
+                    }
+                    if (isDropped)
+                    {
+                        App.Log($"Remove {_dragSourceType} {_dragSource} and prepare to insert at {_dragTargetType} {_dragTarget}");
+                    }
                     ImGui.EndDragDropTarget();
+                }
+                if (group is not TopGroup && ImGui.BeginDragDropSource())
+                {
+                    _dragSource = indexer;
+                    _dragSourceType = "GROUP";
+                    ImGui.SetDragDropPayload("COMPONENT",IntPtr.Zero,0);
+                    ImGui.Text($"{indexer}");
+                    ImGui.EndDragDropSource();
                 }
                 if (isNodeOpen)
                 {
-                    int i = 0;
+                    int i = -1;
                     foreach (Element subElement in group.ElementList)
                     {
                         i++;
                         RecursiveMenu(subElement,$"{indexer}_{i}");
                     }
-                    i = 0;
+                    i = -1;
                     foreach (Group subGroup in group.GroupList)
                     {
                         i++;
@@ -160,17 +144,33 @@ namespace Triggered
             }
             else if (obj is Element leaf)
             {
+                ImGui.PushID(leaf.GetHashCode());
                 bool isNodeOpen = ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
-                if (ImGui.BeginDragDropSource())
-                {
-                    //idk? ImGui.SetDragDropPayload()
-                    ImGui.Text($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}");
-                    ImGui.EndDragDropSource();
-                }
+                ImGui.PopID();
                 if (ImGui.BeginDragDropTarget())
                 {
-                    ImGuiPayloadPtr payload = ImGui.GetDragDropPayload();
+                    bool isDropped = false;
+                    _dragTarget = indexer;
+                    _dragTargetType = "ELEMENT";
+                    //App.Log($"{_dragSource} {_dragSourceType} hovering on {_dragTarget} {_dragTargetType}");
+                    if (ImGui.IsItemHovered() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    {
+                        isDropped = true;
+                        App.Log($"{_dragSource} {_dragSourceType} dropped on {_dragTarget} {_dragTargetType}");
+                    }
+                    if (isDropped)
+                    {
+                        App.Log($"Remove {_dragSourceType} {_dragSource} and prepare to insert at {_dragTargetType} {_dragTarget}");
+                    }
                     ImGui.EndDragDropTarget();
+                }
+                if (ImGui.BeginDragDropSource())
+                {
+                    _dragSource = indexer;
+                    _dragSourceType = "ELEMENT";
+                    ImGui.SetDragDropPayload("COMPONENT", IntPtr.Zero, 0);
+                    ImGui.Text($"{indexer}");
+                    ImGui.EndDragDropSource();
                 }
                 if (isNodeOpen)
                 {
