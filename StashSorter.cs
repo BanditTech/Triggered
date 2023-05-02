@@ -17,6 +17,9 @@ namespace Triggered
         static bool _editWindowOpen = false;
         static Element _rightClickedElement = null;
         static Group _rightClickedGroup = null;
+        static bool confirmRemove = false;
+        static Type removeType;
+        static string removeIndexer;
 
         #region Setup Functions
         static StashSorter()
@@ -104,12 +107,14 @@ namespace Triggered
             {
                 _dragStarted = false;
                 _dragFinalize = false;
-                App.Log($"Source: {_dragSource} Target: {_dragTarget}");
-                App.Log($"After making adjustment\n" +
-                    $"Source: {StripIndexerElement(_dragSourceType,_dragSource)} Target: {StripIndexerElement(_dragTargetType,_dragTarget)}");
                 object fetch = GetObjectByIndexer(_dragSource, _dragSourceType, true);
                 InsertObjectByIndexer(_dragTarget,_dragTargetType,_dragSourceType,fetch);
                 App.Log($"{fetch} {JSON.Str(fetch)}");
+            }
+            if (confirmRemove)
+            {
+                confirmRemove = false;
+                _ = GetObjectByIndexer(removeIndexer, removeType, true);
             }
             if (_dragStarted && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                 _dragStarted = false;
@@ -126,6 +131,37 @@ namespace Triggered
                 str += group.GroupType == "COUNT" ? $" with minimum of {group.Min} match value"
                     : group.GroupType == "WEIGHT" ? $" with minimum of {group.Min} weight"
                     : "";
+                if (group is not TopGroup)
+                {
+                    // allow for deletion of an Group
+                    if (ImGui.Button("X"))
+                    {
+                        removeType = typeof(Group);
+                        removeIndexer = indexer;
+                        ImGui.OpenPopup("DeleteItem");
+                    }
+                    if (ImGui.BeginPopupModal("DeleteItem"))
+                    {
+                        ImGui.Text("Are you sure you want to delete this item?");
+                        if (ImGui.Button("Yes", new Vector2(120, 0)))
+                        {
+                            // delete the item
+                            confirmRemove = true;
+                            ImGui.CloseCurrentPopup();
+                        }
+                        ImGui.SameLine();
+                        if (ImGui.Button("No", new Vector2(120, 0)))
+                        {
+                            removeIndexer = null;
+                            removeType = null;
+                            confirmRemove = false;
+                            ImGui.CloseCurrentPopup();
+                        }
+                        ImGui.EndPopup();
+                    }
+                    ImGui.SameLine();
+                }
+
                 bool isNodeOpen = ImGui.TreeNodeEx(str, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
                 if (ImGui.BeginDragDropTarget())
                 {
@@ -177,7 +213,37 @@ namespace Triggered
                 ImGui.PushID(leaf.GetHashCode());
                 string str = IsWeighted ? $"{leaf.Weight}# " : "";
                 str += $"{leaf.Key} {leaf.Eval} {leaf.Min}";
+
+                // allow for deletion of an Element
+                if (ImGui.Button("X"))
+                {
+                    removeType = typeof(Element);
+                    removeIndexer = indexer;
+                    ImGui.OpenPopup("DeleteItem");
+                }
+                if (ImGui.BeginPopupModal("DeleteItem"))
+                {
+                    ImGui.Text("Are you sure you want to delete this item?");
+                    if (ImGui.Button("Yes", new Vector2(120, 0)))
+                    {
+                        // delete the item
+                        confirmRemove = true;
+                        ImGui.CloseCurrentPopup();
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("No", new Vector2(120, 0)))
+                    {
+                        removeIndexer = null;
+                        removeType = null;
+                        confirmRemove = false;
+                        ImGui.CloseCurrentPopup();
+                    }
+                    ImGui.EndPopup();
+                }
+
+                ImGui.SameLine();
                 ImGui.Selectable(str);
+                
                 if (ImGui.BeginDragDropTarget())
                 {
                     _dragTarget = indexer;

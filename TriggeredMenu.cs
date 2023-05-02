@@ -28,8 +28,6 @@
         private void LogicUpdate()
         {
             Thread.Sleep(App.LogicTickDelayInMilliseconds);
-            //App.Log("test Message", ExampleAppLog.logLevels[ExampleAppLog.logLevelIndex]);
-            //ExampleAppLog.logLevelIndex = (ExampleAppLog.logLevelIndex + 1) % ExampleAppLog.logLevels.Length;
         }
         // Render thread is run every frame
         // We can piggy back on the render thread for simple keybinds
@@ -82,6 +80,7 @@
             ImGui.SliderFloat("Logic MS", ref delay, 10.0f, 1000.0f);
             App.LogicTickDelayInMilliseconds = (int)delay;
             ImGui.Checkbox("Show/Hide the Log", ref App.MenuDisplay_Log);
+            ImGui.Checkbox("Show/Hide the Stash Sorter", ref App.MenuDisplay_StashSorter);
             ImGui.Separator();
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Stash Sorter.");
@@ -100,7 +99,7 @@
             {
                 ImGui.Text("This is inside the collapsible group box.");
             }
-            ImGui.TreeNode("Lets see how this works");
+
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
             // you should remove the below if-statement as well.
