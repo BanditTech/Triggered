@@ -26,6 +26,7 @@ public class Group : IGroupElement
 {
     public string GroupType;
     public int Min;
+    public int Weight;
     public List<Element> ElementList;
     public List<Group> GroupList;
     public Group()
