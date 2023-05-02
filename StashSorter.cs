@@ -17,6 +17,7 @@ namespace Triggered
         static Type _dragTargetType;
         static string _dragSource;
         static Type _dragSourceType;
+        static bool _dragStarted;
         static bool _dragFinalize;
 
         #region Setup Functions
@@ -103,6 +104,7 @@ namespace Triggered
             // finalize the drag action while the collection is not being looped
             if (_dragFinalize)
             {
+                _dragStarted = false;
                 _dragFinalize = false;
                 App.Log($"Source: {_dragSource} Target: {_dragTarget}");
                 App.Log($"After making adjustment\n" +
@@ -111,6 +113,8 @@ namespace Triggered
                 InsertObjectByIndexer(_dragTarget,_dragTargetType,_dragSourceType,fetch);
                 App.Log($"{fetch} {JSON.Str(fetch)}");
             }
+            if (_dragStarted && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                _dragStarted = false;
         }
         static void RecursiveMenu(IGroupElement obj,string indexer = "0")
         {
@@ -130,6 +134,7 @@ namespace Triggered
                 }
                 if (group is not TopGroup && ImGui.BeginDragDropSource())
                 {
+                    _dragStarted = true;
                     _dragSource = indexer;
                     _dragSourceType = typeof(Group);
                     ImGui.SetDragDropPayload("COMPONENT",IntPtr.Zero,0);
@@ -168,6 +173,7 @@ namespace Triggered
                 }
                 if (ImGui.BeginDragDropSource())
                 {
+                    _dragStarted = true;
                     _dragSource = indexer;
                     _dragSourceType = typeof(Element);
                     ImGui.SetDragDropPayload("COMPONENT", IntPtr.Zero, 0);
@@ -302,6 +308,11 @@ namespace Triggered
             if (_dragSourceType == typeof(Element))
                 return true;
 
+            return source != target && _dragStarted && !IsChildObject(source, target);
+        }
+        #endregion
+
+            return source != target && _dragStarted && !IsChildObject(source, target);
 
             return source != target && !IsChildObject(source, target);
         }
