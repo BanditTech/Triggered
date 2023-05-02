@@ -32,13 +32,20 @@
         public static bool fullscreen = true;
         public static bool padding = false;
         public static bool ShowGroupBoxContents = true;
+        public static ImFontPtr AlmaMono;
+        public static ImFontPtr NotoSans;
 
         static App()
         {
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logimgui = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
+            string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", "AlmaMono-Regular.ttf");
+            AlmaMono = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontPath, 18.0f);
+            fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", "NotoSans-Regular.ttf");
+            NotoSans = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontPath, 18.0f);
         }
+
         #region Log(string log, LogLevel level)
         public static void Log(string log, LogLevel level)
         {
