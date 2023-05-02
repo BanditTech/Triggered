@@ -96,7 +96,7 @@ namespace Triggered
             ImGui.Combo("Selected Filter", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
 
             // We recurse the Group structure drawing them onto our menu
-            RecursiveMenu(App.StashSorterList[App.SelectedGroup]);
+            RecursiveMenu(App.StashSorterList[App.SelectedGroup], "NONE");
 
             // End the main window
             ImGui.End();
@@ -116,14 +116,19 @@ namespace Triggered
             if (_dragStarted && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                 _dragStarted = false;
         }
-        static void RecursiveMenu(IGroupElement obj,string indexer = "0")
+        static void RecursiveMenu(IGroupElement obj,string parentType,string indexer = "0")
         {
             if (obj == null)
                 return;
+            bool IsWeighted = parentType == "COUNT" || parentType == "WEIGHT";
             if (obj is Group group)
             {
                 ImGui.PushID(group.GetHashCode());
-                bool isNodeOpen = ImGui.TreeNodeEx($"{group.GroupType} {group.Min}", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
+                string str = IsWeighted ? $"{group.Weight}# {group.GroupType} Group" : $"{group.GroupType} Group";
+                str += group.GroupType == "COUNT" ? $" with minimum of {group.Min} match value"
+                    : group.GroupType == "WEIGHT" ? $" with minimum of {group.Min} weight"
+                    : "";
+                bool isNodeOpen = ImGui.TreeNodeEx(str, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
                 if (ImGui.BeginDragDropTarget())
                 {
                     _dragTarget = indexer;
@@ -148,7 +153,7 @@ namespace Triggered
                     foreach (Element subElement in group.ElementList)
                     {
                         i++;
-                        RecursiveMenu(subElement,$"{indexer}_{i}");
+                        RecursiveMenu(subElement,group.GroupType,$"{indexer}_{i}");
                     }
                     i = -1;
                     foreach (Group subGroup in group.GroupList)
@@ -162,7 +167,9 @@ namespace Triggered
             else if (obj is Element leaf)
             {
                 ImGui.PushID(leaf.GetHashCode());
-                bool isNodeOpen = ImGui.TreeNodeEx($"Key: {leaf.Key}, Eval: {leaf.Eval}, Min: {leaf.Min}, Weight: {leaf.Weight}", ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
+                string str = IsWeighted ? $"{leaf.Weight}# " : "";
+                str += $"{leaf.Key} {leaf.Eval} {leaf.Min}";
+                ImGui.Selectable(str);
                 if (ImGui.BeginDragDropTarget())
                 {
                     _dragTarget = indexer;
