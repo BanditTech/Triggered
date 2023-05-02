@@ -1,5 +1,6 @@
 ﻿namespace Triggered
 {
+    using ImGuiNET;
     using Newtonsoft.Json;
     using NLog;
     using NLog.Config;
@@ -32,6 +33,8 @@
         public static bool fullscreen = true;
         public static bool padding = false;
         public static bool ShowGroupBoxContents = true;
+        public static string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=" };
+        public static string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
         public static ImFontPtr AlmaMono;
         public static ImFontPtr NotoSans;
 
