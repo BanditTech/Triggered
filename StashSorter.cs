@@ -334,7 +334,7 @@ namespace Triggered
 
         #region Edit Popups
         static Vector4 EditingHighlight = new Vector4(0.0f, 0.5f, 0.9f, 0.3f);
-        static Vector4 EditingBackground = new Vector4(0.0f, 0.0f, 0.8f, 0.2f);
+        static Vector4 EditingBackground = new Vector4(0.3f, 0.3f, 1f, 0.25f);
         static void EditElement(string parentType)
         {
             float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
