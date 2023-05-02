@@ -19,6 +19,9 @@ namespace Triggered
         static Type _dragSourceType;
         static bool _dragStarted;
         static bool _dragFinalize;
+        static bool _editWindowOpen = false;
+        static Element _rightClickedElement = null;
+        static Group _rightClickedGroup = null;
 
         #region Setup Functions
         static StashSorter()
@@ -147,6 +150,16 @@ namespace Triggered
                     ImGui.EndDragDropSource();
                 }
                 ImGui.PopID();
+                if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                {
+                    if (_rightClickedGroup == group)
+                        _rightClickedGroup = null;
+                    else
+                        _rightClickedGroup = group;
+                }
+                if (_rightClickedGroup != null && _rightClickedGroup == group)
+                    EditGroup(parentType);
+
                 if (isNodeOpen)
                 {
                     int i = -1;
@@ -159,7 +172,7 @@ namespace Triggered
                     foreach (Group subGroup in group.GroupList)
                     {
                         i++;
-                        RecursiveMenu(subGroup,$"{indexer}_{i}");
+                        RecursiveMenu(subGroup,group.GroupType,$"{indexer}_{i}");
                     }
                     ImGui.TreePop();
                 }
@@ -188,10 +201,15 @@ namespace Triggered
                     ImGui.EndDragDropSource();
                 }
                 ImGui.PopID();
-                if (isNodeOpen)
+                if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
                 {
-                    ImGui.TreePop();
+                    if (_rightClickedElement == leaf)
+                        _rightClickedElement = null;
+                    else
+                        _rightClickedElement = leaf;
                 }
+                if (_rightClickedElement != null && _rightClickedElement == leaf)
+                    EditElement(parentType);
             }
             else
                 App.Log("This should not display",NLog.LogLevel.Error);
@@ -319,9 +337,141 @@ namespace Triggered
         }
         #endregion
 
-            return source != target && _dragStarted && !IsChildObject(source, target);
+        #region Edit Popups
+        static Vector4 EditingHighlight = new Vector4(0.0f, 0.5f, 0.9f, 0.3f);
+        static Vector4 EditingBackground = new Vector4(0.0f, 0.0f, 0.8f, 0.2f);
+        static void EditElement(string parentType)
+        {
+            float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
 
-            return source != target && !IsChildObject(source, target);
+            if (_rightClickedElement != null)
+            {
+                ImGui.BeginGroup();
+                Vector2 padding = new Vector2(5.0f, 2.0f);
+                // Draw an indicator on active Element
+                var drawList = ImGui.GetWindowDrawList();
+                drawList.AddRectFilled(
+                    ImGui.GetItemRectMin(),
+                    ImGui.GetItemRectMax(),
+                    ImGui.GetColorU32(EditingHighlight),
+                    4.0f);
+
+                if (parentType == "COUNT" || parentType == "WEIGHT")
+                {
+                    // int Weight
+                    ImGui.Text("Weight:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(72);
+                    ImGui.InputInt("##Weight", ref _rightClickedElement.Weight);
+                    ImGui.SameLine();
+                }
+                // string Key
+                ImGui.Text("Key:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(availableSpace);
+                ImGui.InputText("##Key", ref _rightClickedElement.Key, 256);
+
+                // string Eval
+                ImGui.Text("Eval:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(72);
+                int comparisonIndex = Array.IndexOf(App.EvalOptions, _rightClickedElement.Eval);
+                if (ImGui.Combo("##Eval", ref comparisonIndex, App.EvalOptions, App.EvalOptions.Length))
+                    _rightClickedElement.Eval = App.EvalOptions[comparisonIndex];
+                // string Min
+                ImGui.SameLine();
+                ImGui.Text("Min:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(availableSpace);
+                ImGui.InputText("##Min", ref _rightClickedElement.Min, 256);
+
+                ImGui.EndGroup();
+                // Draw an indicator on active Element
+                var boxList = ImGui.GetWindowDrawList();
+                boxList.AddRectFilled(
+                    ImGui.GetItemRectMin() - padding,
+                    ImGui.GetItemRectMax() + padding,
+                    ImGui.GetColorU32(EditingBackground),
+                    4.0f);
+            }
+        }
+        static void EditGroup(string parentType)
+        {
+            float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
+            float other = (availableSpace) * 0.2f;
+
+            if (_rightClickedGroup != null)
+            {
+                ImGui.BeginGroup();
+                // Draw an indicator on active Group
+                var drawList = ImGui.GetWindowDrawList();
+                drawList.AddRectFilled(
+                    ImGui.GetItemRectMin(),
+                    ImGui.GetItemRectMax(),
+                    ImGui.GetColorU32(EditingHighlight),
+                    4.0f);
+
+                if (_rightClickedGroup is TopGroup topGroup)
+                {
+                    // int GroupName
+                    ImGui.Text("GroupName:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(availableSpace * 0.85f);
+                    ImGui.InputText("##GroupName", ref topGroup.GroupName, 256);
+                    // int Min
+                    ImGui.Text("Stash Tab:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(72);
+                    ImGui.InputInt("##StashTab", ref topGroup.StashTab);
+                    if (topGroup.StashTab > 999)
+                        topGroup.StashTab = 999;
+                    else if (topGroup.StashTab < 0)
+                        topGroup.StashTab = 0;
+                    // int Strictness
+                    ImGui.SameLine();
+                    ImGui.Text("Strictness:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(72);
+                    ImGui.InputInt("##Strictness", ref topGroup.Strictness);
+                    if (topGroup.Strictness > 99)
+                        topGroup.Strictness = 99;
+                    else if (topGroup.Strictness < 0)
+                        topGroup.Strictness = 0;
+                    ImGui.SameLine();
+                }
+
+                // string Type
+                ImGui.SetNextItemWidth(72);
+                int comparisonIndex = Array.IndexOf(App.GroupTypes, _rightClickedGroup.GroupType);
+                if (ImGui.Combo("##GroupType", ref comparisonIndex, App.GroupTypes, App.GroupTypes.Length))
+                    _rightClickedGroup.GroupType = App.GroupTypes[comparisonIndex];
+                if (_rightClickedGroup.GroupType == "COUNT" || _rightClickedGroup.GroupType == "WEIGHT")
+                {
+                    // int Min
+                    ImGui.SameLine();
+                    ImGui.Text("Min:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(72);
+                    ImGui.InputInt("##Min", ref _rightClickedGroup.Min);
+                }
+                if (parentType == "COUNT" || parentType == "WEIGHT")
+                {
+                    // int Weight
+                    ImGui.SameLine();
+                    ImGui.Text("Weight:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(72);
+                    ImGui.InputInt("##Weight", ref _rightClickedGroup.Weight);
+                }
+
+                ImGui.EndGroup();
+                var boxList = ImGui.GetWindowDrawList();
+                boxList.AddRectFilled(
+                    ImGui.GetItemRectMin(),
+                    ImGui.GetItemRectMax(),
+                    ImGui.GetColorU32(EditingBackground),
+                    4.0f);
+            }
         }
         #endregion
     }
