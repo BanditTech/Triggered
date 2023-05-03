@@ -1,16 +1,12 @@
 ﻿namespace Triggered
 {
     using ImGuiNET;
-    using Newtonsoft.Json;
     using NLog;
     using NLog.Config;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using System.Text;
-    using System.Text.Json;
 
     public static class App
     {
