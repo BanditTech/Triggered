@@ -166,7 +166,6 @@ namespace Triggered
             ImGui.Separator();
             ImGui.Spacing();
             ImGui.Spacing();
-            ImGui.Separator();
 
             if (ImGui.CollapsingHeader("Editor color adjustment", ref _showOptions))
             {
@@ -213,9 +212,9 @@ namespace Triggered
 
                 if (_hoveredGroup == group)
                 {
-                // We want to exclude the topgroup from making a remove button
-                if (group is not TopGroup)
-                {
+                    // We want to exclude the topgroup from making a remove button
+                    if (group is not TopGroup)
+                    {
                         // Delete Button
                         ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
                         if (ImGui.Button(" X "))
@@ -543,6 +542,8 @@ namespace Triggered
                     if (type == typeof(Element))
                     {
                         // final indexer digit is in ElementList array
+                        if (index > ((dynamic)target).ElementList.Count - 1)
+                            index = ((dynamic)target).ElementList.Count - 1;
                         parent = target;
                         target = ((Group)target).ElementList[index];
                         if (pop)
@@ -551,6 +552,8 @@ namespace Triggered
                     else if (type == typeof(Group))
                     {
                         // final indexer digit is in GroupList array
+                        if (index > ((dynamic)target).GroupList.Count - 1)
+                            index = ((dynamic)target).GroupList.Count - 1;
                         parent = target;
                         target = ((Group)target).GroupList[index];
                         if (pop)
@@ -561,8 +564,10 @@ namespace Triggered
                 }
                 else
                 {
+                    if (index > ((dynamic)target).GroupList.Count - 1)
+                        index = ((dynamic)target).GroupList.Count - 1;
                     target = ((dynamic)target).GroupList[index];
-            }
+                }
             }
             if (type == typeof(Group))
                 return (Group)target;
@@ -596,6 +601,8 @@ namespace Triggered
                     // If the last target key is a group, we finish drilling down
                     if (targetType == typeof(Group))
                     {
+                        if (key > ((dynamic)target).GroupList.Count - 1)
+                            key = ((dynamic)target).GroupList.Count - 1;
                         target = (target).GroupList[key];
                         key = 0;
                     }
@@ -607,9 +614,11 @@ namespace Triggered
                 }
                 else
                 {
+                    if (key > ((dynamic)target).GroupList.Count - 1)
+                        key = ((dynamic)target).GroupList.Count - 1;
                     target = ((dynamic)target).GroupList[key];
+                }
             }
-        }
         }
         static bool IsChildObject(string sourceIndexer, string targetIndexer)
         {
