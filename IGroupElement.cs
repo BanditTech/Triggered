@@ -98,6 +98,10 @@ public class Group : IGroupElement
         else if (item is Element element)
             ElementList.Insert(index, element);
     }
+    public Group Clone()
+    {
+        return (Group)this.MemberwiseClone();
+    }
 }
 public class TopGroup : Group
 {
@@ -163,6 +167,10 @@ public class Element : IGroupElement
         Eval = eval;
         Min = min;
         Weight = weight;
+    }
+    public Element Clone()
+    {
+        return (Element)this.MemberwiseClone();
     }
 }
 public class IGroupElementJsonConverter : JsonConverter<IGroupElement>

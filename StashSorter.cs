@@ -5,6 +5,7 @@ using System.IO;
 using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Newtonsoft.Json.Linq;
 
 namespace Triggered
 {
@@ -20,14 +21,24 @@ namespace Triggered
         static Element _rightClickedElement = null;
         static Group _rightClickedGroup = null;
         static bool confirmRemove = false;
+        static bool confirmAdd = false;
         static Type removeType;
         static string removeIndexer;
-        static Vector2 ButtonSize = new Vector2(72, 72);
-        static string ButtonPathRemove = Path.Combine(AppContext.BaseDirectory, "images/Rem.png");
-        static string ButtonPathAdd = Path.Combine(AppContext.BaseDirectory, "images/Add.png");
-        static nint _remTextureId;
-        static nint _addTextureId;
-        // ImGui.ImageButton(string "str_id", nint user_textureid, System.Numerics.Vector2 size);
+        static string addIndexer;
+        static Vector4 EditingHighlight = new Vector4(0f, 0.772549f, 1f, 0.392157f); // #00C5FF64
+        static Vector4 EditingBackground = new Vector4(0.0f, 1f, 0.9254902f, 0.1647059f); // #00FFEC2A
+        static Vector4 RemoveButton = new Vector4(1.0f, 0.0f, 0.0f, 0.2f);
+        static Vector4 AddButton = new Vector4(0.0f, 1.0f, 0.0f, 0.2f);
+        static bool _showOptions = true;
+        static Element _hoveredLeaf = null;
+        static Group _hoveredGroup = null;
+        static float _lineHeight = ImGui.GetFontSize() + ImGui.GetStyle().FramePadding.Y * 2f;
+        static DateTime _lastHover = DateTime.MinValue;
+        static JObject keyValuePairs = new JObject();
+        static Type _addingType = typeof(Element);
+        static Type _oldType = typeof(Element);
+        static IGroupElement _clay;
+
 
         #region Setup Functions
         static StashSorter()
@@ -86,9 +97,7 @@ namespace Triggered
             foreach (IGroupElement group in App.StashSorterList)
             {
                 if (group is TopGroup topGroup)
-                {
                     topGroupsList.Add(topGroup.GroupName);
-                }
             }
             App.TopGroups = topGroupsList.ToArray();
         }
@@ -97,15 +106,71 @@ namespace Triggered
         public static void Render()
         {
             // Create the main window
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(500, 500), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(500, 200), new Vector2(float.MaxValue, float.MaxValue));
             ImGui.Begin("Edit Stash Sorter");
 
             // Select the TopGroup
-            ImGui.Combo("Selected Filter", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
+            ImGui.Text("Selected Filter:");
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+            ImGui.Combo("##Selected Filter", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
+
+            if (App.StashSorterList[App.SelectedGroup] is TopGroup topGroup)
+            {
+                ImGui.Spacing();
+                // int Min
+                ImGui.Text("Stash Tab:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(72);
+                ImGui.InputInt("##StashTab", ref topGroup.StashTab);
+                if (topGroup.StashTab > 999)
+                    topGroup.StashTab = 999;
+                else if (topGroup.StashTab < 0)
+                    topGroup.StashTab = 0;
+                // int Strictness
+                ImGui.SameLine();
+                ImGui.Text("Strictness:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(72);
+                ImGui.InputInt("##Strictness", ref topGroup.Strictness);
+                if (topGroup.Strictness > 99)
+                    topGroup.Strictness = 99;
+                else if (topGroup.Strictness < 0)
+                    topGroup.Strictness = 0;
+                ImGui.SameLine();
+                // int GroupName
+                ImGui.Text("GroupName:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                ImGui.InputText("##GroupName", ref topGroup.GroupName, 256);
+                ImGui.SameLine();
+            }
+
 
             // We recurse the Group structure drawing them onto our menu
+            ImGui.Spacing();
+            ImGui.Spacing();
+            ImGui.Separator();
+            ImGui.Spacing();
+            ImGui.Spacing();
             RecursiveMenu(App.StashSorterList[App.SelectedGroup], "NONE");
+
+            ImGui.Spacing();
+            ImGui.Spacing();
+            ImGui.Spacing();
+            ImGui.Spacing();
+            ImGui.Separator();
+
+            if (ImGui.CollapsingHeader("Editor color adjustment", ref _showOptions))
+            {
+                float space = ImGui.GetContentRegionAvail().X * 0.4f;
+                ImGui.SetNextItemWidth(space);
+                ImGui.ColorPicker4("##Highlight", ref EditingHighlight);
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(space);
+                ImGui.ColorPicker4("##Background", ref EditingBackground);
+            }
 
             // End the main window
             ImGui.End();
@@ -129,6 +194,7 @@ namespace Triggered
         }
         static void RecursiveMenu(IGroupElement obj,string parentType,string indexer = "0")
         {
+            bool _hovered;
             if (obj == null)
                 return;
             bool IsWeighted = parentType == "COUNT" || parentType == "WEIGHT";
@@ -137,40 +203,167 @@ namespace Triggered
                 ImGui.PushID(group.GetHashCode());
                 string str = IsWeighted ? $"{group.Weight}# {group.GroupType} Group" : $"{group.GroupType} Group";
                 str += group.GroupType == "COUNT" ? $" with minimum of {group.Min} match value"
-                    : group.GroupType == "WEIGHT" ? $" with minimum of {group.Min} weight"
-                    : "";
+                    : group.GroupType == "WEIGHT" ? $" with minimum of {group.Min} weight" : "";
+                ImGui.Spacing();
+                // We want to exclude the topgroup from making a remove button
                 if (group is not TopGroup)
                 {
-                    // allow for deletion of an Group
-                    if (ImGui.Button("X"))
+                    if (_hoveredGroup == group)
                     {
-                        removeType = typeof(Group);
-                        removeIndexer = indexer;
-                        ImGui.OpenPopup("DeleteItem");
-                    }
-                    if (ImGui.BeginPopupModal("DeleteItem"))
-                    {
-                        ImGui.Text("Are you sure you want to delete this item?");
-                        if (ImGui.Button("Yes", new Vector2(120, 0)))
+                        // Delete Button
+                        ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
+                        if (ImGui.Button("X"))
                         {
-                            // delete the item
-                            confirmRemove = true;
-                            ImGui.CloseCurrentPopup();
+                            removeType = typeof(Group);
+                            removeIndexer = indexer;
+                            ImGui.OpenPopup("DeleteItem");
                         }
+                        ImGui.PopStyleColor(1);
+                        _hovered = ImGui.IsItemHovered();
+                        if (_hovered && _hoveredGroup == group)
+                            _lastHover = DateTime.Now;
                         ImGui.SameLine();
-                        if (ImGui.Button("No", new Vector2(120, 0)))
-                        {
-                            removeIndexer = null;
-                            removeType = null;
-                            confirmRemove = false;
-                            ImGui.CloseCurrentPopup();
-                        }
-                        ImGui.EndPopup();
                     }
+                }
+                // But any group should show the add button
+                if (_hoveredGroup == group)
+                {
+                    // Add Button
+                    ImGui.PushStyleColor(ImGuiCol.Button, AddButton);
+                    if (ImGui.Button("+"))
+                    {
+                        addIndexer = indexer;
+                        ImGui.OpenPopup("AddItem");
+                    }
+                    ImGui.PopStyleColor(1);
+                    _hovered = ImGui.IsItemHovered();
+                    if (_hovered && _hoveredGroup == group)
+                        _lastHover = DateTime.Now;
                     ImGui.SameLine();
                 }
 
+                if (ImGui.BeginPopupModal("DeleteItem"))
+                {
+                    ImGui.Text("Are you sure you want to delete this item?");
+                    if (ImGui.Button("Yes", new Vector2(120, 0)))
+                    {
+                        // delete the item
+                        confirmRemove = true;
+                        ImGui.CloseCurrentPopup();
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("No", new Vector2(120, 0)))
+                    {
+                        removeIndexer = null;
+                        removeType = null;
+                        confirmRemove = false;
+                        ImGui.CloseCurrentPopup();
+                    }
+                    ImGui.EndPopup();
+                }
+                if (ImGui.BeginPopupModal("AddItem"))
+                {
+                    int clayType = Array.IndexOf(App.ObjectTypes, _addingType);
+                    if (ImGui.Combo("##Eval", ref clayType, App.objectTypes, App.objectTypes.Length))
+                    {
+                        _addingType = App.ObjectTypes[clayType];
+                    }
+                    bool changed = _oldType != _addingType;
+                    if (_clay == null || changed)
+                    {
+                        if (_addingType == typeof(Group))
+                        {
+                            _clay = new Group();
+                        }
+                        else if (_addingType == typeof(Element))
+                        {
+                            _clay = new Element();
+                        }
+                        _oldType = _addingType;
+                        App.Log("Swap logic occuring");
+                    }
+
+                    if (_clay is Element _element)
+                    {
+                        ImGui.PushID(_clay.GetHashCode());
+                        // string Key
+                        ImGui.Text("Key:");
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                        ImGui.InputText("##Key", ref _element.Key, 256);
+                        ImGui.PopID();
+
+                        // We only want to display the Weight field if the parent requires it
+                        if (parentType == "COUNT" || parentType == "WEIGHT")
+                        {
+                            ImGui.PushID(_clay.GetHashCode()+1);
+                            // int Weight
+                            ImGui.Text("Weight:");
+                            ImGui.SameLine();
+                            ImGui.SetNextItemWidth(72);
+                            ImGui.InputInt("##Weight", ref _element.Weight);
+                            ImGui.SameLine();
+                            ImGui.PopID();
+                        }
+                        // string Eval
+                        ImGui.PushID(_clay.GetHashCode() + 2);
+                        ImGui.Text("Eval:");
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(72);
+                        int comparisonIndex = Array.IndexOf(App.EvalOptions, _element.Eval);
+                        if (ImGui.Combo("##Eval", ref comparisonIndex, App.EvalOptions, App.EvalOptions.Length))
+                            _element.Eval = App.EvalOptions[comparisonIndex];
+                        ImGui.PopID();
+
+                        // string Min
+                        ImGui.PushID(_clay.GetHashCode() + 3);
+                        ImGui.SameLine();
+                        ImGui.Text("Min:");
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                        ImGui.InputText("##Min", ref _element.Min, 256);
+                        ImGui.PopID();
+                    }
+
+                    ImGui.Text($"Are you ready to insert the new {App.objectTypes[clayType]}?");
+                    if (ImGui.Button("Yes", new Vector2(120, 0)))
+                    {
+                        // Add the item
+                        confirmAdd = true;
+                        if (_clay is Group)
+                            group.Add(((Group)_clay).Clone());
+                        else if (_clay is Element)
+                            group.Add(((Element)_clay).Clone());
+                        ImGui.CloseCurrentPopup();
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("No", new Vector2(120, 0)))
+                    {
+                        addIndexer = null;
+                        confirmAdd = false;
+                        _clay = null;
+                        ImGui.CloseCurrentPopup();
+                    }
+                    ImGui.EndPopup();
+                }
+
+
                 bool isNodeOpen = ImGui.TreeNodeEx(str, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
+
+                _hovered = ImGui.IsItemHovered();
+                if (_hovered && _hoveredGroup != group)
+                {
+                    _lastHover = DateTime.Now;
+                    _hoveredGroup = group;
+                }
+                else if (_hovered && _hoveredGroup == group)
+                    _lastHover = DateTime.Now;
+                else if (!ImGui.IsAnyItemHovered() && _hoveredGroup == group && (DateTime.Now - _lastHover).TotalSeconds > 1)
+                    _hoveredGroup = null;
+                else if (!_hovered && _hoveredGroup == group && _hoveredLeaf != null)
+                    _hoveredGroup = null;
+
+
                 if (ImGui.BeginDragDropTarget())
                 {
                     _dragTarget = indexer;
@@ -222,12 +415,22 @@ namespace Triggered
                 string str = IsWeighted ? $"{leaf.Weight}# " : "";
                 str += $"{leaf.Key} {leaf.Eval} {leaf.Min}";
 
-                // allow for deletion of an Element
-                if (ImGui.Button("X"))
+                ImGui.Spacing();
+                if (_hoveredLeaf == leaf)
                 {
-                    removeType = typeof(Element);
-                    removeIndexer = indexer;
-                    ImGui.OpenPopup("DeleteItem");
+                    ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
+                    // allow for deletion of an Element
+                    if (ImGui.Button("X"))
+                    {
+                        removeType = typeof(Element);
+                        removeIndexer = indexer;
+                        ImGui.OpenPopup("DeleteItem");
+                    }
+                    ImGui.PopStyleColor(1);
+                    _hovered = ImGui.IsItemHovered();
+                    if (_hovered && _hoveredLeaf == leaf)
+                        _lastHover = DateTime.Now;
+                    ImGui.SameLine();
                 }
                 if (ImGui.BeginPopupModal("DeleteItem"))
                 {
@@ -249,8 +452,20 @@ namespace Triggered
                     ImGui.EndPopup();
                 }
 
-                ImGui.SameLine();
                 ImGui.Selectable(str);
+
+                _hovered = ImGui.IsItemHovered();
+                if (_hovered && _hoveredLeaf != leaf)
+                {
+                    _lastHover = DateTime.Now;
+                    _hoveredLeaf = leaf;
+                }
+                else if (_hovered && _hoveredLeaf == leaf)
+                    _lastHover = DateTime.Now;
+                else if (!ImGui.IsAnyItemHovered() && _hoveredLeaf == leaf && (DateTime.Now - _lastHover).TotalSeconds > 1)
+                    _hoveredLeaf = null;
+                else if (!_hovered && _hoveredLeaf == leaf && _hoveredGroup != null)
+                    _hoveredLeaf = null;
                 
                 if (ImGui.BeginDragDropTarget())
                 {
@@ -407,8 +622,6 @@ namespace Triggered
         #endregion
 
         #region Field Editing Popups
-        static Vector4 EditingHighlight = new Vector4(0.0f, 0.5f, 0.9f, 0.3f);
-        static Vector4 EditingBackground = new Vector4(0.3f, 0.3f, 1f, 0.25f);
         static void EditElement(string parentType)
         {
             float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
@@ -418,8 +631,7 @@ namespace Triggered
                 ImGui.BeginGroup();
                 Vector2 padding = new Vector2(5.0f, 2.0f);
                 // Draw an indicator on active Element
-                var drawList = ImGui.GetWindowDrawList();
-                drawList.AddRectFilled(
+                ImGui.GetWindowDrawList().AddRectFilled(
                     ImGui.GetItemRectMin(),
                     ImGui.GetItemRectMax(),
                     ImGui.GetColorU32(EditingHighlight),
@@ -456,8 +668,7 @@ namespace Triggered
 
                 ImGui.EndGroup();
                 // Draw an indicator on active Element
-                var boxList = ImGui.GetWindowDrawList();
-                boxList.AddRectFilled(
+                ImGui.GetWindowDrawList().AddRectFilled(
                     ImGui.GetItemRectMin() - padding,
                     ImGui.GetItemRectMax() + padding,
                     ImGui.GetColorU32(EditingBackground),
@@ -467,7 +678,6 @@ namespace Triggered
         static void EditGroup(string parentType)
         {
             float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
-            float other = (availableSpace) * 0.2f;
 
             if (_rightClickedGroup != null)
             {
@@ -479,35 +689,6 @@ namespace Triggered
                     ImGui.GetItemRectMax(),
                     ImGui.GetColorU32(EditingHighlight),
                     4.0f);
-
-                if (_rightClickedGroup is TopGroup topGroup)
-                {
-                    // int GroupName
-                    ImGui.Text("GroupName:");
-                    ImGui.SameLine();
-                    ImGui.SetNextItemWidth(availableSpace * 0.85f);
-                    ImGui.InputText("##GroupName", ref topGroup.GroupName, 256);
-                    // int Min
-                    ImGui.Text("Stash Tab:");
-                    ImGui.SameLine();
-                    ImGui.SetNextItemWidth(72);
-                    ImGui.InputInt("##StashTab", ref topGroup.StashTab);
-                    if (topGroup.StashTab > 999)
-                        topGroup.StashTab = 999;
-                    else if (topGroup.StashTab < 0)
-                        topGroup.StashTab = 0;
-                    // int Strictness
-                    ImGui.SameLine();
-                    ImGui.Text("Strictness:");
-                    ImGui.SameLine();
-                    ImGui.SetNextItemWidth(72);
-                    ImGui.InputInt("##Strictness", ref topGroup.Strictness);
-                    if (topGroup.Strictness > 99)
-                        topGroup.Strictness = 99;
-                    else if (topGroup.Strictness < 0)
-                        topGroup.Strictness = 0;
-                    ImGui.SameLine();
-                }
 
                 // string Type
                 ImGui.SetNextItemWidth(72);

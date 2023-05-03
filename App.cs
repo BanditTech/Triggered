@@ -31,18 +31,14 @@
         public static bool ShowGroupBoxContents = true;
         public static string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=" };
         public static string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
-        public static ImFontPtr AlmaMono;
-        public static ImFontPtr NotoSans;
+        public static string[] objectTypes = new string[] { "Group", "Element" };
+        public static Type[] ObjectTypes = new Type[] { typeof(Group), typeof(Element) };
 
         static App()
         {
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logimgui = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
-            string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", "AlmaMono-Regular.ttf");
-            AlmaMono = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontPath, 18.0f);
-            fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", "NotoSans-Regular.ttf");
-            NotoSans = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontPath, 18.0f);
         }
 
         #region Log(string log, LogLevel level)

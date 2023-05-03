@@ -17,7 +17,7 @@
         private const uint MOUSEEVENTF_XUP = 0x0100;
         private const uint MOUSEEVENTF_WHEEL = 0x0800;
         private const uint MOUSEEVENTF_HWHEEL = 0x1000;
-        private static TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+        private static TextInfo textInfo = CultureInfo.GetCultureInfo("en-US").TextInfo;
 
         public static void Click(string methodname, int x, int y)
         {
@@ -25,13 +25,9 @@
             var mouse = new Mouse();
             var method = typeof(Mouse).GetMethod(MethodName);
             if (method != null)
-            {
                 method.Invoke(mouse, new object[] { x, y });
-            }
             else
-            {
                 throw new ArgumentException($"Invalid click method name: {methodname}");
-            }
         }
         public static void Left(int x, int y)
         {
