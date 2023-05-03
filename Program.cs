@@ -1,5 +1,6 @@
 ﻿namespace Triggered
 {
+    using System;
     using System.Threading.Tasks;
 
     class Program
@@ -7,7 +8,19 @@
         static async Task Main()
         {
             using var overlay = new TriggeredMenu();
-            await overlay.Run();
+            try
+            {
+                await overlay.Run();
+            }
+            finally
+            {
+                OnProgramExit();
+            }
+        }
+        static void OnProgramExit()
+        {
+            // Begin to release resources
+            App.Log("Final execution block initiated. Releasing memory resources.");
         }
     }
 }
