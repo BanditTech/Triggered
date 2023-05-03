@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Triggered
 {
@@ -20,6 +22,12 @@ namespace Triggered
         static bool confirmRemove = false;
         static Type removeType;
         static string removeIndexer;
+        static Vector2 ButtonSize = new Vector2(72, 72);
+        static string ButtonPathRemove = Path.Combine(AppContext.BaseDirectory, "images/Rem.png");
+        static string ButtonPathAdd = Path.Combine(AppContext.BaseDirectory, "images/Add.png");
+        static nint _remTextureId;
+        static nint _addTextureId;
+        // ImGui.ImageButton(string "str_id", nint user_textureid, System.Numerics.Vector2 size);
 
         #region Setup Functions
         static StashSorter()
@@ -398,7 +406,7 @@ namespace Triggered
         }
         #endregion
 
-        #region Edit Popups
+        #region Field Editing Popups
         static Vector4 EditingHighlight = new Vector4(0.0f, 0.5f, 0.9f, 0.3f);
         static Vector4 EditingBackground = new Vector4(0.3f, 0.3f, 1f, 0.25f);
         static void EditElement(string parentType)
