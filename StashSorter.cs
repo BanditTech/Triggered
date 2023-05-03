@@ -6,11 +6,13 @@ using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace Triggered
 {
     static class StashSorter
     {
+        #region Static Values
         static string _dragTarget;
         static Type _dragTargetType;
         static string _dragSource;
@@ -38,7 +40,8 @@ namespace Triggered
         static Type _addingType = typeof(Element);
         static Type _oldType = typeof(Element);
         static IGroupElement _clay;
-
+        static bool _shiftHeld = false;
+        #endregion
 
         #region Setup Functions
         static StashSorter()
@@ -115,10 +118,17 @@ namespace Triggered
             ImGui.SameLine();
             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
             ImGui.Combo("##Selected Filter", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
+            ImGui.Spacing();
 
             if (App.StashSorterList[App.SelectedGroup] is TopGroup topGroup)
             {
+                // int GroupName
+                ImGui.Text("GroupName:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                ImGui.InputText("##GroupName", ref topGroup.GroupName, 256);
                 ImGui.Spacing();
+
                 // int Min
                 ImGui.Text("Stash Tab:");
                 ImGui.SameLine();
@@ -138,26 +148,22 @@ namespace Triggered
                     topGroup.Strictness = 99;
                 else if (topGroup.Strictness < 0)
                     topGroup.Strictness = 0;
-                ImGui.SameLine();
-                // int GroupName
-                ImGui.Text("GroupName:");
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                ImGui.InputText("##GroupName", ref topGroup.GroupName, 256);
-                ImGui.SameLine();
             }
 
-
-            // We recurse the Group structure drawing them onto our menu
+            // Add some spacing between the two menu structures
             ImGui.Spacing();
             ImGui.Spacing();
             ImGui.Separator();
             ImGui.Spacing();
             ImGui.Spacing();
+
+            // We recurse the Group structure drawing them onto our menu
             RecursiveMenu(App.StashSorterList[App.SelectedGroup], "NONE");
 
+            // Add some spacing between the two menu structures
             ImGui.Spacing();
             ImGui.Spacing();
+            ImGui.Separator();
             ImGui.Spacing();
             ImGui.Spacing();
             ImGui.Separator();
@@ -204,15 +210,15 @@ namespace Triggered
                 string str = IsWeighted ? $"{group.Weight}# {group.GroupType} Group" : $"{group.GroupType} Group";
                 str += group.GroupType == "COUNT" ? $" with minimum of {group.Min} match value"
                     : group.GroupType == "WEIGHT" ? $" with minimum of {group.Min} weight" : "";
-                ImGui.Spacing();
+
+                if (_hoveredGroup == group)
+                {
                 // We want to exclude the topgroup from making a remove button
                 if (group is not TopGroup)
                 {
-                    if (_hoveredGroup == group)
-                    {
                         // Delete Button
                         ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
-                        if (ImGui.Button("X"))
+                        if (ImGui.Button(" X "))
                         {
                             removeType = typeof(Group);
                             removeIndexer = indexer;
@@ -224,13 +230,9 @@ namespace Triggered
                             _lastHover = DateTime.Now;
                         ImGui.SameLine();
                     }
-                }
-                // But any group should show the add button
-                if (_hoveredGroup == group)
-                {
                     // Add Button
                     ImGui.PushStyleColor(ImGuiCol.Button, AddButton);
-                    if (ImGui.Button("+"))
+                    if (ImGui.Button(group is not TopGroup ? " + " : "    +   "))
                     {
                         addIndexer = indexer;
                         ImGui.OpenPopup("AddItem");
@@ -239,6 +241,18 @@ namespace Triggered
                     _hovered = ImGui.IsItemHovered();
                     if (_hovered && _hoveredGroup == group)
                         _lastHover = DateTime.Now;
+                    ImGui.SameLine();
+                }
+                else
+                {
+                    ImGui.Button("  Group ");
+                    _hovered = ImGui.IsItemHovered();
+                    if (_hovered && _hoveredGroup != group)
+                    {
+                        _hoveredGroup = group;
+                        _hoveredLeaf = null;
+                        _lastHover = DateTime.Now;
+                    }
                     ImGui.SameLine();
                 }
 
@@ -347,9 +361,8 @@ namespace Triggered
                     ImGui.EndPopup();
                 }
 
-
+                ImGui.SameLine();
                 bool isNodeOpen = ImGui.TreeNodeEx(str, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
-
                 _hovered = ImGui.IsItemHovered();
                 if (_hovered && _hoveredGroup != group)
                 {
@@ -362,7 +375,6 @@ namespace Triggered
                     _hoveredGroup = null;
                 else if (!_hovered && _hoveredGroup == group && _hoveredLeaf != null)
                     _hoveredGroup = null;
-
 
                 if (ImGui.BeginDragDropTarget())
                 {
@@ -381,7 +393,6 @@ namespace Triggered
                     ImGui.Text($"{indexer}");
                     ImGui.EndDragDropSource();
                 }
-                ImGui.PopID();
                 if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
                 {
                     if (_rightClickedGroup == group)
@@ -391,6 +402,7 @@ namespace Triggered
                 }
                 if (_rightClickedGroup != null && _rightClickedGroup == group)
                     EditGroup(parentType);
+                ImGui.PopID();
 
                 if (isNodeOpen)
                 {
@@ -414,13 +426,11 @@ namespace Triggered
                 ImGui.PushID(leaf.GetHashCode());
                 string str = IsWeighted ? $"{leaf.Weight}# " : "";
                 str += $"{leaf.Key} {leaf.Eval} {leaf.Min}";
-
-                ImGui.Spacing();
                 if (_hoveredLeaf == leaf)
                 {
                     ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
                     // allow for deletion of an Element
-                    if (ImGui.Button("X"))
+                    if (ImGui.Button("   X   "))
                     {
                         removeType = typeof(Element);
                         removeIndexer = indexer;
@@ -430,6 +440,18 @@ namespace Triggered
                     _hovered = ImGui.IsItemHovered();
                     if (_hovered && _hoveredLeaf == leaf)
                         _lastHover = DateTime.Now;
+                    ImGui.SameLine();
+                }
+                else
+                {
+                    ImGui.Button("Element");
+                    _hovered = ImGui.IsItemHovered();
+                    if (_hovered && _hoveredLeaf != leaf)
+                    {
+                        _hoveredLeaf = leaf;
+                        _hoveredGroup = null;
+                        _lastHover = DateTime.Now;
+                    }
                     ImGui.SameLine();
                 }
                 if (ImGui.BeginPopupModal("DeleteItem"))
@@ -538,7 +560,9 @@ namespace Triggered
                         throw new ArgumentException($"Expecting GROUP or ELEMENT type but received {type}");
                 }
                 else
+                {
                     target = ((dynamic)target).GroupList[index];
+            }
             }
             if (type == typeof(Group))
                 return (Group)target;
@@ -582,8 +606,10 @@ namespace Triggered
                         target.Insert(key,(Group)obj);
                 }
                 else
+                {
                     target = ((dynamic)target).GroupList[key];
             }
+        }
         }
         static bool IsChildObject(string sourceIndexer, string targetIndexer)
         {
