@@ -185,7 +185,7 @@ namespace Triggered
             {
                 _dragStarted = false;
                 _dragFinalize = false;
-                object fetch = GetObjectByIndexer(_dragSource, _dragSourceType, true);
+                object fetch = GetObjectByIndexer(_dragSource, _dragSourceType, !_shiftHeld);
                 InsertObjectByIndexer(_dragTarget,_dragTargetType,_dragSourceType,fetch);
                 App.Log($"{fetch} {JSON.Str(fetch)}");
             }
@@ -217,7 +217,7 @@ namespace Triggered
                     {
                         // Delete Button
                         ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
-                        if (ImGui.Button(" X "))
+                        if (ImGui.Button(" x "))
                         {
                             removeType = typeof(Group);
                             removeIndexer = indexer;
@@ -380,7 +380,10 @@ namespace Triggered
                     _dragTarget = indexer;
                     _dragTargetType = typeof(Group);
                     if (CanDrop() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    {
+                        _shiftHeld = ImGui.GetIO().KeyShift;
                         _dragFinalize = true;
+                    }
                     ImGui.EndDragDropTarget();
                 }
                 if (group is not TopGroup && ImGui.BeginDragDropSource())
@@ -429,7 +432,7 @@ namespace Triggered
                 {
                     ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
                     // allow for deletion of an Element
-                    if (ImGui.Button("   X   "))
+                    if (ImGui.Button("   x   "))
                     {
                         removeType = typeof(Element);
                         removeIndexer = indexer;
@@ -493,7 +496,10 @@ namespace Triggered
                     _dragTarget = indexer;
                     _dragTargetType = typeof(Element);
                     if (CanDrop() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    {
+                        _shiftHeld = ImGui.GetIO().KeyShift;
                         _dragFinalize = true;
+                    }
                     ImGui.EndDragDropTarget();
                 }
                 if (ImGui.BeginDragDropSource())
@@ -580,9 +586,9 @@ namespace Triggered
             if (indexer == "0")
             {
                 if (sourceType == typeof(Group))
-                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add((Group)obj);
+                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add(((Group)obj).Clone());
                 else if (sourceType == typeof(Element))
-                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add((Element)obj);
+                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add(((Element)obj).Clone());
                 return;
             }
 
@@ -608,9 +614,9 @@ namespace Triggered
                     }
                     // Depending on our source type, we insert the correct object type
                     if (sourceType == typeof(Element))
-                        target.Insert(key,(Element)obj);
+                        target.Insert(key,((Element)obj).Clone());
                     else if (sourceType == typeof(Group))
-                        target.Insert(key,(Group)obj);
+                        target.Insert(key,((Group)obj).Clone());
                 }
                 else
                 {

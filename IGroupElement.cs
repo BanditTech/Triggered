@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using TextCopy;
 
 public abstract class IGroupElement
@@ -63,7 +64,7 @@ public class Group : IGroupElement
     }
     public void AddElement(Element element)
     {
-        ElementList.Add(element);
+        ElementList.Add(element.Clone());
     }
     public void RemoveElement(Element element)
     {
@@ -71,7 +72,7 @@ public class Group : IGroupElement
     }
     public void AddGroup(Group group)
     {
-        GroupList.Add(group);
+        GroupList.Add(group.Clone());
     }
     public void RemoveGroup(Group group)
     {
@@ -94,13 +95,15 @@ public class Group : IGroupElement
     public void Insert(int index, IGroupElement item)
     {
         if (item is Group group)
-            GroupList.Insert(index,group);
+            GroupList.Insert(index,group.Clone());
         else if (item is Element element)
-            ElementList.Insert(index, element);
+            ElementList.Insert(index, element.Clone());
     }
     public Group Clone()
     {
-        return (Group)this.MemberwiseClone();
+        string jsonString = this.ToJson();
+        JObject json = JObject.Parse(jsonString);
+        return new Group(json);
     }
 }
 public class TopGroup : Group
@@ -170,7 +173,9 @@ public class Element : IGroupElement
     }
     public Element Clone()
     {
-        return (Element)this.MemberwiseClone();
+        string jsonString = this.ToJson();
+        JObject json = JObject.Parse(jsonString);
+        return new Element(json);
     }
 }
 public class IGroupElementJsonConverter : JsonConverter<IGroupElement>
