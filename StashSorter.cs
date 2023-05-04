@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace Triggered
 {
@@ -35,6 +36,7 @@ namespace Triggered
         static Type _oldType = typeof(Element);
         static IGroupElement _clay;
         static bool _shiftHeld = false;
+        static object _popupModal;
         #endregion
 
         #region Setup Functions
@@ -206,6 +208,9 @@ namespace Triggered
                 // If we match this group, we draw the Add/Remove buttons
                 if (_hoveredGroup == group)
                 {
+                    // Save our origin style
+                    var style = ImGui.GetStyle();
+                    var oldSpacing = style.ItemSpacing;
                     // We want to exclude the topgroup from making a remove button
                     if (group is not TopGroup)
                     {
@@ -222,13 +227,21 @@ namespace Triggered
                         _hovered = ImGui.IsItemHovered();
                         if (_hovered && _hoveredGroup == group)
                             _lastHover = DateTime.Now;
+
+                        // Change the spacing to remove the gap
+                        style.ItemSpacing = Vector2.Zero;
                         ImGui.SameLine();
                     }
                     // All groups have an Add Button
                     ImGui.PushStyleColor(ImGuiCol.Button, AddButton);
-                    if (ImGui.Button(group is not TopGroup ? " + " : "    +   "))
-                        ImGui.OpenPopup("AddItem");
+                    if (ImGui.Button(group is not TopGroup ? " + " : "   +   "))
+                    {
+                        _popupModal = group;
+                        ImGui.OpenPopup("Add to Group");
+                    }
                     ImGui.PopStyleColor(1);
+                    // Restore the origin spacing
+                    style.ItemSpacing = oldSpacing;
                     // Check if we hover this button
                     _hovered = ImGui.IsItemHovered();
                     if (_hovered && _hoveredGroup == group)
@@ -239,7 +252,7 @@ namespace Triggered
                 {
                     // Draw an identifier button
                     // This also is a bandaid to get uniform line height
-                    ImGui.Button("  Group ");
+                    ImGui.Button(" Group ");
                     // Check if we hover this button
                     _hovered = ImGui.IsItemHovered();
                     if (_hovered && _hoveredGroup != group)
@@ -273,13 +286,11 @@ namespace Triggered
                     }
                     ImGui.EndPopup();
                 }
-                if (ImGui.BeginPopupModal("AddItem"))
+                if (_popupModal == group && ImGui.BeginPopupModal("Add to Group"))
                 {
                     int clayType = Array.IndexOf(App.ObjectTypes, _addingType);
                     if (ImGui.Combo("##Eval", ref clayType, App.objectTypes, App.objectTypes.Length))
-                    {
                         _addingType = App.ObjectTypes[clayType];
-                    }
                     bool changed = _oldType != _addingType;
                     if (_clay == null || changed)
                     {
@@ -292,11 +303,13 @@ namespace Triggered
                             _clay = new Element();
                         }
                         _oldType = _addingType;
-                        App.Log("Swap logic occuring");
                     }
 
                     if (_clay is Element _element)
                     {
+                        bool weightedGroup = group.GroupType == "COUNT" || group.GroupType == "WEIGHT";
+                        bool weightedParent = parentType == "COUNT" || parentType == "WEIGHT";
+
                         ImGui.PushID(_clay.GetHashCode());
                         // string Key
                         ImGui.Text("Key:");
@@ -306,7 +319,7 @@ namespace Triggered
                         ImGui.PopID();
 
                         // We only want to display the Weight field if the parent requires it
-                        if (parentType == "COUNT" || parentType == "WEIGHT")
+                        if (weightedGroup)
                         {
                             ImGui.PushID(_clay.GetHashCode()+1);
                             // int Weight
@@ -337,25 +350,9 @@ namespace Triggered
                     }
                     else if (_clay is Group _group)
                     {
-                        // string Type
-                        ImGui.SetNextItemWidth(72);
-                        int comparisonIndex = Array.IndexOf(App.GroupTypes, _group.GroupType);
-                        if (ImGui.Combo("##GroupType", ref comparisonIndex, App.GroupTypes, App.GroupTypes.Length))
-                            _group.GroupType = App.GroupTypes[comparisonIndex];
-
                         bool weightedGroup = _group.GroupType == "COUNT" || _group.GroupType == "WEIGHT";
-                        bool weightedParent = parentType == "COUNT" || parentType == "WEIGHT";
+                        bool weightedParent = group.GroupType == "COUNT" || group.GroupType == "WEIGHT";
 
-                        if (weightedGroup)
-                        {
-                            // int Min
-                            ImGui.Text("Min:");
-                            ImGui.SameLine();
-                            ImGui.SetNextItemWidth(72);
-                            ImGui.InputInt("##Min", ref _group.Min);
-                        }
-                        if  (weightedGroup && weightedParent)
-                            ImGui.SameLine();
                         if (weightedParent)
                         {
                             // int Weight
@@ -363,6 +360,23 @@ namespace Triggered
                             ImGui.SameLine();
                             ImGui.SetNextItemWidth(72);
                             ImGui.InputInt("##Weight", ref _group.Weight);
+                        }
+                        // string Type
+                        ImGui.Text("Type:");
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(72);
+                        int comparisonIndex = Array.IndexOf(App.GroupTypes, _group.GroupType);
+                        if (ImGui.Combo("##GroupType", ref comparisonIndex, App.GroupTypes, App.GroupTypes.Length))
+                            _group.GroupType = App.GroupTypes[comparisonIndex];
+
+                        if (weightedGroup)
+                        {
+                            // int Min
+                            ImGui.SameLine();
+                            ImGui.Text("Min:");
+                            ImGui.SameLine();
+                            ImGui.SetNextItemWidth(72);
+                            ImGui.InputInt("##Min", ref _group.Min);
                         }
                     }
 
@@ -386,11 +400,11 @@ namespace Triggered
                 }
                 #endregion
 
-                // We construct the string we use in the node
+                // Change the display text depending on the group and parent
                 string str = IsWeighted ? $"{group.Weight}# {group.GroupType} Group" : $"{group.GroupType} Group";
                 str += group.GroupType == "COUNT" ? $" with minimum of {group.Min} match value"
                     : group.GroupType == "WEIGHT" ? $" with minimum of {group.Min} weight" : "";
-                // Then we open the tree node
+                // Create our tree node to allow collapsable states
                 bool isTreeNodeOpen = ImGui.TreeNodeEx(str, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
 
                 #region Hover Button Logic
@@ -403,7 +417,7 @@ namespace Triggered
                 }
                 else if (_hovered && _hoveredGroup == group)
                     _lastHover = DateTime.Now;
-                else if (!ImGui.IsAnyItemHovered() && _hoveredGroup == group && (DateTime.Now - _lastHover).TotalSeconds > 1)
+                else if (!ImGui.IsAnyItemHovered() && _hoveredGroup == group && (DateTime.Now - _lastHover).TotalSeconds > .2f)
                     _hoveredGroup = null;
                 else if (!_hovered && _hoveredGroup == group && _hoveredLeaf != null)
                     _hoveredGroup = null;
@@ -432,7 +446,7 @@ namespace Triggered
                 }
                 #endregion
 
-                // Only PopID after all logic is complete
+                // Only PopID after all drag logic is complete
                 ImGui.PopID();
 
                 #region Right Click Edit
@@ -471,17 +485,19 @@ namespace Triggered
                 ImGui.PushID(leaf.GetHashCode());
 
                 #region Hover Buttons
+                // If we match this leaf, we draw the Remove button
                 if (_hoveredLeaf == leaf)
                 {
+                    // Remove Button
                     ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
-                    // allow for deletion of an Element
                     if (ImGui.Button("   x   "))
                     {
                         removeType = typeof(Element);
                         removeIndexer = indexer;
-                        ImGui.OpenPopup("DeleteItem");
+                        ImGui.OpenPopup("Delete Element");
                     }
                     ImGui.PopStyleColor(1);
+                    // Check if we hover this button
                     _hovered = ImGui.IsItemHovered();
                     if (_hovered && _hoveredLeaf == leaf)
                         _lastHover = DateTime.Now;
@@ -489,10 +505,13 @@ namespace Triggered
                 }
                 else
                 {
+                    // Draw an identifier button
                     ImGui.Button("Element");
+                    // Check if we hover this button
                     _hovered = ImGui.IsItemHovered();
                     if (_hovered && _hoveredLeaf != leaf)
                     {
+                        // Swap Element button to Remove
                         _hoveredLeaf = leaf;
                         _hoveredGroup = null;
                         _lastHover = DateTime.Now;
@@ -502,9 +521,9 @@ namespace Triggered
                 #endregion
 
                 #region Popup Modal
-                if (ImGui.BeginPopupModal("DeleteItem"))
+                if (ImGui.BeginPopupModal("Delete Element"))
                 {
-                    ImGui.Text("Are you sure you want to delete this item?");
+                    ImGui.Text("Are you sure you want to delete this Element?");
                     if (ImGui.Button("Yes", new Vector2(120, 0)))
                     {
                         // delete the item
@@ -538,7 +557,7 @@ namespace Triggered
                 }
                 else if (_hovered && _hoveredLeaf == leaf)
                     _lastHover = DateTime.Now;
-                else if (!ImGui.IsAnyItemHovered() && _hoveredLeaf == leaf && (DateTime.Now - _lastHover).TotalSeconds > 1)
+                else if (!ImGui.IsAnyItemHovered() && _hoveredLeaf == leaf && (DateTime.Now - _lastHover).TotalSeconds > .2f)
                     _hoveredLeaf = null;
                 else if (!_hovered && _hoveredLeaf == leaf && _hoveredGroup != null)
                     _hoveredLeaf = null;
@@ -567,7 +586,7 @@ namespace Triggered
                 }
                 #endregion
 
-                // Only PopID after all logic is complete
+                // Only PopID after all drag logic is complete
                 ImGui.PopID();
 
                 #region Right Click Edit
@@ -722,7 +741,7 @@ namespace Triggered
         }
         #endregion
 
-        #region Field Editing Popups
+        #region Right Click Edit Functions
         static void EditElement(string parentType)
         {
             float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
