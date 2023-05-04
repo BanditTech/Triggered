@@ -66,13 +66,8 @@ namespace Triggered
             weightGroup.AddElement(new Element("This values at 10 per stat", ">=", "1",10));
             weightGroup.AddElement(new Element("This values at 20 per stat", ">=", "1",20));
             weightGroup.AddElement(new Element("This would require 100 of the stat", ">=", "100",1));
-            // We nest into another group
-            Group demoGroup = new Group();
-            demoGroup.AddGroup(new Group());
-            demoGroup.AddElement(new Element());
-            // Finally we make our TopGroup
+            // Make our TopGroup to put them all in
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
-            example1.AddGroup(demoGroup);
             example1.AddGroup(andGroup);
             example1.AddGroup(notGroup);
             example1.AddGroup(countGroup);
