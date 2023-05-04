@@ -47,7 +47,7 @@ public class Group : IGroupElement
         if (jobj.TryGetValue("GroupList", out JToken groupToken))
             GroupList = groupToken.ToObject<List<Group>>();
     }
-    public Group(string groupType, int min)
+    public Group(string groupType, int min = 1)
     {
         GroupType = groupType;
         Min = min;

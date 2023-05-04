@@ -50,37 +50,37 @@ namespace Triggered
         }
         static void DumpExampleJson()
         {
-            Group examplegroup = new Group();
-            Element exampleelement = new Element();
-            examplegroup.AddElement(exampleelement);
-            examplegroup.AddElement(exampleelement);
-            examplegroup.AddElement(exampleelement);
-
+            // We construct a default Group/Element
+            Group andGroup = new Group("AND");
+            Group notGroup = new Group("NOT");
+            Group countGroup = new Group("COUNT",4);
+            Group weightGroup = new Group("WEIGHT",100);
+            // We add some children to the group
+            andGroup.AddElement(new Element("Both This",">=","1"));
+            andGroup.AddElement(new Element("And This", ">=", "1"));
+            notGroup.AddElement(new Element("Neither This",">=","1"));
+            notGroup.AddElement(new Element("Nor This", ">=", "1"));
+            countGroup.AddElement(new Element("Requires Both This", ">=", "1",2));
+            countGroup.AddElement(new Element("And This", ">=", "1",2));
+            countGroup.AddElement(new Element("Or just This", ">=", "1",4));
+            weightGroup.AddElement(new Element("This values at 10 per stat", ">=", "1",10));
+            weightGroup.AddElement(new Element("This values at 20 per stat", ">=", "1",20));
+            weightGroup.AddElement(new Element("This would require 100 of the stat", ">=", "100",1));
+            // We nest into another group
             Group demoGroup = new Group();
-            demoGroup.AddGroup(examplegroup);
-            demoGroup.AddElement(exampleelement);
-
+            demoGroup.AddGroup(new Group());
+            demoGroup.AddElement(new Element());
+            // Finally we make our TopGroup
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
-            example1.AddElement(exampleelement);
-            example1.AddElement(exampleelement);
             example1.AddGroup(demoGroup);
-            example1.AddGroup(examplegroup);
-            example1.AddGroup(examplegroup);
-            //TopGroup example2 = new TopGroup("Example 2 NOT", "NOT", default, default, default);
-            //example2.AddElement(exampleelement);
-            //TopGroup example3 = new TopGroup("Example 3 COUNT", "COUNT", default, default, default);
-            //example3.AddElement(exampleelement);
-            //TopGroup example4 = new TopGroup("Test Duplicate", "WEIGHT", default, default, default);
-            //example4.AddElement(exampleelement);
-            //TopGroup example5 = new TopGroup("Test Duplicate", "WEIGHT", default, default, default);
-            //example5.AddElement(exampleelement);
+            example1.AddGroup(andGroup);
+            example1.AddGroup(notGroup);
+            example1.AddGroup(countGroup);
+            example1.AddGroup(weightGroup);
+            // The file itself is a list of TopGroup
             List<TopGroup> dumpthis = new List<TopGroup>();
             dumpthis.Add(example1);
-            //dumpthis.Add(example2);
-            //dumpthis.Add(example3);
-            //dumpthis.Add(example4);
-            //dumpthis.Add(example5);
-
+            // With the final structure, we can serialize
             string jsonString = JSON.Str(dumpthis);
             File.WriteAllText("example.json", jsonString);
         }
