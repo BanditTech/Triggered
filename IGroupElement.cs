@@ -3,8 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
-using TextCopy;
+using ImGuiNET;
 
 public abstract class IGroupElement
 {
@@ -12,10 +11,10 @@ public abstract class IGroupElement
     {
         return Triggered.JSON.Str(this);
     }
-    public void CopyToClipboard()
+    public void ToClipboard()
     {
         string groupData = Triggered.JSON.Str(this);
-        ClipboardService.SetText(groupData);
+        ImGui.SetClipboardText(groupData);
     }
     public void Dump(string fileName)
     {
