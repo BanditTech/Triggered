@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using ImGuiNET;
 
-public abstract class IGroupElement
+public abstract class AGroupElement
 {
     public string ToJson()
     {
@@ -22,7 +22,7 @@ public abstract class IGroupElement
         File.WriteAllText($"{fileName}.json", groupData);
     }
 }
-public class Group : IGroupElement
+public class Group : AGroupElement
 {
     public string GroupType;
     public int Min;
@@ -77,21 +77,21 @@ public class Group : IGroupElement
     {
         GroupList.Remove(group);
     }
-    public void Remove(IGroupElement item)
+    public void Remove(AGroupElement item)
     {
         if (item is Group group)
             RemoveGroup(group);
         else if (item is Element element)
             RemoveElement(element);
     }
-    public void Add(IGroupElement item)
+    public void Add(AGroupElement item)
     {
         if (item is Group group)
             AddGroup(group);
         else if (item is Element element)
             AddElement(element);
     }
-    public void Insert(int index, IGroupElement item)
+    public void Insert(int index, AGroupElement item)
     {
         if (item is Group group)
             GroupList.Insert(index,group.Clone());
@@ -138,7 +138,7 @@ public class TopGroup : Group
         Strictness = strictness;
     }
 }
-public class Element : IGroupElement
+public class Element : AGroupElement
 {
     public string Key;
     public string Eval;
@@ -177,9 +177,9 @@ public class Element : IGroupElement
         return new Element(json);
     }
 }
-public class IGroupElementJsonConverter : JsonConverter<IGroupElement>
+public class AGroupElementJsonConverter : JsonConverter<AGroupElement>
 {
-    public override IGroupElement ReadJson(JsonReader reader, Type objectType, IGroupElement existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override AGroupElement ReadJson(JsonReader reader, Type objectType, AGroupElement existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         // Load JObject from stream
         JObject jsonObject = JObject.Load(reader);
@@ -202,12 +202,12 @@ public class IGroupElementJsonConverter : JsonConverter<IGroupElement>
             return topGroup;
         }
         else if (groupType == null || min == null || jsonObject["ElementList"] == null)
-            throw new JsonSerializationException("Invalid JSON object format: Does not match with any IGroupElement Member.");
+            throw new JsonSerializationException("Invalid JSON object format: Does not match with any AGroupElement Member.");
         // Prior logic leaves us with a Group object
         Group group = new Group(jsonObject);
         return group;
     }
-    public override void WriteJson(JsonWriter writer, IGroupElement value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, AGroupElement value, JsonSerializer serializer)
     {
         serializer.Serialize(writer, value, value.GetType());
     }

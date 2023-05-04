@@ -1,14 +1,14 @@
-public abstract class IGroupElement
+public abstract class AGroupElement
 {
 }
-public class Element : IGroupElement
+public class Element : AGroupElement
 {
     public string Key;
     public string Eval;
     public string Min;
     public int Weight;
 }
-public class Group : IGroupElement
+public class Group : AGroupElement
 {
     public string GroupType;
     public int Min;

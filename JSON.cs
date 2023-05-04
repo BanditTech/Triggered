@@ -26,15 +26,15 @@ namespace Triggered
             object obj = JsonConvert.DeserializeObject(json);
             return obj;
         }
-        public static List<IGroupElement> IGroupElementList(string json)
+        public static List<AGroupElement> IGroupElementList(string json)
         {
-            // Deserialize the JSON into a list of IGroupElement objects
+            // Deserialize the JSON into a list of AGroupElement objects
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Converters = { new IGroupElementJsonConverter() }
+                Converters = { new AGroupElementJsonConverter() }
             };
-            List<IGroupElement> IGroupElementList = JsonConvert.DeserializeObject<List<IGroupElement>>(json, options);
+            List<AGroupElement> IGroupElementList = JsonConvert.DeserializeObject<List<AGroupElement>>(json, options);
             return IGroupElementList;
         }
     }

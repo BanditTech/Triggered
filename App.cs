@@ -15,7 +15,7 @@
         public static Stopwatch Watch = Stopwatch.StartNew();
         public static LogLevel LogWindowMinimumLogLevel = LogLevel.Debug;
         public static string[] TopGroups;
-        public static List<IGroupElement> StashSorterList;
+        public static List<AGroupElement> StashSorterList;
 
         public static int SelectedGroup = 0;
         public static int LogicTickDelayInMilliseconds = 100;

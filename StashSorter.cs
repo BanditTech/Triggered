@@ -36,7 +36,7 @@ namespace Triggered
         static JObject keyValuePairs = new JObject();
         static Type _addingType = typeof(Element);
         static Type _oldType = typeof(Element);
-        static IGroupElement _clay;
+        static AGroupElement _clay;
         static bool _shiftHeld = false;
         static object _popupModal;
         #endregion
@@ -83,14 +83,14 @@ namespace Triggered
         {
             // Load the JSON file into a string
             string jsonString = File.ReadAllText("example.json");
-            // Deserialize the JSON into a list of IGroupElement objects
+            // Deserialize the JSON into a list of AGroupElement objects
             App.StashSorterList = JSON.IGroupElementList(jsonString);
         }
         static void UpdateTopGroups()
         {
             // Fetch the GroupName of each TopGroup and save to a string array in App.TopGroups
             List<string> topGroupsList = new List<string>();
-            foreach (IGroupElement group in App.StashSorterList)
+            foreach (AGroupElement group in App.StashSorterList)
             {
                 if (group is TopGroup topGroup)
                     topGroupsList.Add(topGroup.GroupName);
@@ -251,7 +251,7 @@ namespace Triggered
             if (_dragStarted && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                 _dragStarted = false;
         }
-        static void RecursiveMenu(IGroupElement obj,string parentType,string indexer = "0")
+        static void RecursiveMenu(AGroupElement obj,string parentType,string indexer = "0")
         {
             bool _hovered;
             if (obj == null)
