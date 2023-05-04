@@ -26,7 +26,7 @@ namespace Triggered
             object obj = JsonConvert.DeserializeObject(json);
             return obj;
         }
-        public static List<AGroupElement> IGroupElementList(string json)
+        public static List<AGroupElement> AGroupElementList(string json)
         {
             // Deserialize the JSON into a list of AGroupElement objects
             var options = new JsonSerializerSettings

@@ -53,19 +53,19 @@ namespace Triggered
             // We construct a default Group/Element
             Group andGroup = new Group("AND");
             Group notGroup = new Group("NOT");
-            Group countGroup = new Group("COUNT",4);
-            Group weightGroup = new Group("WEIGHT",100);
+            Group countGroup = new Group("COUNT", 4);
+            Group weightGroup = new Group("WEIGHT", 100);
             // We add some children to the group
-            andGroup.AddElement(new Element("Both This",">=","1"));
+            andGroup.AddElement(new Element("Both This", ">=", "1"));
             andGroup.AddElement(new Element("And This", ">=", "1"));
-            notGroup.AddElement(new Element("Neither This",">=","1"));
+            notGroup.AddElement(new Element("Neither This", ">=", "1"));
             notGroup.AddElement(new Element("Nor This", ">=", "1"));
-            countGroup.AddElement(new Element("Requires Both This", ">=", "1",2));
-            countGroup.AddElement(new Element("And This", ">=", "1",2));
-            countGroup.AddElement(new Element("Or just This", ">=", "1",4));
-            weightGroup.AddElement(new Element("This values at 10 per stat", ">=", "1",10));
-            weightGroup.AddElement(new Element("This values at 20 per stat", ">=", "1",20));
-            weightGroup.AddElement(new Element("This would require 100 of the stat", ">=", "100",1));
+            countGroup.AddElement(new Element("Requires Both This", ">=", "1", 2));
+            countGroup.AddElement(new Element("And This", ">=", "1", 2));
+            countGroup.AddElement(new Element("Or just This", ">=", "1", 4));
+            weightGroup.AddElement(new Element("This values at 10 per stat", ">=", "1", 10));
+            weightGroup.AddElement(new Element("This values at 20 per stat", ">=", "1", 20));
+            weightGroup.AddElement(new Element("This would require 100 of the stat", ">=", "100", 1));
             // Make our TopGroup to put them all in
             TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
             example1.AddGroup(andGroup);
@@ -84,7 +84,7 @@ namespace Triggered
             // Load the JSON file into a string
             string jsonString = File.ReadAllText("example.json");
             // Deserialize the JSON into a list of AGroupElement objects
-            App.StashSorterList = JSON.IGroupElementList(jsonString);
+            App.StashSorterList = JSON.AGroupElementList(jsonString);
         }
         static void UpdateTopGroups()
         {
@@ -164,72 +164,7 @@ namespace Triggered
                 ImGui.ColorPicker4("##Background", ref EditingBackground);
             }
 
-            #region Menu Bar
-            if (ImGui.BeginMenuBar())
-            {
-                if (ImGui.MenuItem("Hide"))
-                {
-                    App.MenuDisplay_StashSorter = !App.MenuDisplay_StashSorter;
-                }
-                if (ImGui.BeginMenu("File"))
-                {
-                    if (ImGui.MenuItem("Load"))
-                    {
-                        // handle Load action
-                    }
-                    if (ImGui.MenuItem("Save"))
-                    {
-                        // handle Save action
-                    }
-                    ImGui.Separator();
-                    if (ImGui.MenuItem("Reload"))
-                    {
-                        // handle Reload action
-                    }
-                    ImGui.EndMenu();
-                }
-                if (ImGui.BeginMenu("Import"))
-                {
-                    if (ImGui.MenuItem("Group"))
-                    {
-                        // handle Group action
-                    }
-                    ImGui.Separator();
-                    if (ImGui.MenuItem("Element"))
-                    {
-                        // handle Element action
-                    }
-                    if (ImGui.BeginMenu("Overwrite"))
-                    {
-                        if (ImGui.MenuItem("TopGroup"))
-                        {
-                            // handle TopGroup action
-                        }
-                        ImGui.Separator();
-                        if (ImGui.MenuItem("Full List"))
-                        {
-                            // handle TopGroup action
-                        }
-                        ImGui.EndMenu();
-                    }
-                    ImGui.EndMenu();
-                }
-                if (ImGui.BeginMenu("Export"))
-                {
-                    if (ImGui.MenuItem("TopGroup"))
-                    {
-                        // handle Group action
-                    }
-                    ImGui.Separator();
-                    if (ImGui.MenuItem("Full List"))
-                    {
-                        // handle Element action
-                    }
-                    ImGui.EndMenu();
-                }
-                ImGui.EndMenuBar();
-            }
-            #endregion
+            DrawMenuBar();
 
             // End the main window
             ImGui.End();
@@ -240,7 +175,7 @@ namespace Triggered
                 _dragStarted = false;
                 _dragFinalize = false;
                 object fetch = GetObjectByIndexer(_dragSource, _dragSourceType, !_shiftHeld);
-                InsertObjectByIndexer(_dragTarget,_dragTargetType,_dragSourceType,fetch);
+                InsertObjectByIndexer(_dragTarget, _dragTargetType, _dragSourceType, fetch);
                 App.Log($"{fetch} {JSON.Str(fetch)}");
             }
             if (confirmRemove)
@@ -251,7 +186,8 @@ namespace Triggered
             if (_dragStarted && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                 _dragStarted = false;
         }
-        static void RecursiveMenu(AGroupElement obj,string parentType,string indexer = "0")
+
+        static void RecursiveMenu(AGroupElement obj, string parentType, string indexer = "0")
         {
             bool _hovered;
             if (obj == null)
@@ -381,7 +317,7 @@ namespace Triggered
                         // We only want to display the Weight field if the parent requires it
                         if (weightedGroup)
                         {
-                            ImGui.PushID(_clay.GetHashCode()+1);
+                            ImGui.PushID(_clay.GetHashCode() + 1);
                             // int Weight
                             ImGui.Text("Weight:");
                             ImGui.SameLine();
@@ -500,7 +436,7 @@ namespace Triggered
                     _dragStarted = true;
                     _dragSource = indexer;
                     _dragSourceType = typeof(Group);
-                    ImGui.SetDragDropPayload("COMPONENT",IntPtr.Zero,0);
+                    ImGui.SetDragDropPayload("COMPONENT", IntPtr.Zero, 0);
                     ImGui.Text($"{indexer}");
                     ImGui.EndDragDropSource();
                 }
@@ -550,13 +486,13 @@ namespace Triggered
                     foreach (Element subElement in group.ElementList)
                     {
                         i++;
-                        RecursiveMenu(subElement,group.GroupType,$"{indexer}_{i}");
+                        RecursiveMenu(subElement, group.GroupType, $"{indexer}_{i}");
                     }
                     i = -1;
                     foreach (Group subGroup in group.GroupList)
                     {
                         i++;
-                        RecursiveMenu(subGroup,group.GroupType,$"{indexer}_{i}");
+                        RecursiveMenu(subGroup, group.GroupType, $"{indexer}_{i}");
                     }
                     ImGui.TreePop();
                 }
@@ -634,7 +570,7 @@ namespace Triggered
 
                     ImGui.PushItemWidth(100f);
                     // We make our Selectable
-                    ImGui.Selectable(str,false, ImGuiSelectableFlags.AllowItemOverlap | ImGuiSelectableFlags.AllowDoubleClick);
+                    ImGui.Selectable(str, false, ImGuiSelectableFlags.AllowItemOverlap | ImGuiSelectableFlags.AllowDoubleClick);
                 }
                 else
                 {
@@ -716,7 +652,80 @@ namespace Triggered
                 ImGui.PopID();
             }
             else
-                App.Log("This should not display",NLog.LogLevel.Error);
+                App.Log("This should not display", NLog.LogLevel.Error);
+        }
+
+        static void DrawMenuBar()
+        {
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.MenuItem("Hide"))
+                {
+                    App.MenuDisplay_StashSorter = !App.MenuDisplay_StashSorter;
+                }
+                if (ImGui.BeginMenu("File"))
+                {
+                    if (ImGui.MenuItem("Load"))
+                    {
+                        // handle Load action
+                    }
+                    NewSection(1);
+                    if (ImGui.MenuItem("Save"))
+                    {
+                        // handle Save action
+                    }
+                    if (ImGui.MenuItem("Save As"))
+                    {
+                        // handle Save action
+                    }
+                    NewSection(1);
+                    if (ImGui.MenuItem("Reload"))
+                    {
+                        // handle Reload action
+                    }
+                    ImGui.EndMenu();
+                }
+                if (ImGui.BeginMenu("Import"))
+                {
+                    if (ImGui.MenuItem("Group"))
+                    {
+                        // handle Group action
+                    }
+                    if (ImGui.MenuItem("Element"))
+                    {
+                        // handle Element action
+                    }
+                    NewSection(1);
+                    if (ImGui.BeginMenu("Overwrite"))
+                    {
+                        if (ImGui.MenuItem("TopGroup"))
+                        {
+                            // handle TopGroup action
+                        }
+                        NewSection(1);
+                        if (ImGui.MenuItem("Full List"))
+                        {
+                            // handle TopGroup action
+                        }
+                        ImGui.EndMenu();
+                    }
+                    ImGui.EndMenu();
+                }
+                if (ImGui.BeginMenu("Export"))
+                {
+                    if (ImGui.MenuItem("TopGroup"))
+                    {
+                        // handle Group action
+                    }
+                    NewSection(1);
+                    if (ImGui.MenuItem("Full List"))
+                    {
+                        // handle Element action
+                    }
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMenuBar();
+            }
         }
 
         #region Utility Helpers
