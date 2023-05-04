@@ -104,7 +104,7 @@ namespace Triggered
             // Create the main window
             ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(500, 200), new Vector2(float.MaxValue, float.MaxValue));
-            ImGui.Begin("Edit Stash Sorter");
+            ImGui.Begin("Edit Stash Sorter", ImGuiWindowFlags.MenuBar);
 
             // Select the TopGroup
             ImGui.Text("Selected Filter:");
@@ -169,6 +169,73 @@ namespace Triggered
                 ImGui.SetNextItemWidth(space);
                 ImGui.ColorPicker4("##Background", ref EditingBackground);
             }
+
+            #region Menu Bar
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.MenuItem("Hide"))
+                {
+                    // handle Hide action
+                }
+                if (ImGui.BeginMenu("File"))
+                {
+                    if (ImGui.MenuItem("Load"))
+                    {
+                        // handle Load action
+                    }
+                    if (ImGui.MenuItem("Save"))
+                    {
+                        // handle Save action
+                    }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Reload"))
+                    {
+                        // handle Reload action
+                    }
+                    ImGui.EndMenu();
+                }
+                if (ImGui.BeginMenu("Import"))
+                {
+                    if (ImGui.MenuItem("Group"))
+                    {
+                        // handle Group action
+                    }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Element"))
+                    {
+                        // handle Element action
+                    }
+                    if (ImGui.BeginMenu("Overwrite"))
+                    {
+                        if (ImGui.MenuItem("TopGroup"))
+                        {
+                            // handle TopGroup action
+                        }
+                        ImGui.Separator();
+                        if (ImGui.MenuItem("Full List"))
+                        {
+                            // handle TopGroup action
+                        }
+                        ImGui.EndMenu();
+                    }
+                    ImGui.EndMenu();
+                }
+                if (ImGui.BeginMenu("Export"))
+                {
+                    if (ImGui.MenuItem("TopGroup"))
+                    {
+                        // handle Group action
+                    }
+                    ImGui.Separator();
+                    if (ImGui.MenuItem("Full List"))
+                    {
+                        // handle Element action
+                    }
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMenuBar();
+            }
+            #endregion
 
             // End the main window
             ImGui.End();
@@ -457,8 +524,19 @@ namespace Triggered
                         _rightClickedGroup = group;
                 }
                 if (_rightClickedGroup != null && _rightClickedGroup == group)
+                {
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("My Button").X - ImGui.GetStyle().FramePadding.X * 2);
+                    if (ImGui.Button("Export"))
+                    {
+                        string json = group.ToJson();
+                        ImGui.SetClipboardText(json);
+                        App.Log(json);
+                    }
                     EditGroup(parentType);
+                }
                 #endregion
+
 
                 // If the Tree is open, we draw its children
                 if (isTreeNodeOpen)
@@ -545,6 +623,7 @@ namespace Triggered
                 // Build the string we will use to display
                 string str = IsWeighted ? $"{leaf.Weight}# " : "";
                 str += $"{leaf.Key} {leaf.Eval} {leaf.Min}";
+                ImGui.SetNextItemWidth(100);
                 // We make our Selectable
                 ImGui.Selectable(str);
 
@@ -598,7 +677,17 @@ namespace Triggered
                         _rightClickedElement = leaf;
                 }
                 if (_rightClickedElement != null && _rightClickedElement == leaf)
+                {
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("My Button").X - ImGui.GetStyle().FramePadding.X * 2);
+                    if (ImGui.Button("Export"))
+                    {
+                        string json = leaf.ToJson();
+                        ImGui.SetClipboardText(json);
+                        App.Log(json);
+                    }
                     EditElement(parentType);
+                }
                 #endregion
             }
             else
@@ -779,6 +868,7 @@ namespace Triggered
                 int comparisonIndex = Array.IndexOf(App.EvalOptions, _rightClickedElement.Eval);
                 if (ImGui.Combo("##Eval", ref comparisonIndex, App.EvalOptions, App.EvalOptions.Length))
                     _rightClickedElement.Eval = App.EvalOptions[comparisonIndex];
+                
                 // string Min
                 ImGui.SameLine();
                 ImGui.Text("Min:");
