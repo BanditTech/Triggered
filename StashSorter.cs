@@ -19,11 +19,9 @@ namespace Triggered
         static Type _dragSourceType;
         static bool _dragStarted;
         static bool _dragFinalize;
-        static bool _editWindowOpen = false;
         static Element _rightClickedElement = null;
         static Group _rightClickedGroup = null;
         static bool confirmRemove = false;
-        static bool confirmAdd = false;
         static Type removeType;
         static string removeIndexer;
         static string addIndexer;
@@ -342,7 +340,6 @@ namespace Triggered
                     if (ImGui.Button("Yes", new Vector2(120, 0)))
                     {
                         // Add the item
-                        confirmAdd = true;
                         if (_clay is Group)
                             group.Add(((Group)_clay).Clone());
                         else if (_clay is Element)
@@ -353,7 +350,6 @@ namespace Triggered
                     if (ImGui.Button("No", new Vector2(120, 0)))
                     {
                         addIndexer = null;
-                        confirmAdd = false;
                         _clay = null;
                         ImGui.CloseCurrentPopup();
                     }
