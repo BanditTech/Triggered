@@ -113,6 +113,7 @@ namespace Triggered
             ImGui.Combo("##Selected Filter", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
             ImGui.Spacing();
 
+            // Add adjustments for TopGroup values
             if (App.StashSorterList[App.SelectedGroup] is TopGroup topGroup)
             {
                 // int GroupName
@@ -143,23 +144,16 @@ namespace Triggered
                     topGroup.Strictness = 0;
             }
 
-            // Add some spacing between the two menu structures
-            ImGui.Spacing();
-            ImGui.Spacing();
-            ImGui.Separator();
-            ImGui.Spacing();
-            ImGui.Spacing();
+            // Add spacing
+            NewSection();
 
             // We recurse the Group structure drawing them onto our menu
             RecursiveMenu(App.StashSorterList[App.SelectedGroup], "NONE");
 
-            // Add some spacing between the two menu structures
-            ImGui.Spacing();
-            ImGui.Spacing();
-            ImGui.Separator();
-            ImGui.Spacing();
-            ImGui.Spacing();
+            // Add spacing
+            NewSection();
 
+            // Color pickers for the Right Click editor
             if (ImGui.CollapsingHeader("Editor color adjustment", ref _showOptions))
             {
                 float space = ImGui.GetContentRegionAvail().X * 0.4f;
@@ -175,7 +169,7 @@ namespace Triggered
             {
                 if (ImGui.MenuItem("Hide"))
                 {
-                    // handle Hide action
+                    App.MenuDisplay_StashSorter = !App.MenuDisplay_StashSorter;
                 }
                 if (ImGui.BeginMenu("File"))
                 {
@@ -709,6 +703,21 @@ namespace Triggered
             else
                 App.Log("This should not display",NLog.LogLevel.Error);
         }
+
+        #region Utility Helpers
+        static void Spacers(int count)
+        {
+            for (int i = 0; i < count; i++)
+                ImGui.Spacing();
+        }
+        static void NewSection(int count = 2, bool separate = true)
+        {
+            Spacers(count);
+            if (separate)
+                ImGui.Separator();
+            Spacers(count);
+        }
+        #endregion
 
         #region Movement Helpers
         static object GetObjectByIndexer(string indexer, Type type, bool pop = false)

@@ -1,13 +1,10 @@
 ﻿namespace Triggered
 {
-    using System.Collections.Generic;
-    using System.IO;
     using System.Numerics;
     using System.Threading;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
-    using Newtonsoft.Json;
 
     public class TriggeredMenu : Overlay
     {
