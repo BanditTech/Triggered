@@ -678,7 +678,6 @@ namespace Triggered
                 }
                 #endregion
 
-
                 #region Right Click Edit
                 if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
                 {
@@ -703,6 +702,7 @@ namespace Triggered
                     EditElement(parentType);
                 }
                 #endregion
+
                 // Only PopID after all logic is complete
                 ImGui.PopID();
             }
