@@ -512,21 +512,21 @@ namespace Triggered
                 }
                 #endregion
 
-                // Only PopID after all drag logic is complete
-                ImGui.PopID();
-
                 #region Right Click Edit
                 if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
                 {
                     if (_rightClickedGroup == group)
                         _rightClickedGroup = null;
                     else
+                    {
+                        _rightClickedElement = null;
                         _rightClickedGroup = group;
+                    }
                 }
                 if (_rightClickedGroup != null && _rightClickedGroup == group)
                 {
                     ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("My Button").X - ImGui.GetStyle().FramePadding.X * 2);
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
                     if (ImGui.Button("Export"))
                     {
                         string json = group.ToJson();
@@ -536,6 +536,9 @@ namespace Triggered
                     EditGroup(parentType);
                 }
                 #endregion
+
+                // Only PopID after all logic is complete
+                ImGui.PopID();
 
 
                 // If the Tree is open, we draw its children
@@ -623,9 +626,19 @@ namespace Triggered
                 // Build the string we will use to display
                 string str = IsWeighted ? $"{leaf.Weight}# " : "";
                 str += $"{leaf.Key} {leaf.Eval} {leaf.Min}";
-                ImGui.SetNextItemWidth(100);
-                // We make our Selectable
-                ImGui.Selectable(str);
+
+                if (_rightClickedElement != null && _rightClickedElement == leaf)
+                {
+
+                    ImGui.PushItemWidth(100f);
+                    // We make our Selectable
+                    ImGui.Selectable(str,false, ImGuiSelectableFlags.AllowItemOverlap | ImGuiSelectableFlags.AllowDoubleClick);
+                }
+                else
+                {
+                    // We make our Selectable
+                    ImGui.Selectable(str);
+                }
 
                 #region Hover Button Logic
                 _hovered = ImGui.IsItemHovered();
@@ -665,8 +678,6 @@ namespace Triggered
                 }
                 #endregion
 
-                // Only PopID after all drag logic is complete
-                ImGui.PopID();
 
                 #region Right Click Edit
                 if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
@@ -674,12 +685,15 @@ namespace Triggered
                     if (_rightClickedElement == leaf)
                         _rightClickedElement = null;
                     else
+                    {
+                        _rightClickedGroup = null;
                         _rightClickedElement = leaf;
+                    }
                 }
                 if (_rightClickedElement != null && _rightClickedElement == leaf)
                 {
                     ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("My Button").X - ImGui.GetStyle().FramePadding.X * 2);
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
                     if (ImGui.Button("Export"))
                     {
                         string json = leaf.ToJson();
@@ -689,6 +703,8 @@ namespace Triggered
                     EditElement(parentType);
                 }
                 #endregion
+                // Only PopID after all logic is complete
+                ImGui.PopID();
             }
             else
                 App.Log("This should not display",NLog.LogLevel.Error);
