@@ -519,6 +519,14 @@ namespace Triggered
                 }
                 if (_rightClickedGroup != null && _rightClickedGroup == group)
                 {
+                    // Draw an indicator on active Group
+                    var drawList = ImGui.GetWindowDrawList();
+                    drawList.AddRectFilled(
+                        ImGui.GetItemRectMin(),
+                        ImGui.GetItemRectMax(),
+                        ImGui.GetColorU32(EditingHighlight),
+                        4.0f);
+
                     ImGui.SameLine();
                     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
                     if (ImGui.Button("Export"))
@@ -685,6 +693,13 @@ namespace Triggered
                 }
                 if (_rightClickedElement != null && _rightClickedElement == leaf)
                 {
+                    // Draw an indicator on active Element
+                    ImGui.GetWindowDrawList().AddRectFilled(
+                        ImGui.GetItemRectMin(),
+                        ImGui.GetItemRectMax(),
+                        ImGui.GetColorU32(EditingHighlight),
+                        4.0f);
+
                     ImGui.SameLine();
                     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
                     if (ImGui.Button("Export"))
@@ -864,12 +879,6 @@ namespace Triggered
             {
                 ImGui.BeginGroup();
                 Vector2 padding = new Vector2(5.0f, 2.0f);
-                // Draw an indicator on active Element
-                ImGui.GetWindowDrawList().AddRectFilled(
-                    ImGui.GetItemRectMin(),
-                    ImGui.GetItemRectMax(),
-                    ImGui.GetColorU32(EditingHighlight),
-                    4.0f);
 
                 if (parentType == "COUNT" || parentType == "WEIGHT")
                 {
@@ -917,13 +926,6 @@ namespace Triggered
             if (_rightClickedGroup != null)
             {
                 ImGui.BeginGroup();
-                // Draw an indicator on active Group
-                var drawList = ImGui.GetWindowDrawList();
-                drawList.AddRectFilled(
-                    ImGui.GetItemRectMin(),
-                    ImGui.GetItemRectMax(),
-                    ImGui.GetColorU32(EditingHighlight),
-                    4.0f);
 
                 // string Type
                 ImGui.SetNextItemWidth(72);
