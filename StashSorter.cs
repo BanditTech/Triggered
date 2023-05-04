@@ -25,7 +25,9 @@ namespace Triggered
         static Vector4 EditingHighlight = new Vector4(0f, 0.772549f, 1f, 0.392157f); // #00C5FF64
         static Vector4 EditingBackground = new Vector4(0.0f, 1f, 0.9254902f, 0.1647059f); // #00FFEC2A
         static Vector4 RemoveButton = new Vector4(1.0f, 0.0f, 0.0f, 0.2f);
+        static Vector4 RemoveButtonHover = new Vector4(1.0f, 0.0f, 0.0f, 0.6f);
         static Vector4 AddButton = new Vector4(0.0f, 1.0f, 0.0f, 0.2f);
+        static Vector4 AddButtonHover = new Vector4(0.0f, 1.0f, 0.0f, 0.6f);
         static bool _showOptions = true;
         static Element _hoveredLeaf = null;
         static Group _hoveredGroup = null;
@@ -216,13 +218,14 @@ namespace Triggered
                     {
                         // Remove Button
                         ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, RemoveButtonHover);
                         if (ImGui.Button(" x "))
                         {
                             removeType = typeof(Group);
                             removeIndexer = indexer;
                             ImGui.OpenPopup("Remove Group");
                         }
-                        ImGui.PopStyleColor(1);
+                        ImGui.PopStyleColor(2);
                         // Check if we hover this button
                         _hovered = ImGui.IsItemHovered();
                         if (_hovered && _hoveredGroup == group)
@@ -234,12 +237,13 @@ namespace Triggered
                     }
                     // All groups have an Add Button
                     ImGui.PushStyleColor(ImGuiCol.Button, AddButton);
+                    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, AddButtonHover);
                     if (ImGui.Button(group is not TopGroup ? " + " : "   +   "))
                     {
                         _popupModal = group;
                         ImGui.OpenPopup("Add to Group");
                     }
-                    ImGui.PopStyleColor(1);
+                    ImGui.PopStyleColor(2);
                     // Restore the origin spacing
                     style.ItemSpacing = oldSpacing;
                     // Check if we hover this button
@@ -490,13 +494,14 @@ namespace Triggered
                 {
                     // Remove Button
                     ImGui.PushStyleColor(ImGuiCol.Button, RemoveButton);
+                    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, RemoveButtonHover);
                     if (ImGui.Button("   x   "))
                     {
                         removeType = typeof(Element);
                         removeIndexer = indexer;
                         ImGui.OpenPopup("Delete Element");
                     }
-                    ImGui.PopStyleColor(1);
+                    ImGui.PopStyleColor(2);
                     // Check if we hover this button
                     _hovered = ImGui.IsItemHovered();
                     if (_hovered && _hoveredLeaf == leaf)
