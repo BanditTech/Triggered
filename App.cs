@@ -1,12 +1,10 @@
 ﻿namespace Triggered
 {
-    using ImGuiNET;
     using NLog;
     using NLog.Config;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
 
     public static class App
     {

@@ -34,8 +34,8 @@ namespace Triggered
                 TypeNameHandling = TypeNameHandling.Auto,
                 Converters = { new AGroupElementJsonConverter() }
             };
-            List<AGroupElement> IGroupElementList = JsonConvert.DeserializeObject<List<AGroupElement>>(json, options);
-            return IGroupElementList;
+            List<AGroupElement> AGroupElementList = JsonConvert.DeserializeObject<List<AGroupElement>>(json, options);
+            return AGroupElementList;
         }
     }
 }

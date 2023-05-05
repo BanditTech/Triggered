@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Vortice.Win32;
 
 namespace Triggered
 {
@@ -39,6 +40,7 @@ namespace Triggered
         static AGroupElement _clay;
         static bool _shiftHeld = false;
         static object _popupModal;
+        static string _selectedFile;
         #endregion
 
         #region Setup Functions
@@ -81,9 +83,13 @@ namespace Triggered
         }
         static void UpdateStashSorterFile()
         {
-            // Load the JSON file into a string
-            string jsonString = File.ReadAllText("example.json");
-            // Deserialize the JSON into a list of AGroupElement objects
+            string jsonString;
+            // if we have a selected file we will use that.
+            if (_selectedFile != null && File.Exists(_selectedFile))
+                jsonString = File.ReadAllText(_selectedFile);
+            else // Load the example file
+                jsonString = File.ReadAllText("example.json");
+            // Store the filter in memory as deserialized objects
             App.StashSorterList = JSON.AGroupElementList(jsonString);
         }
         static void UpdateTopGroups()
@@ -667,16 +673,29 @@ namespace Triggered
                 {
                     if (ImGui.MenuItem("Load"))
                     {
-                        // handle Load action
+                        Task.Run(() =>
+                        {
+                            var ahk = new AHK();
+                            _selectedFile = ahk.SelectFile();
+                            App.Log(_selectedFile);
+                        });
                     }
                     NewSection(1);
                     if (ImGui.MenuItem("Save"))
                     {
-                        // handle Save action
+                        Task.Run(() =>
+                        {
+                            File.WriteAllText(_selectedFile != null ? _selectedFile : "examplesave.json", JSON.Str(App.StashSorterList));
+                        });
                     }
                     if (ImGui.MenuItem("Save As"))
                     {
-                        // handle Save action
+                        Task.Run(() =>
+                        {
+                            var ahk = new AHK();
+                            _selectedFile = ahk.SelectFile(default,"S0");
+                            File.WriteAllText(_selectedFile != null ? _selectedFile : "examplesave.json", JSON.Str(App.StashSorterList));
+                        });
                     }
                     NewSection(1);
                     if (ImGui.MenuItem("Reload"))
