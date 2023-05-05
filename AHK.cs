@@ -28,6 +28,15 @@
         {
             ahk.ExecRaw($"MsgBox,{message}");
         }
+        public string SelectFile(string ext = "*.json", string option = "1")
+        {
+            ahk.ExecRaw($"FileSelectFile, selectedFile, {option}, , Select a file to open, {ext}");
+            return GetVar("selectedFile");
+        }
+        public string GetVar(string var)
+        {
+            return ahk.GetVar(var);
+        }
         public void Demo()
         {
             ahk.ExecRaw("Run, Notepad,, Min, PID");
