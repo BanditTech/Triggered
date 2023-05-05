@@ -41,6 +41,7 @@ namespace Triggered
         static bool _shiftHeld = false;
         static object _popupModal;
         static string _selectedFile;
+        static bool _fileOperation = false;
         #endregion
 
         #region Setup Functions
@@ -85,7 +86,7 @@ namespace Triggered
         {
             string jsonString;
             // if we have a selected file we will use that.
-            if (_selectedFile != null && File.Exists(_selectedFile))
+            if (_selectedFile != null && _selectedFile != "" && File.Exists(_selectedFile))
                 jsonString = File.ReadAllText(_selectedFile);
             else // Load the example file
                 jsonString = File.ReadAllText("example.json");
@@ -673,34 +674,65 @@ namespace Triggered
                 {
                     if (ImGui.MenuItem("Load"))
                     {
+                        if (IsFileOperating())
+                            return;
                         Task.Run(() =>
                         {
                             var ahk = new AHK();
                             _selectedFile = ahk.SelectFile();
-                            App.Log(_selectedFile);
+                            App.Log($"Loaded file path has been changed to {_selectedFile}");
+                            UpdateStashSorterFile();
+                            IsFileOperating(false);
                         });
                     }
                     NewSection(1);
                     if (ImGui.MenuItem("Save"))
                     {
+                        if (IsFileOperating())
+                            return;
                         Task.Run(() =>
                         {
-                            File.WriteAllText(_selectedFile != null ? _selectedFile : "examplesave.json", JSON.Str(App.StashSorterList));
+                            string example = Path.Combine(AppContext.BaseDirectory,"examplesave.json");
+                            bool validSelection = _selectedFile != null && _selectedFile != "" && File.Exists(_selectedFile);
+                            string path = validSelection ? _selectedFile : example;
+                            File.WriteAllText( path, JSON.Str(App.StashSorterList));
+                            App.Log($"Saved file to {path}");
+                            IsFileOperating(false);
                         });
                     }
                     if (ImGui.MenuItem("Save As"))
                     {
+                        if (IsFileOperating())
+                            return;
                         Task.Run(() =>
                         {
+                            bool validSelection;
                             var ahk = new AHK();
-                            _selectedFile = ahk.SelectFile(default,"S0");
-                            File.WriteAllText(_selectedFile != null ? _selectedFile : "examplesave.json", JSON.Str(App.StashSorterList));
+                            string result = ahk.SelectFile(default,"S0");
+                            validSelection = result != null && result != "";
+                            if (validSelection)
+                            {
+                                _selectedFile = result;
+                                App.Log($"Saving file to selected path at {_selectedFile}");
+                                File.WriteAllText(_selectedFile, JSON.Str(App.StashSorterList));
+                            }
+                            else
+                            {
+                                App.Log("Issue making a selection, nothing was saved");
+                            }
+                            IsFileOperating(false);
                         });
                     }
                     NewSection(1);
                     if (ImGui.MenuItem("Reload"))
                     {
-                        // handle Reload action
+                        if (IsFileOperating())
+                            return;
+                        Task.Run(() =>
+                        {
+                            App.Log($"Saved file to ");
+                            IsFileOperating(false);
+                        });
                     }
                     ImGui.EndMenu();
                 }
@@ -747,6 +779,19 @@ namespace Triggered
             }
         }
 
+        static bool IsFileOperating(bool reset = false)
+        {
+            if (reset)
+            {
+                _fileOperation = false;
+                return false;
+            }
+            if (_fileOperation)
+                return true;
+            if (!_fileOperation)
+                _fileOperation = true;
+            return false;
+        }
         #region Utility Helpers
         static void Spacers(int count)
         {
