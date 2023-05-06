@@ -10,6 +10,14 @@ namespace Triggered
     {
         public JObject keyList = new JObject();
         public string Name = "";
+
+        ~Options()
+        {
+            // When constructing JArray without list size, we set to 20
+            // We trim the keyList to remove extra JArray Null objects 
+            TrimNullValues(keyList);
+        }
+
         public void SetKey(string keys, object value)
         {
             int index;
@@ -278,10 +286,13 @@ namespace Triggered
         public Options_MainMenu()
         {
             Name = "MainMenu";
+            // Panel Visibility
             SetKey("Display_StashSorter", true);
             SetKey("Display_Main", true);
             SetKey("Display_Log", true);
-            TrimNullValues(keyList);
+            // Viewport options
+            SetKey("Fullscreen", true);
+            SetKey("Padding", false);
         }
     }
 }
