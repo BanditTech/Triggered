@@ -202,6 +202,10 @@ namespace Triggered
             }
         }
     }
+    public class AppOptions
+    {
+        public MainMenuOptions MainMenu = new MainMenuOptions();
+    }
     public class MainMenuOptions : Options
     {
         public MainMenuOptions()

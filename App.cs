@@ -33,6 +33,7 @@
         public static string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
         public static string[] objectTypes = new string[] { "Group", "Element" };
         public static Type[] ObjectTypes = new Type[] { typeof(Group), typeof(Element) };
+        public static AppOptions Options = new AppOptions();
 
         static App()
         {
@@ -40,38 +41,18 @@
             logimgui = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
 
-            Options mainMenu = new Options();
-            mainMenu.SetKey("This.That", new JObject());
-            mainMenu.SetKey("This.Int", 1);
-            mainMenu.SetKey("This.Float", 1f);
-            mainMenu.SetKey("This.Bool", true);
-            mainMenu.SetKey("This.String", "Fart");
-            object value;
-            value = mainMenu.GetKey<object>("This.That");
-            App.Log($"Fetched value was {value} and it was a {value.GetType()}");
-            value = mainMenu.GetKey<object>("This.Int");
-            App.Log($"Fetched value was {value} and it was a {value.GetType()}");
-            var testVal = 1f;
-            App.Log($"Test value was {testVal} and it was a {testVal.GetType()}");
-            value = mainMenu.GetKey<object>("This.Float");
-            App.Log($"Fetched value was {value} and it was a {value.GetType()}");
-            value = mainMenu.GetKey<object>("This.Bool");
-            App.Log($"Fetched value was {value} and it was a {value.GetType()}");
-            value = mainMenu.GetKey<object>("This.String");
-            App.Log($"Fetched value was {value} and it was a {value.GetType()}");
-            App.Log($"Test settings returned this JSON string:\n" +
-                $"{mainMenu.ToJson()}");
-            MainMenuOptions mainMenuOptions = new MainMenuOptions();
-            App.Log($"Main Menu Options created this object:\n" +
-                $"{mainMenuOptions.ToJson()}");
-            mainMenuOptions.SetKey("Change_Me",false);
-            mainMenuOptions.SetKey("MenuDisplay_StashSorter", 2);
-            App.Log($"Changing the values resulted in:\n" +
-                $"{mainMenuOptions.ToJson()}");
-            var saveObj = mainMenuOptions.PrepareSaveObject();
+            //MainMenuOptions mainMenuOptions = new MainMenuOptions();
+            //App.Log($"Main Menu Options created this object:\n" +
+            //    $"{mainMenuOptions.ToJson()}");
+            //mainMenuOptions.SetKey("Change_Me",false);
+            //mainMenuOptions.SetKey("MenuDisplay_StashSorter", 2);
+            //App.Log($"Changing the values resulted in:\n" +
+            //    $"{mainMenuOptions.ToJson()}");
+            var saveObj = App.Options.MainMenu.PrepareSaveObject();
             App.Log($"Stripped save file is:\n" +
                 $"{saveObj}");
-            File.WriteAllText("save.json",JSON.Str(saveObj));
+            Directory.CreateDirectory("save");
+            File.WriteAllText("save\\save.json",JSON.Str(saveObj));
         }
 
         #region Log(string log, LogLevel level)
