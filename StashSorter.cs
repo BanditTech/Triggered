@@ -471,6 +471,14 @@ namespace Triggered
                         4.0f);
 
                     ImGui.SameLine();
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Import ").X - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 4);
+                    if (ImGui.Button("Import"))
+                    {
+                        string json = group.ToJson();
+                        ImGui.SetClipboardText(json);
+                        App.Log(json);
+                    }
+                    ImGui.SameLine();
                     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
                     if (ImGui.Button("Export"))
                     {
@@ -779,6 +787,7 @@ namespace Triggered
             }
         }
 
+        #region Utility Helpers
         static bool IsFileOperating(bool reset = false)
         {
             if (reset)
@@ -792,7 +801,6 @@ namespace Triggered
                 _fileOperation = true;
             return false;
         }
-        #region Utility Helpers
         static void Spacers(int count)
         {
             for (int i = 0; i < count; i++)
