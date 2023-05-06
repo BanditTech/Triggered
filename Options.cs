@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Triggered
@@ -7,6 +9,7 @@ namespace Triggered
     public class Options
     {
         public JObject keyList = new JObject();
+        public string Name = "";
         public void SetKey(string keys, object value)
         {
             int index;
@@ -150,7 +153,7 @@ namespace Triggered
         }
         public JToken PrepareSaveObject()
         {
-            var defaultOptions = new MainMenuOptions();
+            var defaultOptions = new Options_MainMenu();
             var saveObject = new JObject();
             CompareValuesAndAddToSaveFile(keyList, defaultOptions.keyList, saveObject);
             return saveObject;
@@ -201,18 +204,61 @@ namespace Triggered
                 }
             }
         }
+        public void Save()
+        {
+            var saveObj = PrepareSaveObject();
+            File.WriteAllText($"save\\{Name}.json", JSON.Str(saveObj));
+        }
+        public void Load()
+        {
+            if (File.Exists($"save\\{Name}.json"))
+            {
+                string json = File.ReadAllText($"save\\{Name}.json");
+                var obj = (JToken)JSON.Obj(json);
+                Merge(obj);
+            }
+        }
     }
     public class AppOptions
     {
-        public MainMenuOptions MainMenu = new MainMenuOptions();
-    }
-    public class MainMenuOptions : Options
-    {
-        public MainMenuOptions()
+        public Options_MainMenu MainMenu = new Options_MainMenu();
+        public Options_StashSorter StashSorter = new Options_StashSorter();
+        public IEnumerable<Options> Itterate()
         {
-            SetKey("MenuDisplay_StashSorter", 1);
-            SetKey("Change_Me", true);
-            SetKey("Not_Me", true);
+            yield return MainMenu;
+            yield return StashSorter;
+        }
+        public void Save()
+        {
+            foreach (var options in Itterate())
+            {
+                options.Save();
+            }
+        }
+        public void Load()
+        {
+            foreach (var options in Itterate())
+            {
+                options.Load();
+            }
+        }
+    }
+    public class Options_StashSorter : Options
+    {
+        public Options_StashSorter()
+        {
+            Name = "StashSorter";
+            SetKey("SelectedGroup", 0);
+        }
+    }
+    public class Options_MainMenu : Options
+    {
+        public Options_MainMenu()
+        {
+            Name = "MainMenu";
+            SetKey("Display_StashSorter", true);
+            SetKey("Display_Main", true);
+            SetKey("Display_Log", true);
             TrimNullValues(keyList);
         }
     }

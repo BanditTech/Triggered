@@ -17,18 +17,14 @@
         public static string[] TopGroups;
         public static List<AGroupElement> StashSorterList;
 
-        public static int SelectedGroup = 0;
         public static int LogicTickDelayInMilliseconds = 100;
         public static int SelectedLogLevelIndex = 1;
-        public static bool MenuDisplay_Main = true;
-        public static bool MenuDisplay_Log = true;
-        public static bool MenuDisplay_StashSorter = true;
         public static bool IsVisible = true;
         public static bool IsRunning = true;
-        public static bool ShowTransparentViewport = true;
+
         public static bool fullscreen = true;
         public static bool padding = false;
-        public static bool ShowGroupBoxContents = true;
+
         public static string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=", "~=", ">0<", ">0<=", "!=" };
         public static string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
         public static string[] objectTypes = new string[] { "Group", "Element" };
@@ -40,19 +36,8 @@
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logimgui = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
-
-            //MainMenuOptions mainMenuOptions = new MainMenuOptions();
-            //App.Log($"Main Menu Options created this object:\n" +
-            //    $"{mainMenuOptions.ToJson()}");
-            //mainMenuOptions.SetKey("Change_Me",false);
-            //mainMenuOptions.SetKey("MenuDisplay_StashSorter", 2);
-            //App.Log($"Changing the values resulted in:\n" +
-            //    $"{mainMenuOptions.ToJson()}");
-            var saveObj = App.Options.MainMenu.PrepareSaveObject();
-            App.Log($"Stripped save file is:\n" +
-                $"{saveObj}");
             Directory.CreateDirectory("save");
-            File.WriteAllText("save\\save.json",JSON.Str(saveObj));
+            App.Options.LoadOptions();
         }
 
         #region Log(string log, LogLevel level)

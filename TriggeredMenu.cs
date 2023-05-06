@@ -32,22 +32,26 @@
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
             {
-                App.MenuDisplay_Main = !App.MenuDisplay_Main;
+                var mainMenu = App.Options.MainMenu;
+                var value = mainMenu.GetKey<bool>("Display_Main");
+                mainMenu.SetKey("Display_Main",!value);
             }
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
             {
-                App.MenuDisplay_StashSorter = !App.MenuDisplay_StashSorter;
+                var mainMenu = App.Options.MainMenu;
+                var value = mainMenu.GetKey<bool>("Display_StashSorter");
+                mainMenu.SetKey("Display_StashSorter", !value);
             }
             // We always render this invisible window
             // Having no viewport will break the children docks
             RenderViewPort();
 
-            if (App.MenuDisplay_Main)
+            if (App.Options.MainMenu.GetKey<bool>("Display_Main"))
                 RenderMainMenu();
-            if (App.MenuDisplay_StashSorter)
+            if (App.Options.MainMenu.GetKey<bool>("Display_StashSorter"))
                 StashSorter.Render();
-            if (App.MenuDisplay_Log)
+            if (App.Options.MainMenu.GetKey<bool>("Display_Log"))
                 RenderLogWindow();
 
             return;
@@ -76,8 +80,14 @@
             float delay = App.LogicTickDelayInMilliseconds;
             ImGui.SliderFloat("Logic MS", ref delay, 10.0f, 1000.0f);
             App.LogicTickDelayInMilliseconds = (int)delay;
-            ImGui.Checkbox("Show/Hide the Log", ref App.MenuDisplay_Log);
-            ImGui.Checkbox("Show/Hide the Stash Sorter", ref App.MenuDisplay_StashSorter);
+
+            var options = App.Options.MainMenu;
+            var displayLog = options.GetKey<bool>("Display_Log");
+            if (ImGui.Checkbox("Show/Hide the Log", ref displayLog))
+                options.SetKey("Display_Log", displayLog);
+            var displayStashSorter = options.GetKey<bool>("Display_StashSorter");
+            if (ImGui.Checkbox("Show/Hide the Stash Sorter", ref displayStashSorter))
+                options.SetKey("Display_Log", displayStashSorter);
             ImGui.Separator();
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Stash Sorter.");
@@ -90,11 +100,6 @@
                     ahk.Demo();
                 });
                 thread.Start();
-            }
-
-            if (ImGui.CollapsingHeader("Collapsible Group Box Label", ref App.ShowGroupBoxContents))
-            {
-                ImGui.Text("This is inside the collapsible group box.");
             }
 
             // This is to show the menu bar that will change the config settings at runtime.

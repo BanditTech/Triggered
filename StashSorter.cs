@@ -108,6 +108,7 @@ namespace Triggered
 
         public static void Render()
         {
+            var options = App.Options.StashSorter;
             // Create the main window
             ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(500, 200), new Vector2(float.MaxValue, float.MaxValue));
@@ -117,11 +118,13 @@ namespace Triggered
             ImGui.Text("Selected Filter:");
             ImGui.SameLine();
             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-            ImGui.Combo("##Selected Filter", ref App.SelectedGroup, App.TopGroups, App.TopGroups.Length);
+            int selectedGroup = options.GetKey<int>("SelectedGroup");
+            if (ImGui.Combo("##Selected Filter", ref selectedGroup, App.TopGroups, App.TopGroups.Length))
+                options.SetKey("SelectedGroup", selectedGroup);
             ImGui.Spacing();
 
             // Add adjustments for TopGroup values
-            if (App.StashSorterList[App.SelectedGroup] is TopGroup topGroup)
+            if (App.StashSorterList[selectedGroup] is TopGroup topGroup)
             {
                 // int GroupName
                 ImGui.Text("GroupName:");
@@ -155,7 +158,7 @@ namespace Triggered
             NewSection();
 
             // We recurse the Group structure drawing them onto our menu
-            RecursiveMenu(App.StashSorterList[App.SelectedGroup], "NONE");
+            RecursiveMenu(App.StashSorterList[selectedGroup], "NONE");
 
             // Add spacing
             NewSection();
@@ -676,7 +679,9 @@ namespace Triggered
             {
                 if (ImGui.MenuItem("Hide"))
                 {
-                    App.MenuDisplay_StashSorter = !App.MenuDisplay_StashSorter;
+                    var mainMenu = App.Options.MainMenu;
+                    var value = mainMenu.GetKey<bool>("Display_StashSorter");
+                    mainMenu.SetKey("Display_StashSorter", !value);
                 }
                 if (ImGui.BeginMenu("File"))
                 {
@@ -823,7 +828,7 @@ namespace Triggered
 
             string[] indices = indexer.Split('_');
             int length = indices.Length;
-            object target = App.StashSorterList[App.SelectedGroup];
+            object target = App.StashSorterList[App.Options.StashSorter.GetKey<int>("SelectedGroup")];
             object parent;
 
             // Iterate over the index keys, skipping the first one (which is always 0)
@@ -872,18 +877,19 @@ namespace Triggered
         }
         static void InsertObjectByIndexer(string indexer, Type targetType, Type sourceType, object obj)
         {
+            int selectedGroup = App.Options.StashSorter.GetKey<int>("SelectedGroup");
             if (indexer == "0")
             {
                 if (sourceType == typeof(Group))
-                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add(((Group)obj).Clone());
+                    ((TopGroup)App.StashSorterList[selectedGroup]).Add(((Group)obj).Clone());
                 else if (sourceType == typeof(Element))
-                    ((TopGroup)App.StashSorterList[App.SelectedGroup]).Add(((Element)obj).Clone());
+                    ((TopGroup)App.StashSorterList[selectedGroup]).Add(((Element)obj).Clone());
                 return;
             }
 
             string[] indices = indexer.Split('_');
             int length = indices.Length;
-            Group target = (TopGroup)App.StashSorterList[App.SelectedGroup];
+            Group target = (TopGroup)App.StashSorterList[selectedGroup];
 
             // Iterate over the index keys, skipping the first one (which is always 0)
             for (int i = 1; i < length; i++)
