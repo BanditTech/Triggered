@@ -37,7 +37,7 @@
             logimgui = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
             Directory.CreateDirectory("save");
-            App.Options.LoadOptions();
+            App.Options.Load();
         }
 
         #region Log(string log, LogLevel level)
