@@ -1,5 +1,6 @@
 ﻿namespace Triggered
 {
+    using Newtonsoft.Json.Linq;
     using NLog;
     using NLog.Config;
     using System;
@@ -37,6 +38,31 @@
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logimgui = new ExampleAppLog();
             logger = LogManager.GetCurrentClassLogger();
+
+            //Options mainMenu = new Options();
+            //mainMenu.SetKey("This.That", new JObject());
+            //mainMenu.SetKey("This.Int", 1);
+            //mainMenu.SetKey("This.Float", 1f);
+            //mainMenu.SetKey("This.Bool", true);
+            //mainMenu.SetKey("This.String", "Fart");
+            //object value;
+            //value = mainMenu.GetKey<object>("This.That");
+            //App.Log($"Fetched value was {value} and it was a {value.GetType()}");
+            //value = mainMenu.GetKey<object>("This.Int");
+            //App.Log($"Fetched value was {value} and it was a {value.GetType()}");
+            //var testVal = 1f;
+            //App.Log($"Test value was {testVal} and it was a {testVal.GetType()}");
+            //value = mainMenu.GetKey<object>("This.Float");
+            //App.Log($"Fetched value was {value} and it was a {value.GetType()}");
+            //value = mainMenu.GetKey<object>("This.Bool");
+            //App.Log($"Fetched value was {value} and it was a {value.GetType()}");
+            //value = mainMenu.GetKey<object>("This.String");
+            //App.Log($"Fetched value was {value} and it was a {value.GetType()}");
+            //App.Log($"Test settings returned this JSON string:\n" +
+            //    $"{mainMenu.ToJson()}");
+            MainMenuOptions mainMenuOptions = new MainMenuOptions();
+            App.Log($"Main Menu Options created this object:\n" +
+                $"{mainMenuOptions.ToJson()}");
         }
 
         #region Log(string log, LogLevel level)
