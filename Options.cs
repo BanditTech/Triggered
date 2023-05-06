@@ -235,11 +235,33 @@ namespace Triggered
                 options.Save();
             }
         }
+        public void Save(Type type)
+        {
+            foreach (var options in Itterate())
+            {
+                if (options.GetType() == type)
+                {
+                    options.Save();
+                    break;
+                }
+            }
+        }
         public void Load()
         {
             foreach (var options in Itterate())
             {
                 options.Load();
+            }
+        }
+        public void Load(Type type)
+        {
+            foreach (var options in Itterate())
+            {
+                if (options.GetType() == type)
+                {
+                    options.Load();
+                    break;
+                }
             }
         }
     }
