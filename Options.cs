@@ -161,9 +161,9 @@ namespace Triggered
         }
         public JToken PrepareSaveObject()
         {
-            var defaultOptions = new Options_MainMenu();
+            var defaultOptions = Activator.CreateInstance(this.GetType());
             var saveObject = new JObject();
-            CompareValuesAndAddToSaveFile(keyList, defaultOptions.keyList, saveObject);
+            CompareValuesAndAddToSaveFile(keyList, ((Options)defaultOptions).keyList, saveObject);
             return saveObject;
         }
         private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JObject saveObject, string depth = "")
@@ -293,6 +293,8 @@ namespace Triggered
             // Viewport options
             SetKey("Fullscreen", true);
             SetKey("Padding", false);
+            // Logic
+            SetKey("LogicTickDelayInMilliseconds", 100);
         }
     }
 }
