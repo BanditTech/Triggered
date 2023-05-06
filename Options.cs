@@ -148,32 +148,32 @@ namespace Triggered
                     break;
             }
         }
-        public JToken CreateStrippedSaveFile()
+        public JToken PrepareSaveObject()
         {
             var defaultOptions = new MainMenuOptions();
-            var strippedObject = new JObject();
-            CompareValuesAndAddToSaveFile(keyList, defaultOptions.keyList, strippedObject);
-            return strippedObject;
+            var saveObject = new JObject();
+            CompareValuesAndAddToSaveFile(keyList, defaultOptions.keyList, saveObject);
+            return saveObject;
         }
-        private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JObject strippedObject, string currentPath = "")
+        private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JObject saveObject, string depth = "")
         {
             if (currentObject.Type == JTokenType.Object)
             {
                 foreach (var prop in currentObject.Children<JProperty>())
                 {
-                    var path = string.IsNullOrEmpty(currentPath) ? prop.Name : $"{currentPath}.{prop.Name}";
+                    var path = string.IsNullOrEmpty(depth) ? prop.Name : $"{depth}.{prop.Name}";
                     var currentValue = prop.Value;
                     var defaultValue = defaultObject[prop.Name];
                     if (!JToken.DeepEquals(currentValue, defaultValue))
                     {
                         if (currentValue.Type == JTokenType.Object)
                         {
-                            strippedObject.Add(prop.Name, new JObject());
-                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)strippedObject[prop.Name], path);
+                            saveObject.Add(prop.Name, new JObject());
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)saveObject[prop.Name], path);
                         }
                         else
                         {
-                            strippedObject.Add(path, currentValue);
+                            saveObject.Add(path, currentValue);
                         }
                     }
                 }
@@ -182,7 +182,7 @@ namespace Triggered
             {
                 for (int i = 0; i < currentObject.Count(); i++)
                 {
-                    var path = $"{currentPath}.{i}";
+                    var path = $"{depth}.{i}";
                     var currentValue = currentObject[i];
                     var defaultValue = defaultObject[i];
                     if (!JToken.DeepEquals(currentValue, defaultValue))
@@ -190,12 +190,12 @@ namespace Triggered
                         // We have a difference in JToken, determine type
                         if (currentValue.Type == JTokenType.Object)
                         {
-                            strippedObject.Add(path, new JObject());
-                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)strippedObject[path], path);
+                            saveObject.Add(path, new JObject());
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)saveObject[path], path);
                         }
                         else
                         {
-                            strippedObject.Add(path, currentValue);
+                            saveObject.Add(path, currentValue);
                         }
                     }
                 }

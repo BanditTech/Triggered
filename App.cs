@@ -68,10 +68,10 @@
             mainMenuOptions.SetKey("MenuDisplay_StashSorter", 2);
             App.Log($"Changing the values resulted in:\n" +
                 $"{mainMenuOptions.ToJson()}");
-            var saveFile = mainMenuOptions.CreateStrippedSaveFile();
+            var saveObj = mainMenuOptions.PrepareSaveObject();
             App.Log($"Stripped save file is:\n" +
-                $"{saveFile}");
-            File.WriteAllText("save.json",JSON.Str(saveFile));
+                $"{saveObj}");
+            File.WriteAllText("save.json",JSON.Str(saveObj));
         }
 
         #region Log(string log, LogLevel level)
