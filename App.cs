@@ -22,9 +22,6 @@
         public static bool IsVisible = true;
         public static bool IsRunning = true;
 
-        public static bool fullscreen = true;
-        public static bool padding = false;
-
         public static string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=", "~=", ">0<", ">0<=", "!=" };
         public static string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
         public static string[] objectTypes = new string[] { "Group", "Element" };

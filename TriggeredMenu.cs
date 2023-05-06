@@ -111,8 +111,12 @@
                 {
                     // Disabling fullscreen would allow the window to be moved to the front of other windows,
                     // which we can't undo at the moment without finer window depth/z control.
-                    ImGui.MenuItem("Fullscreen", null, ref App.fullscreen);
-                    ImGui.MenuItem("Padding", null, ref App.padding);
+                    var fullscreen = options.GetKey<bool>("Fullscreen");
+                    if (ImGui.MenuItem("Fullscreen", null, ref fullscreen))
+                        options.SetKey("Fullscreen",fullscreen);
+                    var padding = options.GetKey<bool>("Padding");
+                    if (ImGui.MenuItem("Padding", null, ref padding))
+                        options.SetKey("Padding", padding);
                     ImGui.Separator();
 
                     // Display a menu item to close this example.
@@ -127,6 +131,12 @@
         }
         private void RenderViewPort()
         {
+            // Load our options for the main menu
+            var options = App.Options.MainMenu;
+            // Prepare the local variables
+            var fullscreen = options.GetKey<bool>("Fullscreen");
+            var padding = options.GetKey<bool>("Padding");
+
             // Variables to configure the Dockspace example.
             // Includes App.fullscreen, App.padding
             ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None | ImGuiDockNodeFlags.PassthruCentralNode | ImGuiDockNodeFlags.AutoHideTabBar;
@@ -141,7 +151,7 @@
             ImGuiWindowFlags window_flags = ImGuiWindowFlags.NoDocking;
 
             // Is the example in Fullscreen mode?
-            if (App.fullscreen)
+            if (fullscreen)
             {
                 // If so, get the main viewport:
                 var viewport = ImGui.GetMainViewport();
@@ -175,7 +185,7 @@
                 window_flags |= ImGuiWindowFlags.NoBackground;
 
             // If the padding option is disabled, set the parent window's padding size to 0 to effectively hide said padding.
-            if (!App.padding)
+            if (!padding)
                 ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0.0f, 0.0f));
 
             // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
@@ -186,11 +196,11 @@
             ImGui.Begin("DockSpace Demo", ref App.IsRunning, window_flags);
 
             // Remove the padding configuration - we pushed it, now we pop it:
-            if (!App.padding)
+            if (!padding)
                 ImGui.PopStyleVar();
 
             // Pop the two style rules set in Fullscreen mode - the corner rounding and the border size.
-            if (App.fullscreen)
+            if (fullscreen)
             {
                 ImGui.PopStyleColor();
                 ImGui.PopStyleVar(2);
