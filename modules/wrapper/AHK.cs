@@ -1,4 +1,4 @@
-﻿namespace Triggered
+﻿namespace Triggered.modules.wrapper
 {
     using AutoHotkey.Interop;
     using System;

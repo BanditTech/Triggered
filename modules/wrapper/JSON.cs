@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Triggered
+namespace Triggered.modules.wrapper
 {
     public static class JSON
     {

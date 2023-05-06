@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
-using Vortice.Win32;
+using Triggered.modules.wrapper;
 
-namespace Triggered
+namespace Triggered.modules.panels
 {
     static class StashSorter
     {
@@ -34,7 +33,6 @@ namespace Triggered
         static Group _hoveredGroup = null;
         static float _lineHeight = ImGui.GetFontSize() + ImGui.GetStyle().FramePadding.Y * 2f;
         static DateTime _lastHover = DateTime.MinValue;
-        static JObject keyValuePairs = new JObject();
         static Type _addingType = typeof(Element);
         static Type _oldType = typeof(Element);
         static AGroupElement _clay;
@@ -705,10 +703,10 @@ namespace Triggered
                             return;
                         Task.Run(() =>
                         {
-                            string example = Path.Combine(AppContext.BaseDirectory,"examplesave.json");
+                            string example = Path.Combine(AppContext.BaseDirectory, "examplesave.json");
                             bool validSelection = _selectedFile != null && _selectedFile != "" && File.Exists(_selectedFile);
                             string path = validSelection ? _selectedFile : example;
-                            File.WriteAllText( path, JSON.Str(App.StashSorterList));
+                            File.WriteAllText(path, JSON.Str(App.StashSorterList));
                             App.Log($"Saved file to {path}");
                             IsFileOperating(false);
                         });
@@ -721,7 +719,7 @@ namespace Triggered
                         {
                             bool validSelection;
                             var ahk = new AHK();
-                            string result = ahk.SelectFile(default,"S0");
+                            string result = ahk.SelectFile(default, "S0");
                             validSelection = result != null && result != "";
                             if (validSelection)
                             {
@@ -904,14 +902,14 @@ namespace Triggered
                     {
                         if (key > ((dynamic)target).GroupList.Count - 1)
                             key = ((dynamic)target).GroupList.Count - 1;
-                        target = (target).GroupList[key];
+                        target = target.GroupList[key];
                         key = 0;
                     }
                     // Depending on our source type, we insert the correct object type
                     if (sourceType == typeof(Element))
-                        target.Insert(key,((Element)obj).Clone());
+                        target.Insert(key, ((Element)obj).Clone());
                     else if (sourceType == typeof(Group))
-                        target.Insert(key,((Group)obj).Clone());
+                        target.Insert(key, ((Group)obj).Clone());
                 }
                 else
                 {
@@ -947,8 +945,8 @@ namespace Triggered
         }
         static bool CanDrop()
         {
-            string source = StripIndexerElement(_dragSourceType,_dragSource);
-            string target = StripIndexerElement(_dragTargetType,_dragTarget);
+            string source = StripIndexerElement(_dragSourceType, _dragSource);
+            string target = StripIndexerElement(_dragTargetType, _dragTarget);
 
             if (_dragSourceType == typeof(Element))
                 return true;
@@ -989,7 +987,7 @@ namespace Triggered
                 int comparisonIndex = Array.IndexOf(App.EvalOptions, _rightClickedElement.Eval);
                 if (ImGui.Combo("##Eval", ref comparisonIndex, App.EvalOptions, App.EvalOptions.Length))
                     _rightClickedElement.Eval = App.EvalOptions[comparisonIndex];
-                
+
                 // string Min
                 ImGui.SameLine();
                 ImGui.Text("Min:");

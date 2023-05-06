@@ -1,15 +1,17 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using Triggered.modules.wrapper;
 
-namespace Triggered
+namespace Triggered.modules.options
 {
     public class Options
     {
         public JObject keyList = new JObject();
         public string Name = "";
+        internal bool _changed = false;
 
         ~Options()
         {
@@ -29,7 +31,7 @@ namespace Triggered
                 var next = keyArray[i + 1];
                 if (target.Type == JTokenType.Array && int.TryParse(key, out index))
                 {
-                    if (target[index] == null || (target[index]).Type == JTokenType.Null)
+                    if (target[index] == null || target[index].Type == JTokenType.Null)
                     {
                         bool willInt = int.TryParse(next, out int _);
                         target[index] = willInt ? new JArray(new object[20]) : new JObject();
@@ -44,6 +46,36 @@ namespace Triggered
                 }
                 target = target[key];
             }
+
+            // Determine if we are changing the value
+            switch (value)
+            {
+                case string stringValue:
+                    if (GetKey<string>(keys) != stringValue)
+                        _changed = true;
+                    break;
+                case int intValue:
+                    if (GetKey<int>(keys) != intValue)
+                        _changed = true;
+                    break;
+                case float floatValue:
+                    if (GetKey<float>(keys) != floatValue)
+                        _changed = true;
+                    break;
+                case bool boolValue:
+                    if (GetKey<bool>(keys) != boolValue)
+                        _changed = true;
+                    break;
+                case Vector4 v4Value:
+                    if (GetKey<Vector4>(keys) != v4Value)
+                        _changed = true;
+                    break;
+                default:
+                    _changed = true;
+                    break;
+            }
+
+            // Set the key to the value depending on type
             if (target.Type == JTokenType.Array)
             {
                 if (int.TryParse(keyArray.Last(), out index))
@@ -80,6 +112,15 @@ namespace Triggered
 
             if (value == null)
                 return default;
+
+            if (typeof(T) == typeof(Vector4) && value is JObject obj)
+            {
+                var x = obj.GetValue("x").Value<float>();
+                var y = obj.GetValue("y").Value<float>();
+                var z = obj.GetValue("z").Value<float>();
+                var w = obj.GetValue("w").Value<float>();
+                return (T)(object)new Vector4(x, y, z, w);
+            }
 
             if (value.Type == JTokenType.String)
                 return (T)Convert.ChangeType(value.Value<string>(), typeof(T));
@@ -129,7 +170,7 @@ namespace Triggered
         {
             var internalTarget = keyList;
             var importTarget = import;
-            Merge(internalTarget,importTarget);
+            Merge(internalTarget, importTarget);
         }
         private void Merge(JToken internalTarget, JToken importTarget)
         {
@@ -161,7 +202,7 @@ namespace Triggered
         }
         public JToken PrepareSaveObject()
         {
-            var defaultOptions = Activator.CreateInstance(this.GetType());
+            var defaultOptions = Activator.CreateInstance(GetType());
             var saveObject = new JObject();
             CompareValuesAndAddToSaveFile(keyList, ((Options)defaultOptions).keyList, saveObject);
             return saveObject;
@@ -214,6 +255,7 @@ namespace Triggered
         }
         public void Save()
         {
+            _changed = false;
             var saveObj = PrepareSaveObject();
             File.WriteAllText($"save\\{Name}.json", JSON.Str(saveObj));
         }
@@ -226,75 +268,13 @@ namespace Triggered
                 Merge(obj);
             }
         }
-    }
-    public class AppOptions
-    {
-        public Options_MainMenu MainMenu = new Options_MainMenu();
-        public Options_StashSorter StashSorter = new Options_StashSorter();
-        public IEnumerable<Options> Itterate()
+        public void SaveChanged()
         {
-            yield return MainMenu;
-            yield return StashSorter;
-        }
-        public void Save()
-        {
-            foreach (var options in Itterate())
+            if (_changed)
             {
-                options.Save();
+                App.Log($"We changed something inside {Name}");
+                Save();
             }
-        }
-        public void Save(Type type)
-        {
-            foreach (var options in Itterate())
-            {
-                if (options.GetType() == type)
-                {
-                    options.Save();
-                    break;
-                }
-            }
-        }
-        public void Load()
-        {
-            foreach (var options in Itterate())
-            {
-                options.Load();
-            }
-        }
-        public void Load(Type type)
-        {
-            foreach (var options in Itterate())
-            {
-                if (options.GetType() == type)
-                {
-                    options.Load();
-                    break;
-                }
-            }
-        }
-    }
-    public class Options_StashSorter : Options
-    {
-        public Options_StashSorter()
-        {
-            Name = "StashSorter";
-            SetKey("SelectedGroup", 0);
-        }
-    }
-    public class Options_MainMenu : Options
-    {
-        public Options_MainMenu()
-        {
-            Name = "MainMenu";
-            // Panel Visibility
-            SetKey("Display_StashSorter", true);
-            SetKey("Display_Main", true);
-            SetKey("Display_Log", true);
-            // Viewport options
-            SetKey("Fullscreen", true);
-            SetKey("Padding", false);
-            // Logic
-            SetKey("LogicTickDelayInMilliseconds", 100);
         }
     }
 }

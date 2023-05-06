@@ -1,6 +1,7 @@
 ﻿namespace Triggered
 {
     using System.Threading.Tasks;
+    using Triggered.modules.panels;
 
     class Program
     {

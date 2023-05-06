@@ -6,9 +6,9 @@ using System.Numerics;
 using ImGuiNET;
 using NLog;
 
-namespace Triggered
+namespace Triggered.modules.panels
 {
-    public class ExampleAppLog
+    public class LogWindow
     {
         private readonly List<(string text, Vector4 color)> items = new List<(string text, Vector4 color)>();
         private readonly object locker = new object();
@@ -57,7 +57,7 @@ namespace Triggered
                 ImGui.End();
                 return;
             }
-
+            var options = App.Options.MainMenu;
             if (ImGui.Button("Clear"))
             {
                 Clear();
@@ -70,15 +70,17 @@ namespace Triggered
             AutoScroll = shouldAutoScroll;
             ImGui.SameLine();
             ImGui.SetNextItemWidth(100);
-            if (ImGui.Combo(">= Level", ref App.SelectedLogLevelIndex, logLevelNames, logLevels.Length))
+            var selectedLogLevelIndex = options.GetKey<int>("SelectedLogLevelIndex");
+            if (ImGui.Combo(">= Level", ref selectedLogLevelIndex, logLevelNames, logLevels.Length))
             {
-                LogLevel selectedLogLevel = logLevels[App.SelectedLogLevelIndex];
+                options.SetKey("SelectedLogLevelIndex", selectedLogLevelIndex);
+                LogLevel selectedLogLevel = logLevels[selectedLogLevelIndex];
                 App.Log($"Changing minimum log level to {selectedLogLevel}", LogLevel.Fatal);
                 App.LogWindowMinimumLogLevel = selectedLogLevel;
             }
 
             ImGui.Separator();
-            ImGui.BeginChild("scrolling", new System.Numerics.Vector2(0, 0), false, ImGuiWindowFlags.HorizontalScrollbar);
+            ImGui.BeginChild("scrolling", new Vector2(0, 0), false, ImGuiWindowFlags.HorizontalScrollbar);
 
             List<(string text, Vector4 color)> displayItems;
 

@@ -1,8 +1,9 @@
-﻿namespace Triggered
+﻿namespace Triggered.modules.wrapper
 {
     using System;
     using System.Globalization;
     using System.Runtime.InteropServices;
+
     public class Mouse
     {
         [DllImport("user32.dll", SetLastError = true)]

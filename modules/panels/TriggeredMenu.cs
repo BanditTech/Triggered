@@ -1,14 +1,16 @@
-﻿namespace Triggered
+﻿namespace Triggered.modules.panels
 {
     using System.Numerics;
     using System.Threading;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
+    using Triggered.modules.wrapper;
 
     public class TriggeredMenu : Overlay
     {
         private readonly Thread logicThread;
+        private readonly Thread optionThread;
         // Begin the LogicUpdate thread when the frame initiates
         public TriggeredMenu()
         {
@@ -20,12 +22,22 @@
                 }
             });
             logicThread.Start();
+            optionThread = new Thread(() =>
+            {
+                while (App.IsRunning)
+                {
+                    App.Options.SaveChanged();
+                    Thread.Sleep(1000);
+                }
+            });
+            optionThread.Start();
         }
         // Logic is operated upon based on our timeout
         private void LogicUpdate()
         {
-            Thread.Sleep(App.LogicTickDelayInMilliseconds);
+            Thread.Sleep(App.Options.MainMenu.GetKey<int>("LogicTickDelayInMilliseconds"));
         }
+
         // Render thread is run every frame
         // We can piggy back on the render thread for simple keybinds
         protected override void Render()
@@ -34,7 +46,7 @@
             {
                 var mainMenu = App.Options.MainMenu;
                 var value = mainMenu.GetKey<bool>("Display_Main");
-                mainMenu.SetKey("Display_Main",!value);
+                mainMenu.SetKey("Display_Main", !value);
             }
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
@@ -62,6 +74,7 @@
         }
         private void RenderMainMenu()
         {
+            var options = App.Options.MainMenu;
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
                 ref App.IsRunning,
@@ -77,17 +90,15 @@
                 return;
             }
             // Menu definition area
-            float delay = App.LogicTickDelayInMilliseconds;
-            ImGui.SliderFloat("Logic MS", ref delay, 10.0f, 1000.0f);
-            App.LogicTickDelayInMilliseconds = (int)delay;
-
-            var options = App.Options.MainMenu;
+            int delay = options.GetKey<int>("LogicTickDelayInMilliseconds");
+            if (ImGui.SliderInt("Logic MS", ref delay, 10, 1000))
+                options.SetKey("LogicTickDelayInMilliseconds", delay);
             var displayLog = options.GetKey<bool>("Display_Log");
             if (ImGui.Checkbox("Show/Hide the Log", ref displayLog))
                 options.SetKey("Display_Log", displayLog);
             var displayStashSorter = options.GetKey<bool>("Display_StashSorter");
             if (ImGui.Checkbox("Show/Hide the Stash Sorter", ref displayStashSorter))
-                options.SetKey("Display_Log", displayStashSorter);
+                options.SetKey("Display_StashSorter", displayStashSorter);
             ImGui.Separator();
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Stash Sorter.");
@@ -113,7 +124,7 @@
                     // which we can't undo at the moment without finer window depth/z control.
                     var fullscreen = options.GetKey<bool>("Fullscreen");
                     if (ImGui.MenuItem("Fullscreen", null, ref fullscreen))
-                        options.SetKey("Fullscreen",fullscreen);
+                        options.SetKey("Fullscreen", fullscreen);
                     var padding = options.GetKey<bool>("Padding");
                     if (ImGui.MenuItem("Padding", null, ref padding))
                         options.SetKey("Padding", padding);
