@@ -6,11 +6,7 @@ namespace Triggered
 {
     public class Options
     {
-        public static JObject keyList;
-        public Options()
-        {
-            keyList = new JObject();
-        }
+        public JObject keyList = new JObject();
         public void SetKey(string keys, object value)
         {
             int index;
@@ -25,7 +21,7 @@ namespace Triggered
                     if (target[index] == null || (target[index]).Type == JTokenType.Null)
                     {
                         bool willInt = int.TryParse(next, out int _);
-                        target[index] = willInt ? new JArray(new object[100]) : new JObject();
+                        target[index] = willInt ? new JArray(new object[20]) : new JObject();
                     }
                     target = target[index];
                     continue;
@@ -33,7 +29,7 @@ namespace Triggered
                 else if (target[key] == null)
                 {
                     bool willInt = int.TryParse(next, out int _);
-                    target[key] = willInt ? new JArray(new object[100]) : new JObject();
+                    target[key] = willInt ? new JArray(new object[20]) : new JObject();
                 }
                 target = target[key];
             }
@@ -118,20 +114,101 @@ namespace Triggered
                     break;
             }
         }
+        public void Merge(JToken import)
+        {
+            var internalTarget = keyList;
+            var importTarget = import;
+            Merge(internalTarget,importTarget);
+        }
+        private void Merge(JToken internalTarget, JToken importTarget)
+        {
+            switch (importTarget.Type)
+            {
+                case JTokenType.Object:
+                    foreach (var prop in importTarget.Children<JProperty>())
+                    {
+                        var internalProp = ((JObject)internalTarget).Property(prop.Name);
+                        if (internalProp != null)
+                        {
+                            Merge(internalProp.Value, prop.Value);
+                        }
+                    }
+                    break;
+
+                case JTokenType.Array:
+                    for (int i = 0; i < importTarget.Count(); i++)
+                    {
+                        Merge(internalTarget[i], importTarget[i]);
+                    }
+                    break;
+
+                default:
+                    // Replace the value in the internal target with the value in the import target
+                    internalTarget.Replace(importTarget);
+                    break;
+            }
+        }
+        public JToken CreateStrippedSaveFile()
+        {
+            var defaultOptions = new MainMenuOptions();
+            var strippedObject = new JObject();
+            CompareValuesAndAddToSaveFile(keyList, defaultOptions.keyList, strippedObject);
+            return strippedObject;
+        }
+        private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JObject strippedObject, string currentPath = "")
+        {
+            if (currentObject.Type == JTokenType.Object)
+            {
+                foreach (var prop in currentObject.Children<JProperty>())
+                {
+                    var path = string.IsNullOrEmpty(currentPath) ? prop.Name : $"{currentPath}.{prop.Name}";
+                    var currentValue = prop.Value;
+                    var defaultValue = defaultObject[prop.Name];
+                    if (!JToken.DeepEquals(currentValue, defaultValue))
+                    {
+                        if (currentValue.Type == JTokenType.Object)
+                        {
+                            strippedObject.Add(prop.Name, new JObject());
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)strippedObject[prop.Name], path);
+                        }
+                        else
+                        {
+                            strippedObject.Add(path, currentValue);
+                        }
+                    }
+                }
+            }
+            else if (currentObject.Type == JTokenType.Array)
+            {
+                for (int i = 0; i < currentObject.Count(); i++)
+                {
+                    var path = $"{currentPath}.{i}";
+                    var currentValue = currentObject[i];
+                    var defaultValue = defaultObject[i];
+                    if (!JToken.DeepEquals(currentValue, defaultValue))
+                    {
+                        // We have a difference in JToken, determine type
+                        if (currentValue.Type == JTokenType.Object)
+                        {
+                            strippedObject.Add(path, new JObject());
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)strippedObject[path], path);
+                        }
+                        else
+                        {
+                            strippedObject.Add(path, currentValue);
+                        }
+                    }
+                }
+            }
+        }
     }
     public class MainMenuOptions : Options
     {
-        public MainMenuOptions() : base()
+        public MainMenuOptions()
         {
-            //SetKey("DefaultKey",true);
-            //SetKey("Depth.two",1);
-            // I can make a new Array like this:
-            //SetKey("List.0", 1);
-            // Or I can make another array inside the array
-            //SetKey("Test.0",new JArray(new object[100]));
-            //SetKey("Test.0.0",1);
-            // But this will cause an error:
-            SetKey("Other.0.0.0",1);
+            SetKey("MenuDisplay_StashSorter", 1);
+            SetKey("Change_Me", true);
+            SetKey("Not_Me", true);
             TrimNullValues(keyList);
         }
     }
