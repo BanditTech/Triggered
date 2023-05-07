@@ -23,8 +23,8 @@ namespace Triggered.modules.panels
         static bool confirmRemove = false;
         static Type removeType;
         static string removeIndexer;
-        static Vector4 EditingHighlight = new Vector4(0f, 0.772549f, 1f, 0.392157f); // #00C5FF64
-        static Vector4 EditingBackground = new Vector4(0.0f, 1f, 0.9254902f, 0.1647059f); // #00FFEC2A
+        static Vector4 EditingHighlight = new Vector4(0f, 0.772549f, 1f, 0.392157f);
+        static Vector4 EditingBackground = new Vector4(0.0f, 1f, 0.9254902f, 0.1647059f);
         static Vector4 RemoveButton = new Vector4(1.0f, 0.0f, 0.0f, 0.2f);
         static Vector4 RemoveButtonHover = new Vector4(1.0f, 0.0f, 0.0f, 0.6f);
         static Vector4 AddButton = new Vector4(0.0f, 1.0f, 0.0f, 0.2f);

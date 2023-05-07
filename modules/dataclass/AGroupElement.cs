@@ -34,8 +34,21 @@ public abstract class AGroupElement
         File.WriteAllText($"{fileName}.json", ToJson());
     }
 }
+/// <summary>
+/// Casts JToken into Element, TopGroup, or Group
+/// </summary>
 public class AGroupElementJsonConverter : JsonConverter<AGroupElement>
 {
+    /// <summary>
+    /// Newtonsoft JSON deserializer implimentation for reading AGroupElement
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <param name="objectType"></param>
+    /// <param name="existingValue"></param>
+    /// <param name="hasExistingValue"></param>
+    /// <param name="serializer"></param>
+    /// <returns>jtoken cast as Element, TopGroup, or Group</returns>
+    /// <exception cref="JsonSerializationException"></exception>
     public override AGroupElement ReadJson(JsonReader reader, Type objectType, AGroupElement existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         // Load JObject from stream
@@ -64,6 +77,12 @@ public class AGroupElementJsonConverter : JsonConverter<AGroupElement>
         Group group = new Group(jsonObject);
         return group;
     }
+    /// <summary>
+    /// This should pass to default serializer, but does not work!
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <param name="value"></param>
+    /// <param name="serializer"></param>
     public override void WriteJson(JsonWriter writer, AGroupElement value, JsonSerializer serializer)
     {
         serializer.Serialize(writer, value, value.GetType());
