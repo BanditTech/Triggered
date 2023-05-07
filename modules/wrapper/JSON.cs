@@ -36,5 +36,15 @@ namespace Triggered.modules.wrapper
             List<AGroupElement> AGroupElementList = JsonConvert.DeserializeObject<List<AGroupElement>>(json, options);
             return AGroupElementList;
         }
+        public static AGroupElement AGroupElement(string json)
+        {
+            var options = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Converters = { new AGroupElementJsonConverter() }
+            };
+            AGroupElement AGroupElementObj = JsonConvert.DeserializeObject<AGroupElement>(json, options);
+            return AGroupElementObj;
+        }
     }
 }
