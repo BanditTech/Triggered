@@ -471,13 +471,25 @@ namespace Triggered.modules.panels
                         ImGui.GetColorU32(EditingHighlight),
                         4.0f);
 
+                    // Draw Import and Export Buttons at the end of the row
                     ImGui.SameLine();
                     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Import ").X - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 4);
                     if (ImGui.Button("Import"))
                     {
-                        string json = group.ToJson();
-                        ImGui.SetClipboardText(json);
-                        App.Log(json);
+                        var import = ImGui.GetClipboardText();
+                        var Jobj = JSON.AGroupElement(import);
+                        if (Jobj is Group _group)
+                        {
+                            App.Log($"Importing group from clipboard:\n" +
+                                $"{import}");
+                            group.Add(_group);
+                        }
+                        else if (Jobj is Element _element)
+                        {
+                            App.Log($"Importing element from clipboard:\n" +
+                                $"{import}");
+                            group.Add(_element);
+                        }
                     }
                     ImGui.SameLine();
                     ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
