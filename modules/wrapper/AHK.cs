@@ -28,9 +28,9 @@
         {
             ahk.ExecRaw($"MsgBox,{message}");
         }
-        public string SelectFile(string ext = "*.json", string option = "1")
+        public string SelectFile(string option = "", string path = "", string title = "Select a file", string ext = "*.json")
         {
-            ahk.ExecRaw($"FileSelectFile, selectedFile, {option}, , Select a file to open, {ext}");
+            ahk.ExecRaw($"FileSelectFile, selectedFile, {option}, {path}, {title}, {ext}");
             return GetVar("selectedFile");
         }
         public string GetVar(string var)

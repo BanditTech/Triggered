@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,7 +48,6 @@ namespace Triggered.modules.panels
         {
             DumpExampleJson();
             UpdateStashSorterFile();
-            UpdateTopGroups();
         }
         static void DumpExampleJson()
         {
@@ -78,7 +78,7 @@ namespace Triggered.modules.panels
             dumpthis.Add(example1);
             // With the final structure, we can serialize
             string jsonString = JSON.Str(dumpthis);
-            File.WriteAllText("example.json", jsonString);
+            File.WriteAllText("save\\StashSorter.json", jsonString);
         }
         static void UpdateStashSorterFile()
         {
@@ -86,10 +86,11 @@ namespace Triggered.modules.panels
             // if we have a selected file we will use that.
             if (_selectedFile != null && _selectedFile != "" && File.Exists(_selectedFile))
                 jsonString = File.ReadAllText(_selectedFile);
-            else // Load the example file
-                jsonString = File.ReadAllText("example.json");
+            else // Load the default file
+                jsonString = File.ReadAllText("save\\StashSorter.json");
             // Store the filter in memory as deserialized objects
             App.StashSorterList = JSON.AGroupElementList(jsonString);
+            UpdateTopGroups();
         }
         static void UpdateTopGroups()
         {
@@ -701,11 +702,23 @@ namespace Triggered.modules.panels
                             return;
                         Task.Run(() =>
                         {
+                            // create an instance of AHK to select a path
                             var ahk = new AHK();
-                            _selectedFile = ahk.SelectFile();
-                            App.Log($"Loaded file path has been changed to {_selectedFile}");
-                            UpdateStashSorterFile();
-                            IsFileOperating(false);
+                            string returnPath = ahk.SelectFile("1",Path.Combine(AppContext.BaseDirectory,"save"),"Select a file to load.");
+                            string dir = Path.GetDirectoryName(_selectedFile);
+                            // We need to check if the path is null, blank, or invalid.
+                            if (returnPath == null || returnPath == "")
+                                App.Log($"File selection was canceled.", LogLevel.Info);
+                            else if (!Directory.Exists(dir))
+                                App.Log($"File selection of {returnPath} returned an invalid directory: {dir}", LogLevel.Error);
+                            else
+                            {
+                                App.Log($"Loaded file path has been changed to {returnPath}",LogLevel.Trace);
+                                _selectedFile = returnPath;
+                                UpdateStashSorterFile();
+                            }
+                            // We end by unlocking file operations
+                            _fileOperation = false;
                         });
                     }
                     NewSection(1);
@@ -715,12 +728,18 @@ namespace Triggered.modules.panels
                             return;
                         Task.Run(() =>
                         {
-                            string example = Path.Combine(AppContext.BaseDirectory, "examplesave.json");
-                            bool validSelection = _selectedFile != null && _selectedFile != "" && File.Exists(_selectedFile);
-                            string path = validSelection ? _selectedFile : example;
+                            // We make our default path
+                            string defaultPath = Path.Combine(AppContext.BaseDirectory, "save", "StashSorter.json");
+                            // We validate the _selectedFile
+                            string dir = Path.GetDirectoryName(_selectedFile);
+                            bool validSelection = _selectedFile != null && _selectedFile != "" && Directory.Exists(dir);
+                            // determine the path we will use to save
+                            // if we have loaded a valid location then we will want to continue to use it
+                            string path = validSelection ? _selectedFile : defaultPath;
                             File.WriteAllText(path, JSON.Str(App.StashSorterList));
-                            App.Log($"Saved file to {path}");
-                            IsFileOperating(false);
+                            App.Log($"Saved file to {path}", LogLevel.Trace);
+                            // We end by unlocking file operations
+                            _fileOperation = false;
                         });
                     }
                     if (ImGui.MenuItem("Save As"))
@@ -730,20 +749,22 @@ namespace Triggered.modules.panels
                         Task.Run(() =>
                         {
                             bool validSelection;
+                            // create an instance of AHK to select a path
                             var ahk = new AHK();
-                            string result = ahk.SelectFile(default, "S0");
-                            validSelection = result != null && result != "";
+                            string result = ahk.SelectFile("S0", Path.Combine(AppContext.BaseDirectory, "save"), "Select a new save target.");
+                            // Validate the resulting selection
+                            string dir = Path.GetDirectoryName(result);
+                            validSelection = result != null && result != "" && Directory.Exists(dir);
                             if (validSelection)
                             {
                                 _selectedFile = result;
-                                App.Log($"Saving file to selected path at {_selectedFile}");
+                                App.Log($"Saving file to selected path at {_selectedFile}", LogLevel.Trace);
                                 File.WriteAllText(_selectedFile, JSON.Str(App.StashSorterList));
                             }
                             else
-                            {
-                                App.Log("Issue making a selection, nothing was saved");
-                            }
-                            IsFileOperating(false);
+                                App.Log($"File selection was canceled.", LogLevel.Info);
+                            // We end by unlocking file operations
+                            _fileOperation = false;
                         });
                     }
                     NewSection(1);
@@ -753,33 +774,76 @@ namespace Triggered.modules.panels
                             return;
                         Task.Run(() =>
                         {
-                            App.Log($"Saved file to ");
-                            IsFileOperating(false);
+                            // determine the target file for the log message
+                            bool isSelected = _selectedFile != null && _selectedFile != "" && File.Exists(_selectedFile);
+                            string path = isSelected ? _selectedFile : Path.Combine(AppContext.BaseDirectory, "save", "StashSorter.json");
+                            App.Log($"Reloading from {path}", LogLevel.Trace);
+                            // Load the file without saving
+                            UpdateStashSorterFile();
+                            // We end by unlocking file operations
+                            _fileOperation = false;
                         });
                     }
                     ImGui.EndMenu();
                 }
                 if (ImGui.BeginMenu("Import"))
                 {
-                    if (ImGui.MenuItem("Group"))
+                    if (ImGui.MenuItem("Group or Element"))
                     {
-                        // handle Group action
-                    }
-                    if (ImGui.MenuItem("Element"))
-                    {
-                        // handle Element action
+                        if (IsFileOperating())
+                            return;
+                        Task.Run(() =>
+                        {
+                            // Prepare local variables
+                            var options = App.Options.StashSorter;
+                            var key = options.GetKey<int>("SelectedGroup");
+                            var import = ImGui.GetClipboardText();
+                            var Jobj = JSON.AGroupElement(import);
+                            // Validate the resulting object type
+                            if (Jobj is Group _group)
+                            {
+                                App.Log($"Importing group from clipboard:\n" +
+                                    $"{import}", LogLevel.Trace);
+                                ((TopGroup)App.StashSorterList[key]).Add(_group);
+                            }
+                            else if (Jobj is Element _element)
+                            {
+                                App.Log($"Importing element from clipboard:\n" +
+                                    $"{import}", LogLevel.Trace);
+                                ((TopGroup)App.StashSorterList[key]).Add(_element);
+                            }
+                            else
+                                App.Log($"The clipboard contents were not valid Group or Element:\n" +
+                                    $"{import}", LogLevel.Trace);
+                            // We end by unlocking file operations
+                            _fileOperation = false;
+                        });
                     }
                     NewSection(1);
                     if (ImGui.BeginMenu("Overwrite"))
                     {
                         if (ImGui.MenuItem("TopGroup"))
                         {
-                            // handle TopGroup action
+                            if (IsFileOperating())
+                                return;
+                            Task.Run(() =>
+                            {
+                                App.Log($"", LogLevel.Trace);
+                                // We end by unlocking file operations
+                                _fileOperation = false;
+                            });
                         }
                         NewSection(1);
                         if (ImGui.MenuItem("Full List"))
                         {
-                            // handle TopGroup action
+                            if (IsFileOperating())
+                                return;
+                            Task.Run(() =>
+                            {
+                                App.Log($"", LogLevel.Trace);
+                                // We end by unlocking file operations
+                                _fileOperation = false;
+                            });
                         }
                         ImGui.EndMenu();
                     }
@@ -789,12 +853,26 @@ namespace Triggered.modules.panels
                 {
                     if (ImGui.MenuItem("TopGroup"))
                     {
-                        // handle Group action
+                        if (IsFileOperating())
+                            return;
+                        Task.Run(() =>
+                        {
+                            App.Log($"", LogLevel.Trace);
+                            // We end by unlocking file operations
+                            _fileOperation = false;
+                        });
                     }
                     NewSection(1);
                     if (ImGui.MenuItem("Full List"))
                     {
-                        // handle Element action
+                        if (IsFileOperating())
+                            return;
+                        Task.Run(() =>
+                        {
+                            App.Log($"", LogLevel.Trace);
+                            // We end by unlocking file operations
+                            _fileOperation = false;
+                        });
                     }
                     ImGui.EndMenu();
                 }
