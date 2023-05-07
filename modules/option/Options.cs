@@ -170,35 +170,8 @@ namespace Triggered.modules.options
         {
             var internalTarget = keyList;
             var importTarget = import;
-            Merge(internalTarget, importTarget);
-        }
-        private void Merge(JToken internalTarget, JToken importTarget)
-        {
-            switch (importTarget.Type)
-            {
-                case JTokenType.Object:
-                    foreach (var prop in importTarget.Children<JProperty>())
-                    {
-                        var internalProp = ((JObject)internalTarget).Property(prop.Name);
-                        if (internalProp != null)
-                        {
-                            Merge(internalProp.Value, prop.Value);
-                        }
-                    }
-                    break;
-
-                case JTokenType.Array:
-                    for (int i = 0; i < importTarget.Count(); i++)
-                    {
-                        Merge(internalTarget[i], importTarget[i]);
-                    }
-                    break;
-
-                default:
-                    // Replace the value in the internal target with the value in the import target
-                    internalTarget.Replace(importTarget);
-                    break;
-            }
+            var mergeSettings = new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace };
+            internalTarget.Merge(importTarget,mergeSettings);
         }
         public JToken PrepareSaveObject()
         {
