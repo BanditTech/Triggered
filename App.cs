@@ -33,6 +33,7 @@
             logimgui = new LogWindow();
             logger = LogManager.GetCurrentClassLogger();
             Directory.CreateDirectory("save");
+            Directory.CreateDirectory("profile");
             App.Options.Load();
         }
 
