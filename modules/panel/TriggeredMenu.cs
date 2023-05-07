@@ -70,7 +70,7 @@
         }
         private void RenderLogWindow()
         {
-            App.logimgui.Draw("Log Window", true);
+            App.logimgui.Draw("Log Window");
         }
         private void RenderMainMenu()
         {

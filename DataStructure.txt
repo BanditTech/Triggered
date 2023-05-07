@@ -6,7 +6,7 @@ public class Element : AGroupElement
     public string Key;
     public string Eval;
     public string Min;
-    public int Weight;
+    public float Weight;
 }
 public class Group : AGroupElement
 {
@@ -14,6 +14,7 @@ public class Group : AGroupElement
     public int Min;
     public List<Element> ElementList;
     public List<Group> GroupList;
+    public float Weight;
 }
 public class TopGroup : Group
 {

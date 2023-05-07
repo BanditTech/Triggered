@@ -319,7 +319,7 @@ namespace Triggered.modules.panels
                         bool weightedGroup = group.GroupType == "COUNT" || group.GroupType == "WEIGHT";
                         bool weightedParent = parentType == "COUNT" || parentType == "WEIGHT";
 
-                        ImGui.PushID(_clay.GetHashCode());
+                        ImGui.PushID(_clay.GetHashCode()+10);
                         // string Key
                         ImGui.Text("Key:");
                         ImGui.SameLine();
@@ -330,17 +330,17 @@ namespace Triggered.modules.panels
                         // We only want to display the Weight field if the parent requires it
                         if (weightedGroup)
                         {
-                            ImGui.PushID(_clay.GetHashCode() + 1);
-                            // int Weight
+                            ImGui.PushID(_clay.GetHashCode() + 11);
+                            // float Weight
                             ImGui.Text("Weight:");
                             ImGui.SameLine();
                             ImGui.SetNextItemWidth(72);
-                            ImGui.InputInt("##Weight", ref _element.Weight);
+                            ImGui.InputFloat("##Weight", ref _element.Weight);
                             ImGui.PopID();
                             ImGui.SameLine();
                         }
                         // string Eval
-                        ImGui.PushID(_clay.GetHashCode() + 2);
+                        ImGui.PushID(_clay.GetHashCode() + 12);
                         ImGui.Text("Eval:");
                         ImGui.SameLine();
                         ImGui.SetNextItemWidth(72);
@@ -350,7 +350,7 @@ namespace Triggered.modules.panels
                         ImGui.PopID();
 
                         // string Min
-                        ImGui.PushID(_clay.GetHashCode() + 3);
+                        ImGui.PushID(_clay.GetHashCode() + 13);
                         ImGui.Text("Min:");
                         ImGui.SameLine();
                         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
@@ -364,11 +364,11 @@ namespace Triggered.modules.panels
 
                         if (weightedParent)
                         {
-                            // int Weight
+                            // float Weight
                             ImGui.Text("Weight:");
                             ImGui.SameLine();
                             ImGui.SetNextItemWidth(72);
-                            ImGui.InputInt("##Weight", ref _group.Weight);
+                            ImGui.InputFloat("##Weight", ref _group.Weight);
                         }
                         // string Type
                         ImGui.Text("Type:");
@@ -394,7 +394,10 @@ namespace Triggered.modules.panels
                     {
                         // Add the item
                         if (_clay is Group _group)
-                            group.Add(_group.Clone());
+                        {
+                            var result = _group.Clone();
+                            group.Add(result);
+                        }
                         else if (_clay is Element _leaf)
                             group.Add(_leaf.Clone());
                         ImGui.CloseCurrentPopup();
@@ -1056,11 +1059,11 @@ namespace Triggered.modules.panels
 
                 if (parentType == "COUNT" || parentType == "WEIGHT")
                 {
-                    // int Weight
+                    // float Weight
                     ImGui.Text("Weight:");
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(72);
-                    ImGui.InputInt("##Weight", ref _rightClickedElement.Weight);
+                    ImGui.InputFloat("##Weight", ref _rightClickedElement.Weight);
                     ImGui.SameLine();
                 }
                 // string Key
@@ -1117,12 +1120,12 @@ namespace Triggered.modules.panels
                 }
                 if (parentType == "COUNT" || parentType == "WEIGHT")
                 {
-                    // int Weight
+                    // float Weight
                     ImGui.SameLine();
                     ImGui.Text("Weight:");
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(72);
-                    ImGui.InputInt("##Weight", ref _rightClickedGroup.Weight);
+                    ImGui.InputFloat("##Weight", ref _rightClickedGroup.Weight);
                 }
 
                 ImGui.EndGroup();

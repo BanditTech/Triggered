@@ -27,7 +27,9 @@
         /// An instance of NLog LogManager.
         /// </summary>
         public static Logger logger;
-        public static LogLevel LogWindowMinimumLogLevel;
+        /// <summary>
+        /// A stored list of the loaded StashFilter groups.
+        /// </summary>
         public static string[] TopGroups;
         /// <summary>
         /// The loaded Stash Sorter list, which will contain the [{TopGroup},{TopGroup}] structure.
@@ -40,8 +42,6 @@
 
         static App()
         {
-            var selectedLogLevelIndex = App.Options.MainMenu.GetKey<int>("SelectedLogLevelIndex");
-            LogWindowMinimumLogLevel = LogWindow.logLevels[selectedLogLevelIndex];
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logimgui = new LogWindow();
             logger = LogManager.GetCurrentClassLogger();
@@ -51,15 +51,25 @@
         }
 
         #region Log(string log, LogLevel level)
+        /// <summary>
+        /// A uniform point to send log entries to both 
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="level">NLog LogLevel</param>
         public static void Log(string log, LogLevel level)
         {
+            var selectedLogLevelIndex = App.Options.MainMenu.GetKey<int>("SelectedLogLevelIndex");
             // Only send message to the log window above Debug level
-            if (level.Ordinal >= App.LogWindowMinimumLogLevel.Ordinal)
+            if (level.Ordinal >= selectedLogLevelIndex)
             {
                 logimgui.AddLog(string.Format("{0}: {1}", level.ToString(), log),level);
             }
             logger.Log(level,log);
         }
+        /// <summary>
+        /// Simplify the format of creating info log entries.
+        /// </summary>
+        /// <param name="log"></param>
         public static void Log(string log)
         {
             Log(log, LogLevel.Info);

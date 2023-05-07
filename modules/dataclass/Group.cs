@@ -5,13 +5,14 @@ public class Group : AGroupElement
 {
     public string GroupType;
     public int Min;
-    public int Weight;
+    public float Weight;
     public List<Element> ElementList;
     public List<Group> GroupList;
     public Group()
     {
         GroupType = "AND";
         Min = 1;
+        Weight = 1f;
         ElementList = new List<Element>();
         GroupList = new List<Group>();
     }
@@ -21,6 +22,8 @@ public class Group : AGroupElement
             GroupType = typeToken.Value<string>();
         if (jobj.TryGetValue("Min", out JToken minToken))
             Min = minToken.Value<int>();
+        if (jobj.TryGetValue("Weight", out JToken weightToken))
+            Weight = weightToken.Value<float>();
         if (jobj.TryGetValue("ElementList", out JToken elementToken))
             ElementList = elementToken.ToObject<List<Element>>();
         if (jobj.TryGetValue("GroupList", out JToken groupToken))

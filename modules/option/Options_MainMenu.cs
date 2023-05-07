@@ -17,6 +17,8 @@
             SetKey("LogicTickDelayInMilliseconds", 100);
             // Logging
             SetKey("SelectedLogLevelIndex", 1);
+            SetKey("LogAutoScroll", true);
+            SetKey("LogMaxLines", 1000);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

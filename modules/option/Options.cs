@@ -36,9 +36,8 @@ namespace Triggered.modules.options
             TrimNullValues(keyList);
         }
         /// <summary>
-        /// Set the object located at keys to the content of value.<br/>
-        /// This uses dot notation to navigate the object structure.<br/>
-        /// It attempts to produce the proper Array or Object structure to match your keys string.
+        /// Set the object located at keys to the content of value.
+        /// This uses dot notation to navigate the object structure.
         /// </summary>
         /// <param name="keys">string</param>
         /// <param name="value">dynamic</param>
@@ -111,7 +110,7 @@ namespace Triggered.modules.options
         }
         /// <summary>
         /// Navigate the object structure using the dot notation keys string.<br/>
-        /// You must state the type of the value which you are retrieving.<br/>
+        /// You must state the type of the value which you are retrieving.
         /// </summary>
         /// <typeparam name="T">Pass the Type you want to return</typeparam>
         /// <param name="keys">dot notation string of object path</param>
