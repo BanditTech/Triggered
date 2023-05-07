@@ -9,20 +9,33 @@
     using Triggered.modules.options;
     using Triggered.modules.panels;
 
+    /// <summary>
+    /// The is the main hub for the application.
+    /// Holds most of the shared resources and all options.
+    /// </summary>
     public static class App
     {
-        public static bool IsVisible = true;
+        /// <summary>
+        /// This is the on/off switch for the application.
+        /// </summary>
         public static bool IsRunning = true;
-        public static readonly string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=", "~=", ">0<", ">0<=", "!=" };
-        public static readonly string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
-        public static readonly string[] objectTypes = new string[] { "Group", "Element" };
+        /// <summary>
+        /// A Log Window rendered using ImGui.
+        /// </summary>
         public static LogWindow logimgui;
+        /// <summary>
+        /// An instance of NLog LogManager.
+        /// </summary>
         public static Logger logger;
-        public static Stopwatch Watch = Stopwatch.StartNew();
         public static LogLevel LogWindowMinimumLogLevel;
         public static string[] TopGroups;
+        /// <summary>
+        /// The loaded Stash Sorter list, which will contain the [{TopGroup},{TopGroup}] structure.
+        /// </summary>
         public static List<AGroupElement> StashSorterList;
-        public static Type[] ObjectTypes = new Type[] { typeof(Group), typeof(Element) };
+        /// <summary>
+        /// Options are loaded as a group using a Manager.
+        /// </summary>
         public static Options_Manager Options = new Options_Manager();
 
         static App()

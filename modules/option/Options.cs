@@ -7,12 +7,28 @@ using Triggered.modules.wrapper;
 
 namespace Triggered.modules.options
 {
-    public class Options
+    /// <summary>
+    /// Instantiate
+    /// </summary>
+    public abstract class Options
     {
+        /// <summary>
+        /// We save the values within a JObject for flexibility
+        /// </summary>
         public JObject keyList = new JObject();
+        /// <summary>
+        /// We use the Name key to build the filename
+        /// </summary>
         public string Name = "";
+        /// <summary>
+        /// We track any changes that occur to the options.
+        /// Any changes are saved each second.
+        /// </summary>
         internal bool _changed = false;
 
+        /// <summary>
+        /// Class finalizer. 
+        /// </summary>
         ~Options()
         {
             // When constructing JArray without list size, we set to 20
@@ -20,12 +36,9 @@ namespace Triggered.modules.options
             TrimNullValues(keyList);
         }
         /// <summary>
-        /// Set the provided key[s] to the content of value.
-        /// This uses dot notation to navigate the object structure.
-        /// <br/>
-        /// It attempts to determine if it should create Array or Object.
-        /// <br/>
-        /// Do not use int keys as strings!
+        /// Set the object located at keys to the content of value.<br/>
+        /// This uses dot notation to navigate the object structure.<br/>
+        /// It attempts to produce the proper Array or Object structure to match your keys string.
         /// </summary>
         /// <param name="keys">string</param>
         /// <param name="value">dynamic</param>
@@ -97,11 +110,12 @@ namespace Triggered.modules.options
                 target[keyArray.Last()] = JToken.FromObject(value);
         }
         /// <summary>
-        /// 
+        /// Navigate the object structure using the dot notation keys string.<br/>
+        /// You must state the type of the value which you are retrieving.<br/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="keys"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">Pass the Type you want to return</typeparam>
+        /// <param name="keys">dot notation string of object path</param>
+        /// <returns>dynamic</returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         public T GetKey<T>(string keys)
@@ -157,10 +171,19 @@ namespace Triggered.modules.options
 
             throw new InvalidOperationException($"Unsupported JTokenType {value.Type}");
         }
+        /// <summary>
+        /// Serialize the keyList into a string.
+        /// </summary>
+        /// <returns>JSON string</returns>
         public string ToJson()
         {
             return JSON.Str(keyList);
         }
+        /// <summary>
+        /// A bandaid function that allows us to build arrays of unknown length.<br/>
+        /// Is run automatically by the class finalizer.
+        /// </summary>
+        /// <param name="token">This is usually the keyList</param>
         public void TrimNullValues(JToken token)
         {
             switch (token.Type)
@@ -261,12 +284,18 @@ namespace Triggered.modules.options
                 }
             }
         }
+        /// <summary>
+        /// Allows the inherited classes to save their options to file.
+        /// </summary>
         public void Save()
         {
             _changed = false;
             var saveObj = PrepareSaveObject();
             File.WriteAllText($"save\\{Name}.json", JSON.Str(saveObj));
         }
+        /// <summary>
+        /// Allows the inherited classes to merge the saved option subset.
+        /// </summary>
         public void Load()
         {
             if (File.Exists($"save\\{Name}.json"))
@@ -276,6 +305,9 @@ namespace Triggered.modules.options
                 Merge(obj);
             }
         }
+        /// <summary>
+        /// We determine if the options have been changed, in order to save to file.
+        /// </summary>
         public void SaveChanged()
         {
             if (_changed)

@@ -5,21 +5,33 @@ using System.IO;
 using ImGuiNET;
 using Triggered.modules.wrapper;
 
+/// <summary>
+/// An abstract group for representing both Group and Element.
+/// </summary>
 public abstract class AGroupElement
 {
+    /// <summary>
+    /// Inherited classes can export themselves to string.
+    /// </summary>
+    /// <returns>JSON string</returns>
     public string ToJson()
     {
         return JSON.Str(this);
     }
+    /// <summary>
+    /// Inherited classes can export themselves to clipboard.
+    /// </summary>
     public void ToClipboard()
     {
-        string groupData = JSON.Str(this);
-        ImGui.SetClipboardText(groupData);
+        ImGui.SetClipboardText(ToJson());
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fileName"></param>
     public void Dump(string fileName)
     {
-        string groupData = JSON.Str(this);
-        File.WriteAllText($"{fileName}.json", groupData);
+        File.WriteAllText($"{fileName}.json", ToJson());
     }
 }
 public class AGroupElementJsonConverter : JsonConverter<AGroupElement>

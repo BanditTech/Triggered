@@ -41,6 +41,10 @@ namespace Triggered.modules.panels
         static object _popupModal;
         static string _selectedFile;
         static bool _fileOperation = false;
+        public static Type[] ObjectTypes = new Type[] { typeof(Group), typeof(Element) };
+        public static readonly string[] objectTypes = new string[] { "Group", "Element" };
+        public static readonly string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=", "~=", ">0<", ">0<=", "!=" };
+        public static readonly string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
         #endregion
 
         #region Setup Functions
@@ -293,9 +297,9 @@ namespace Triggered.modules.panels
                 }
                 if (_popupModal == group && ImGui.BeginPopupModal("Add to Group"))
                 {
-                    int clayType = Array.IndexOf(App.ObjectTypes, _addingType);
-                    if (ImGui.Combo("##Eval", ref clayType, App.objectTypes, App.objectTypes.Length))
-                        _addingType = App.ObjectTypes[clayType];
+                    int clayType = Array.IndexOf(ObjectTypes, _addingType);
+                    if (ImGui.Combo("##Eval", ref clayType, objectTypes, objectTypes.Length))
+                        _addingType = ObjectTypes[clayType];
                     bool changed = _oldType != _addingType;
                     if (_clay == null || changed)
                     {
@@ -340,9 +344,9 @@ namespace Triggered.modules.panels
                         ImGui.Text("Eval:");
                         ImGui.SameLine();
                         ImGui.SetNextItemWidth(72);
-                        int comparisonIndex = Array.IndexOf(App.EvalOptions, _element.Eval);
-                        if (ImGui.Combo("##Eval", ref comparisonIndex, App.EvalOptions, App.EvalOptions.Length))
-                            _element.Eval = App.EvalOptions[comparisonIndex];
+                        int comparisonIndex = Array.IndexOf(EvalOptions, _element.Eval);
+                        if (ImGui.Combo("##Eval", ref comparisonIndex, EvalOptions, EvalOptions.Length))
+                            _element.Eval = EvalOptions[comparisonIndex];
                         ImGui.PopID();
 
                         // string Min
@@ -370,9 +374,9 @@ namespace Triggered.modules.panels
                         ImGui.Text("Type:");
                         ImGui.SameLine();
                         ImGui.SetNextItemWidth(72);
-                        int comparisonIndex = Array.IndexOf(App.GroupTypes, _group.GroupType);
-                        if (ImGui.Combo("##GroupType", ref comparisonIndex, App.GroupTypes, App.GroupTypes.Length))
-                            _group.GroupType = App.GroupTypes[comparisonIndex];
+                        int comparisonIndex = Array.IndexOf(GroupTypes, _group.GroupType);
+                        if (ImGui.Combo("##GroupType", ref comparisonIndex, GroupTypes, GroupTypes.Length))
+                            _group.GroupType = GroupTypes[comparisonIndex];
 
                         if (weightedGroup)
                         {
@@ -385,7 +389,7 @@ namespace Triggered.modules.panels
                         }
                     }
 
-                    ImGui.Text($"Are you ready to insert the new {App.objectTypes[clayType]}?");
+                    ImGui.Text($"Are you ready to insert the new {objectTypes[clayType]}?");
                     if (ImGui.Button("Yes", new Vector2(120, 0)))
                     {
                         // Add the item
@@ -881,13 +885,8 @@ namespace Triggered.modules.panels
         }
 
         #region Utility Helpers
-        static bool IsFileOperating(bool reset = false)
+        static bool IsFileOperating()
         {
-            if (reset)
-            {
-                _fileOperation = false;
-                return false;
-            }
             if (_fileOperation)
                 return true;
             if (!_fileOperation)
@@ -1074,9 +1073,9 @@ namespace Triggered.modules.panels
                 ImGui.Text("Eval:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(72);
-                int comparisonIndex = Array.IndexOf(App.EvalOptions, _rightClickedElement.Eval);
-                if (ImGui.Combo("##Eval", ref comparisonIndex, App.EvalOptions, App.EvalOptions.Length))
-                    _rightClickedElement.Eval = App.EvalOptions[comparisonIndex];
+                int comparisonIndex = Array.IndexOf(EvalOptions, _rightClickedElement.Eval);
+                if (ImGui.Combo("##Eval", ref comparisonIndex, EvalOptions, EvalOptions.Length))
+                    _rightClickedElement.Eval = EvalOptions[comparisonIndex];
 
                 // string Min
                 ImGui.SameLine();
@@ -1104,9 +1103,9 @@ namespace Triggered.modules.panels
 
                 // string Type
                 ImGui.SetNextItemWidth(72);
-                int comparisonIndex = Array.IndexOf(App.GroupTypes, _rightClickedGroup.GroupType);
-                if (ImGui.Combo("##GroupType", ref comparisonIndex, App.GroupTypes, App.GroupTypes.Length))
-                    _rightClickedGroup.GroupType = App.GroupTypes[comparisonIndex];
+                int comparisonIndex = Array.IndexOf(GroupTypes, _rightClickedGroup.GroupType);
+                if (ImGui.Combo("##GroupType", ref comparisonIndex, GroupTypes, GroupTypes.Length))
+                    _rightClickedGroup.GroupType = GroupTypes[comparisonIndex];
                 if (_rightClickedGroup.GroupType == "COUNT" || _rightClickedGroup.GroupType == "WEIGHT")
                 {
                     // int Min
