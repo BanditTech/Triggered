@@ -19,7 +19,17 @@ namespace Triggered.modules.options
             // We trim the keyList to remove extra JArray Null objects 
             TrimNullValues(keyList);
         }
-
+        /// <summary>
+        /// Set the provided key[s] to the content of value.
+        /// This uses dot notation to navigate the object structure.
+        /// <br/>
+        /// It attempts to determine if it should create Array or Object.
+        /// <br/>
+        /// Do not use int keys as strings!
+        /// </summary>
+        /// <param name="keys">string</param>
+        /// <param name="value">dynamic</param>
+        /// <exception cref="ArgumentException"></exception>
         public void SetKey(string keys, object value)
         {
             int index;
@@ -86,6 +96,14 @@ namespace Triggered.modules.options
             else
                 target[keyArray.Last()] = JToken.FromObject(value);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public T GetKey<T>(string keys)
         {
             string[] keyArray = keys.Split('.');
@@ -166,6 +184,11 @@ namespace Triggered.modules.options
                     break;
             }
         }
+        /// <summary>
+        /// Utilize the merge method available within Newtonsoft JSON package.
+        /// This will only replace values which we have present in the origin.
+        /// </summary>
+        /// <param name="import">JToken</param>
         public void Merge(JToken import)
         {
             var internalTarget = keyList;
@@ -173,13 +196,25 @@ namespace Triggered.modules.options
             var mergeSettings = new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace };
             internalTarget.Merge(importTarget,mergeSettings);
         }
-        public JToken PrepareSaveObject()
+        /// <summary>
+        /// Prepare a stripped down file which only contains changes from default
+        /// </summary>
+        /// <returns>JObject</returns>
+        public JObject PrepareSaveObject()
         {
             var defaultOptions = Activator.CreateInstance(GetType());
             var saveObject = new JObject();
             CompareValuesAndAddToSaveFile(keyList, ((Options)defaultOptions).keyList, saveObject);
             return saveObject;
         }
+        /// <summary>
+        /// This is a recursive function which navigates the two object structures.
+        /// We preserve the location using dot notation. 
+        /// </summary>
+        /// <param name="currentObject">JToken</param>
+        /// <param name="defaultObject">JToken</param>
+        /// <param name="saveObject">JObject</param>
+        /// <param name="depth">string</param>
         private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JObject saveObject, string depth = "")
         {
             if (currentObject.Type == JTokenType.Object)
