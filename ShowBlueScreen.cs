@@ -8,8 +8,9 @@ using System.Windows.Forms;
 
 namespace Triggered
 {
-    internal class ShowBlueScreen
+    public class ShowBlueScreen
     {
+        ImageViewer viewer;
         public ShowBlueScreen()
         {
             //Create a 3 channel image of 400x200
@@ -25,9 +26,17 @@ namespace Triggered
                    FontFace.HersheyComplex,
                    1.0,
                    new Bgr(0, 255, 0).MCvScalar);
-
-                //Show the image using ImageViewer from Emgu.CV.UI
-                ImageViewer.Show(img, "Test Window");
+                var style = false;
+                if (style)
+                {
+                    CvInvoke.Imshow("Test Window", img);
+                    CvInvoke.WaitKey();
+                }
+                else
+                {
+                    //Show the image using ImageViewer from Emgu.CV.UI
+                    ImageViewer.Show(img, "Test Window");
+                }
             }
         }
     }
