@@ -1,10 +1,12 @@
 ﻿namespace Triggered
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using Triggered.modules.panels;
 
     class Program
     {
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
         static async Task Main()
         {
             using var overlay = new TriggeredMenu();
