@@ -40,19 +40,33 @@
         /// </summary>
         public static Options_Manager Options = new Options_Manager();
 
+        /// <summary>
+        /// Constructing the App is a good entry point for basic configuration.
+        /// </summary>
         static App()
         {
-            LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
-            logimgui = new LogWindow();
-            logger = LogManager.GetCurrentClassLogger();
+            // Create the default folders if they do not exist
             Directory.CreateDirectory("save");
             Directory.CreateDirectory("profile");
+            // Load our Options before anything else
             App.Options.Load();
+            // Now we can start our ImGui LogWindow
+            logimgui = new LogWindow();
+            // NLog requires some setup to begin logging to file
+            LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
+            logger = LogManager.GetCurrentClassLogger();
         }
 
         #region Log(string log, LogLevel level)
         /// <summary>
-        /// A uniform point to send log entries to both 
+        /// A uniform point to send log entries to both logger systems.<br/>
+        /// Log levels ordered by severity:<br/>
+        /// - <see cref="LogLevel.Trace"/> (Ordinal = 0) : Most verbose level. Used for development and seldom enabled in production.<br/>
+        /// - <see cref="LogLevel.Debug"/> (Ordinal = 1) : Debugging the application behavior from internal events of interest.<br/>
+        /// - <see cref="LogLevel.Info"/>  (Ordinal = 2) : Information that highlights progress or application lifetime events.<br/>
+        /// - <see cref="LogLevel.Warn"/>  (Ordinal = 3) : Warnings about validation issues or temporary failures that can be recovered.<br/>
+        /// - <see cref="LogLevel.Error"/> (Ordinal = 4) : Errors where functionality has failed or <see cref="System.Exception"/> have been caught.<br/>
+        /// - <see cref="LogLevel.Fatal"/> (Ordinal = 5) : Most critical level. Application is about to abort.<br/>
         /// </summary>
         /// <param name="log"></param>
         /// <param name="level">NLog LogLevel</param>
@@ -67,12 +81,26 @@
             logger.Log(level,log);
         }
         /// <summary>
-        /// Simplify the format of creating info log entries.
+        /// Simplify the format of creating info log entries.<br/>
+        /// Log levels ordered by severity:<br/>
+        /// - <see cref="LogLevel.Trace"/> (Ordinal = 0) : Most verbose level. Used for development and seldom enabled in production.<br/>
+        /// - <see cref="LogLevel.Debug"/> (Ordinal = 1) : Debugging the application behavior from internal events of interest.<br/>
+        /// - <see cref="LogLevel.Info"/>  (Ordinal = 2) : Information that highlights progress or application lifetime events.<br/>
+        /// - <see cref="LogLevel.Warn"/>  (Ordinal = 3) : Warnings about validation issues or temporary failures that can be recovered.<br/>
+        /// - <see cref="LogLevel.Error"/> (Ordinal = 4) : Errors where functionality has failed or <see cref="System.Exception"/> have been caught.<br/>
+        /// - <see cref="LogLevel.Fatal"/> (Ordinal = 5) : Most critical level. Application is about to abort.<br/>
         /// </summary>
         /// <param name="log"></param>
-        public static void Log(string log)
+        /// <param name="level"></param>
+        public static void Log(string log, int level = 2)
         {
-            Log(log, LogLevel.Info);
+            if (level > 5)
+                level = 5;
+            else if (level < 0)
+                level = 0;
+
+            var levelType = LogLevel.FromOrdinal(level);
+            Log(log, levelType);
         }
         #endregion
     }
