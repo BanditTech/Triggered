@@ -72,7 +72,7 @@ namespace Triggered.modules.panels
             weightGroup.AddElement(new Element("This values at 20 per stat", ">=", "1", 20));
             weightGroup.AddElement(new Element("This would require 100 of the stat", ">=", "100", 1));
             // Make our TopGroup to put them all in
-            TopGroup example1 = new TopGroup("Example 1 AND", "AND", default, default, default);
+            TopGroup example1 = new TopGroup("Example 1 AND", "AND");
             example1.AddGroup(andGroup);
             example1.AddGroup(notGroup);
             example1.AddGroup(countGroup);
@@ -202,8 +202,7 @@ namespace Triggered.modules.panels
         }
 
         /// <summary>
-        /// This method is doing all the heavy lifting for drawing the filter menu.
-        /// I have given ample comments in order to facilitate adjustments.
+        /// This method does the heavy lifting of drawing the filter menu.
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="parentType"></param>

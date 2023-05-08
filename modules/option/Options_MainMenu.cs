@@ -1,7 +1,13 @@
 ﻿namespace Triggered.modules.options
 {
+    /// <summary>
+    /// Options class for the Main Menu.
+    /// </summary>
     public class Options_MainMenu : Options
     {
+        /// <summary>
+        /// Construct a default Main Menu options.
+        /// </summary>
         public Options_MainMenu()
         {
             // Assign the name we will use to save the file

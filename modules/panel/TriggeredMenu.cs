@@ -7,11 +7,22 @@
     using ImGuiNET;
     using Triggered.modules.wrapper;
 
+    /// <summary>
+    /// The main brains of the App Behavior
+    /// </summary>
     public class TriggeredMenu : Overlay
     {
+        /// <summary>
+        /// Running logic thread for handling decision making.
+        /// </summary>
         private readonly Thread logicThread;
+        /// <summary>
+        /// Running option thread for saving any changed variables.
+        /// </summary>
         private readonly Thread optionThread;
-        // Begin the LogicUpdate thread when the frame initiates
+        /// <summary>
+        /// Constructing the menu class also initiates our threads.
+        /// </summary>
         public TriggeredMenu()
         {
             logicThread = new Thread(() =>
@@ -32,14 +43,18 @@
             });
             optionThread.Start();
         }
-        // Logic is operated upon based on our timeout
+        /// <summary>
+        /// Logic operates 
+        /// </summary>
         private void LogicUpdate()
         {
             Thread.Sleep(App.Options.MainMenu.GetKey<int>("LogicTickDelayInMilliseconds"));
         }
 
-        // Render thread is run every frame
-        // We can piggy back on the render thread for simple keybinds
+        /// <summary>
+        /// Render thread is run every frame
+        /// We can piggy back on the render thread for simple keybinds
+        /// </summary>
         protected override void Render()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.

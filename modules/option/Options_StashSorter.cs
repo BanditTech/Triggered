@@ -1,7 +1,13 @@
 ﻿namespace Triggered.modules.options
 {
+    /// <summary>
+    /// Options class for the Stash Sorter.
+    /// </summary>
     public class Options_StashSorter : Options
     {
+        /// <summary>
+        /// Construct a default Stash Sorter options.
+        /// </summary>
         public Options_StashSorter()
         {
             // Assign the name we will use to save the file
