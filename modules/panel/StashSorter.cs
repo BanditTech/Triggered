@@ -188,8 +188,9 @@ namespace Triggered.modules.panels
                 _dragStarted = false;
                 _dragFinalize = false;
                 object fetch = GetObjectByIndexer(_dragSource, _dragSourceType, !_shiftHeld);
-                InsertObjectByIndexer(_dragTarget, _dragTargetType, _dragSourceType, fetch);
-                App.Log($"{fetch} {JSON.Str(fetch)}");
+                // we will adjust the target key if the source group is also in the same key level of the target
+                var adjustKey = AdjustTargetKey(_dragSource, _dragTarget, _dragSourceType == typeof(Group),_shiftHeld);
+                InsertObjectByIndexer(adjustKey, _dragTargetType, _dragSourceType, fetch);
             }
             if (confirmRemove)
             {
@@ -200,12 +201,22 @@ namespace Triggered.modules.panels
                 _dragStarted = false;
         }
 
+        /// <summary>
+        /// This method is doing all the heavy lifting for drawing the filter menu.
+        /// I have given ample comments in order to facilitate adjustments.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="parentType"></param>
+        /// <param name="indexer"></param>
         static void RecursiveMenu(AGroupElement obj, string parentType, string indexer = "0")
         {
             bool _hovered;
             if (obj == null)
                 return;
             bool IsWeighted = parentType == "COUNT" || parentType == "WEIGHT";
+
+            #region Draw Group
+            // Group Section
             if (obj is Group group)
             {
                 // We need to push this ID here to associate everything with the tree node
@@ -417,7 +428,7 @@ namespace Triggered.modules.panels
                 str += group.GroupType == "COUNT" ? $" with minimum of {group.Min} match value"
                     : group.GroupType == "WEIGHT" ? $" with minimum of {group.Min} weight" : "";
                 // Create our tree node to allow collapsable states
-                bool isTreeNodeOpen = ImGui.TreeNodeEx(str, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick);
+                bool isTreeNodeOpen = ImGui.TreeNodeEx(str, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick | ImGuiTreeNodeFlags.AllowItemOverlap);
 
                 #region Hover Button Logic
                 // Check if we are hovering the tree node
@@ -440,10 +451,11 @@ namespace Triggered.modules.panels
                 {
                     _dragTarget = indexer;
                     _dragTargetType = typeof(Group);
-                    if (CanDrop() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    if (CanDrop(ImGui.GetIO().KeyShift) && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                     {
                         _shiftHeld = ImGui.GetIO().KeyShift;
                         _dragFinalize = true;
+                        App.Log($"{_dragSource} was dragged to {_dragTarget}" + (_shiftHeld ? " and it was duplicated." : "."),LogLevel.Trace);
                     }
                     ImGui.EndDragDropTarget();
                 }
@@ -479,28 +491,40 @@ namespace Triggered.modules.panels
                         ImGui.GetColorU32(EditingHighlight),
                         4.0f);
 
-                    // Draw Import and Export Buttons at the end of the row
                     ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Import ").X - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 4);
+                    // Draw Import and Export Buttons at the end of the row
+                    bool isScrollable = ImGui.GetScrollMaxY() > 0;
+                    var letterSpace = ImGui.CalcTextSize("Import ").X;
+                    var padding = ImGui.GetStyle().FramePadding.X;
+                    var value = ImGui.GetWindowWidth() - letterSpace * 2 - padding * 4;
+                    ImGui.SetCursorPosX(isScrollable ? value - ImGui.GetStyle().ScrollbarSize : value);
                     if (ImGui.Button("Import"))
                     {
                         var import = ImGui.GetClipboardText();
-                        var Jobj = JSON.AGroupElement(import);
-                        if (Jobj is Group _group)
+                        if (JSON.Validate(import))
                         {
-                            App.Log($"Importing group from clipboard:\n" +
-                                $"{import}");
-                            group.Add(_group);
+                            var Jobj = JSON.AGroupElement(import);
+                            if (Jobj is Group _group)
+                            {
+                                App.Log($"Importing group from clipboard:\n" +
+                                    $"{import}");
+                                group.Add(_group);
+                            }
+                            else if (Jobj is Element _element)
+                            {
+                                App.Log($"Importing element from clipboard:\n" +
+                                    $"{import}");
+                                group.Add(_element);
+                            }
                         }
-                        else if (Jobj is Element _element)
+                        else
                         {
-                            App.Log($"Importing element from clipboard:\n" +
-                                $"{import}");
-                            group.Add(_element);
+                            App.Log("The clipboard did not contain a valid JSON");
                         }
                     }
                     ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
+                    value = ImGui.GetWindowWidth() - letterSpace - padding * 2;
+                    ImGui.SetCursorPosX(isScrollable ? value - ImGui.GetStyle().ScrollbarSize : value);
                     if (ImGui.Button("Export"))
                     {
                         string json = group.ToJson();
@@ -533,6 +557,10 @@ namespace Triggered.modules.panels
                     ImGui.TreePop();
                 }
             }
+            #endregion
+
+            #region Draw Element
+            // Element Section
             else if (obj is Element leaf)
             {
                 // We need to push this ID here to associate everything with the selectable
@@ -634,7 +662,7 @@ namespace Triggered.modules.panels
                 {
                     _dragTarget = indexer;
                     _dragTargetType = typeof(Element);
-                    if (CanDrop() && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
+                    if (CanDrop(ImGui.GetIO().KeyShift) && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                     {
                         _shiftHeld = ImGui.GetIO().KeyShift;
                         _dragFinalize = true;
@@ -687,6 +715,8 @@ namespace Triggered.modules.panels
                 // Only PopID after all logic is complete
                 ImGui.PopID();
             }
+            #endregion
+            
             else
                 App.Log("This should not display", NLog.LogLevel.Error);
         }
@@ -805,23 +835,30 @@ namespace Triggered.modules.panels
                             var options = App.Options.StashSorter;
                             var key = options.GetKey<int>("SelectedGroup");
                             var import = ImGui.GetClipboardText();
-                            var Jobj = JSON.AGroupElement(import);
-                            // Validate the resulting object type
-                            if (Jobj is Group _group)
+                            if (JSON.Validate(import))
                             {
-                                App.Log($"Importing group from clipboard:\n" +
-                                    $"{import}", LogLevel.Trace);
-                                ((TopGroup)App.StashSorterList[key]).Add(_group);
-                            }
-                            else if (Jobj is Element _element)
-                            {
-                                App.Log($"Importing element from clipboard:\n" +
-                                    $"{import}", LogLevel.Trace);
-                                ((TopGroup)App.StashSorterList[key]).Add(_element);
+                                var Jobj = JSON.AGroupElement(import);
+                                // Validate the resulting object type
+                                if (Jobj is Group _group)
+                                {
+                                    App.Log($"Importing group from clipboard:\n" +
+                                        $"{import}", LogLevel.Trace);
+                                    ((TopGroup)App.StashSorterList[key]).Add(_group);
+                                }
+                                else if (Jobj is Element _element)
+                                {
+                                    App.Log($"Importing element from clipboard:\n" +
+                                        $"{import}", LogLevel.Trace);
+                                    ((TopGroup)App.StashSorterList[key]).Add(_element);
+                                }
+                                else
+                                    App.Log($"The clipboard contents were not valid Group or Element:\n" +
+                                        $"{import}", LogLevel.Trace);
                             }
                             else
-                                App.Log($"The clipboard contents were not valid Group or Element:\n" +
-                                    $"{import}", LogLevel.Trace);
+                            {
+                                App.Log("The clipboard did not contain a valid JSON");
+                            }
                             // We end by unlocking file operations
                             _fileOperation = false;
                         });
@@ -1035,13 +1072,44 @@ namespace Triggered.modules.panels
                 return indexer.Substring(0, indexer.Length - 2);
             return indexer;
         }
-        static bool CanDrop()
+        static string AdjustTargetKey(string sourceKey, string destKey, bool isSourceGroup, bool isDuplicating)
         {
-            string source = StripIndexerElement(_dragSourceType, _dragSource);
-            string target = StripIndexerElement(_dragTargetType, _dragTarget);
+            // First we take care of obvious returns
+            if (!isSourceGroup || isDuplicating || destKey == "0")
+                return destKey;
+            // Split the string by the _ symbol in order to get our groups
+            string[] sourceParts = sourceKey.Split('_');
+            string[] destParts = destKey.Split('_');
+            // If the source is deeper than the target 
+            if (sourceParts.Length > destParts.Length)
+                return destKey;
 
+            for (int i = 1; i < sourceParts.Length - 1; i++)
+            {
+                if (sourceParts[i] != destParts[i])
+                    return destKey;
+            }
+
+            var key = sourceParts.Length - 1;
+
+            var sourceInt = int.Parse(sourceParts[key]);
+            var destInt = int.Parse(destParts[key]);
+
+            if (sourceInt < destInt)
+            {
+                destParts[key] = (destInt - 1).ToString();
+            }
+
+            return string.Join("_", destParts);
+        }
+        static bool CanDrop(bool isShiftHeld)
+        {
             if (_dragSourceType == typeof(Element))
                 return true;
+            if (isShiftHeld)
+                return true;
+            string source = StripIndexerElement(_dragSourceType, _dragSource);
+            string target = StripIndexerElement(_dragTargetType, _dragTarget);
 
             return source != target && _dragStarted && !IsChildObject(source, target);
         }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Triggered.modules.wrapper
 {
@@ -24,6 +25,18 @@ namespace Triggered.modules.wrapper
         {
             object obj = JsonConvert.DeserializeObject(json);
             return obj;
+        }
+        public static bool Validate(string json)
+        {
+            using (var reader = new JsonTextReader(new StringReader(json)))
+            {
+                while (reader.Read())
+                {
+                    // Do nothing
+                }
+                // if the final token is None, we have a valid string.
+                return reader.TokenType == JsonToken.None;
+            }
         }
         public static List<AGroupElement> AGroupElementList(string json)
         {
