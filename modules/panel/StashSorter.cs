@@ -1105,9 +1105,9 @@ namespace Triggered.modules.panels
         static bool CanDrop(bool isShiftHeld)
         {
             if (_dragSourceType == typeof(Element))
-                return true;
+                return _dragStarted;
             if (isShiftHeld)
-                return true;
+                return _dragStarted;
             string source = StripIndexerElement(_dragSourceType, _dragSource);
             string target = StripIndexerElement(_dragTargetType, _dragTarget);
 
