@@ -49,15 +49,25 @@ namespace Triggered
         }
         public static void Capture()
         {
+            // Construct our variables with `using` when possible
+            int direction;
+            var rnd = new Random();
+            string win1 = "Primary Screen Capture";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             Rectangle drawBox = new Rectangle(100, 100, 400, 400);
             using Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height);
             using Mat frame = new Mat(screenBounds.Height / 2, screenBounds.Width / 2, DepthType.Cv8U, 3);
             using Mat screenMat = new Mat();
-            string win1 = "Primary Screen Capture";
-            CvInvoke.NamedWindow(win1);
-            int direction;
-            var rnd = new Random();
+            // We create our named window
+            if (CvInvoke.GetWindowProperty(win1,WindowPropertyFlags.Visible) == 4)
+            {
+                CvInvoke.DestroyWindow(win1);
+                return;
+            }
+            else
+                CvInvoke.NamedWindow(win1);
+
+            // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
                 // Capture the primary screen and convert it to a System.Drawing.Bitmap object
