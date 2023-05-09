@@ -2,6 +2,7 @@
 {
     using System.Numerics;
     using System.Threading;
+    using System.Threading.Tasks;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
     using ImGuiNET;
@@ -126,6 +127,22 @@
                     ahk.Demo();
                 });
                 thread.Start();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Open Blue window"))
+            {
+                Task.Run(() =>
+                {
+                    demoCV.ShowBlue();
+                });
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Open Capture window"))
+            {
+                Task.Run(() =>
+                {
+                    demoCV.Capture();
+                });
             }
 
             // This is to show the menu bar that will change the config settings at runtime.

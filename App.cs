@@ -2,9 +2,7 @@
 {
     using NLog;
     using NLog.Config;
-    using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
     using Triggered.modules.options;
@@ -56,10 +54,6 @@
             // NLog requires some setup to begin logging to file
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logger = LogManager.GetCurrentClassLogger();
-            Task.Run(() =>
-            {
-                var blueScreen = new ShowBlueScreen();
-            });
         }
 
         #region Log(string log, LogLevel level)
