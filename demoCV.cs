@@ -1,11 +1,9 @@
-﻿using ClickableTransparentOverlay.Win32;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using System;
 using System.Drawing;
-using System.Drawing.Design;
 using System.Windows.Forms;
 
 namespace Triggered
@@ -62,12 +60,23 @@ namespace Triggered
             var rnd = new Random();
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                // Capture the primary screen and convert it to an Emgu.CV Mat object
+                // Capture the primary screen and convert it to a System.Drawing.Bitmap object
                 using (Graphics g = Graphics.FromImage(screenBitmap))
                 {
+                    // Copy the pixels of the screen into the bitmap
+                    // screenBounds.Location is the upper left corner of the screen rectangle
+                    // Point.Empty is the offset within the bitmap to start copying the pixels from
+                    // screenBounds.Size is the size of the rectangle to copy
                     g.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
-                    BitmapExtension.ToMat(screenBitmap,screenMat);
+                    // Convert the bitmap to an Emgu.CV Mat object
+                    // screenMat is the output Mat object
+                    BitmapExtension.ToMat(screenBitmap, screenMat);
                 }
+
+                // The Graphics object has been released
+                // At this point the screen data is contained within screenMat
+
+                #region Random Direction Fun
                 direction = rnd.Next(1,5);
                 // Check if the drawBox rectangle is within the screen bounds
                 if (drawBox.X < 0)
@@ -106,8 +115,10 @@ namespace Triggered
                         drawBox.X += rnd.Next(11, 111);
                         break;
                 }
+                #endregion
+
                 // Draw a rectangle on the image
-                CvInvoke.Rectangle(screenMat, drawBox, new MCvScalar(0, 255, 0), 2);
+                CvInvoke.Rectangle(screenMat, drawBox, new MCvScalar(0, 255, 0), default, LineType.AntiAlias);
                 // Resize the captured screen image and display it in the named window
                 CvInvoke.Resize(screenMat, frame, frame.Size);
                 CvInvoke.Imshow(win1, frame);
