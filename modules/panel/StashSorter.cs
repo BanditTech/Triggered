@@ -1,10 +1,12 @@
 ﻿using ImGuiNET;
 using NLog;
 using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Triggered.modules.wrapper;
 
 namespace Triggered.modules.panels
@@ -21,6 +23,9 @@ namespace Triggered.modules.panels
         static Element _rightClickedElement = null;
         static Group _rightClickedGroup = null;
         static bool confirmRemove = false;
+        static string verticalMovement = null;
+        static string verticalIndexer = null;
+        static Type verticalType = null;
         static Type removeType;
         static string removeIndexer;
         static Vector4 EditingHighlight = new Vector4(0f, 0.772549f, 1f, 0.392157f);
@@ -199,6 +204,39 @@ namespace Triggered.modules.panels
             }
             if (_dragStarted && ImGui.IsMouseReleased(ImGuiMouseButton.Left))
                 _dragStarted = false;
+            if (verticalMovement != null)
+            {
+                string parent = verticalIndexer.Substring(0, verticalIndexer.Length - 2);
+                int index = int.Parse(verticalIndexer.Substring(verticalIndexer.Length - 1, 1));
+                Group parentObj = (Group)GetObjectByIndexer(parent, typeof(Group), false);
+                object list = null;
+                if (verticalType == typeof(Group))
+                    list = parentObj.GroupList;
+                else if (verticalType == typeof(Element))
+                    list = parentObj.ElementList;
+
+                var Slist = (System.Collections.IList)list;
+
+                if (verticalMovement == "up")
+                {
+                    var holdingVar = Slist[index];
+                    if (index - 1 >= 0)
+                    {
+                        Slist.RemoveAt(index);
+                        Slist.Insert(index - 1,holdingVar);
+                    }
+                }
+                else if (verticalMovement == "down")
+                {
+                    var holdingVar = Slist[index];
+                    if (index + 1 < Slist.Count)
+                    {
+                        Slist.RemoveAt(index);
+                        Slist.Insert(index + 1, holdingVar);
+                    }
+                }
+                verticalMovement = null;
+            }
         }
 
         /// <summary>
@@ -207,7 +245,7 @@ namespace Triggered.modules.panels
         /// <param name="obj"></param>
         /// <param name="parentType"></param>
         /// <param name="indexer"></param>
-        static void RecursiveMenu(AGroupElement obj, string parentType, string indexer = "0")
+        static unsafe void RecursiveMenu(AGroupElement obj, string parentType, string indexer = "0")
         {
             bool _hovered;
             if (obj == null)
@@ -497,25 +535,48 @@ namespace Triggered.modules.panels
                     var padding = ImGui.GetStyle().FramePadding.X;
                     var scrollAdjust = (isScrollable ? -ImGui.GetStyle().ScrollbarSize : 0);
                     var letterSpace = ImGui.CalcTextSize("Import ").X;
-                    
-                    // Up/Down Button Section
-                    bool filled = false;
-                    string up = filled ? "▲" : "↑";
-                    string down = filled ? "▼" : "↓";
-                    var directionSpace = ImGui.CalcTextSize(down + " ").X;
-                    ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - letterSpace * 2 - directionSpace * 2 - padding * 4 + scrollAdjust);
-                    if (ImGui.Button(up))
+
+                    // We want these to be fully opaque
+                    // Get the original style colors for the button, button hover state, and button active state
+                    Vector4* buttonColor = ImGui.GetStyleColorVec4(ImGuiCol.Button);
+                    Vector4* buttonHoverColor = ImGui.GetStyleColorVec4(ImGuiCol.ButtonHovered);
+                    Vector4* buttonActiveColor = ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive);
+                    // Set the alpha channel to 1f for the opaque style
+                    buttonColor->W = 1f;
+                    buttonHoverColor->W = 1f;
+                    buttonHoverColor->X = 0.1f;
+                    buttonHoverColor->Y = 0.7f;
+                    buttonHoverColor->Z = 0.8f;
+                    buttonActiveColor->W = 1f;
+                    // Set the opaque style for the button, button hover state, and button active state
+                    ImGui.PushStyleColor(ImGuiCol.Button, *buttonColor);
+                    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, *buttonHoverColor);
+                    ImGui.PushStyleColor(ImGuiCol.ButtonActive, *buttonActiveColor);
+
+                    if (group is not TopGroup)
                     {
-
+                        // Up/Down Button Section
+                        bool filled = false;
+                        string up = filled ? "▲" + "↑" : "^";
+                        string down = filled ? "▼" + "↓" : "v";
+                        var directionSpace = ImGui.CalcTextSize("  ").X;
+                        ImGui.SameLine();
+                        ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 7 - letterSpace * 2 - directionSpace * 2 - padding * 4 + scrollAdjust);
+                        if (ImGui.Button(up))
+                        {
+                            verticalMovement = "up";
+                            verticalIndexer = indexer;
+                            verticalType = typeof(Group);
+                        }
+                        ImGui.SameLine();
+                        ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 5 - letterSpace * 2 - directionSpace - padding * 4 + scrollAdjust);
+                        if (ImGui.Button(down))
+                        {
+                            verticalMovement = "down";
+                            verticalIndexer = indexer;
+                            verticalType = typeof(Group);
+                        }
                     }
-                    ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - letterSpace * 2 - directionSpace - padding * 4 + scrollAdjust);
-                    if (ImGui.Button(down))
-                    {
-
-                    }
-
 
                     // Import/Export Button Section
                     ImGui.SameLine();
@@ -552,6 +613,8 @@ namespace Triggered.modules.panels
                         ImGui.SetClipboardText(json);
                         App.Log(json);
                     }
+                    // Remove the opacity increase on the buttons
+                    ImGui.PopStyleColor(3);
                     EditGroup(parentType);
                 }
                 #endregion
@@ -721,8 +784,57 @@ namespace Triggered.modules.panels
                         ImGui.GetColorU32(EditingHighlight),
                         4.0f);
 
+
+                    // We want these to be fully opaque
+                    // Get the original style colors for the button, button hover state, and button active state
+                    Vector4* buttonColor = ImGui.GetStyleColorVec4(ImGuiCol.Button);
+                    Vector4* buttonHoverColor = ImGui.GetStyleColorVec4(ImGuiCol.ButtonHovered);
+                    Vector4* buttonActiveColor = ImGui.GetStyleColorVec4(ImGuiCol.ButtonActive);
+                    // Set the alpha channel to 1f for the opaque style
+                    buttonColor->W = 1f;
+                    buttonHoverColor->W = 1f;
+                    buttonHoverColor->X = 0.1f;
+                    buttonHoverColor->Y = 0.7f;
+                    buttonHoverColor->Z = 0.8f;
+                    buttonActiveColor->W = 1f;
+                    // Set the opaque style for the button, button hover state, and button active state
+                    ImGui.PushStyleColor(ImGuiCol.Button, *buttonColor);
+                    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, *buttonHoverColor);
+                    ImGui.PushStyleColor(ImGuiCol.ButtonActive, *buttonActiveColor);
+
+
+                    //Set up some locat variables related to the right margin
+                    bool isScrollable = ImGui.GetScrollMaxY() > 0;
+                    var padding = ImGui.GetStyle().FramePadding.X;
+                    var scrollAdjust = (isScrollable ? -ImGui.GetStyle().ScrollbarSize : 0);
+                    var letterSpace = ImGui.CalcTextSize("Export ").X;
+                    var winWidth = ImGui.GetWindowWidth();
+
+                    // Up/Down Button Section
+                    bool filled = false;
+                    string up = filled ? "▲" + "↑" : "^";
+                    string down = filled ? "▼" + "↓" : "v";
+                    var directionSpace = ImGui.CalcTextSize("  ").X;
                     ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - ImGui.CalcTextSize("Export ").X - ImGui.GetStyle().FramePadding.X * 2);
+                    ImGui.SetCursorPosX(winWidth - 7 - letterSpace - directionSpace * 2 - padding * 2 + scrollAdjust);
+                    if (ImGui.Button(up))
+                    {
+                        verticalMovement = "up";
+                        verticalIndexer = indexer;
+                        verticalType = typeof(Element);
+                    }
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(winWidth - 5 - letterSpace - directionSpace - padding * 2 + scrollAdjust);
+                    if (ImGui.Button(down))
+                    {
+                        verticalMovement = "down";
+                        verticalIndexer = indexer;
+                        verticalType = typeof(Element);
+                    }
+
+
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(winWidth - letterSpace - padding * 2 + scrollAdjust);
                     if (ImGui.Button("Export"))
                     {
                         string json = leaf.ToJson();
@@ -730,6 +842,8 @@ namespace Triggered.modules.panels
                         App.Log(json);
                     }
                     EditElement(parentType);
+                    // 
+                    ImGui.PopStyleColor(3);
                 }
                 #endregion
 
@@ -969,9 +1083,19 @@ namespace Triggered.modules.panels
         #endregion
 
         #region Movement Helpers
+        /// <summary>
+        /// Fetch the object at the specified indexer.
+        /// Type determines the returned index is from Group or Element list.
+        /// Pop will remove the object instead of just giving a reference.
+        /// </summary>
+        /// <param name="indexer"></param>
+        /// <param name="type"></param>
+        /// <param name="pop"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         static object GetObjectByIndexer(string indexer, Type type, bool pop = false)
         {
-            if (indexer == "0")
+            if (indexer == "0" && verticalMovement == null)
                 throw new ArgumentException("TopGroup should never be a drag source.");
 
             string[] indices = indexer.Split('_');
