@@ -491,12 +491,35 @@ namespace Triggered.modules.panels
                         4.0f);
 
                     ImGui.SameLine();
-                    // Draw Import and Export Buttons at the end of the row
+                    // Draw Import/Export and Up/Down Buttons at the end of the row
+                    //Set up some locat variables related to the right margin
                     bool isScrollable = ImGui.GetScrollMaxY() > 0;
-                    var letterSpace = ImGui.CalcTextSize("Import ").X;
                     var padding = ImGui.GetStyle().FramePadding.X;
-                    var value = ImGui.GetWindowWidth() - letterSpace * 2 - padding * 4;
-                    ImGui.SetCursorPosX(isScrollable ? value - ImGui.GetStyle().ScrollbarSize : value);
+                    var scrollAdjust = (isScrollable ? -ImGui.GetStyle().ScrollbarSize : 0);
+                    var letterSpace = ImGui.CalcTextSize("Import ").X;
+                    
+                    // Up/Down Button Section
+                    bool filled = false;
+                    string up = filled ? "▲" : "↑";
+                    string down = filled ? "▼" : "↓";
+                    var directionSpace = ImGui.CalcTextSize(down + " ").X;
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - letterSpace * 2 - directionSpace * 2 - padding * 4 + scrollAdjust);
+                    if (ImGui.Button(up))
+                    {
+
+                    }
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - letterSpace * 2 - directionSpace - padding * 4 + scrollAdjust);
+                    if (ImGui.Button(down))
+                    {
+
+                    }
+
+
+                    // Import/Export Button Section
+                    ImGui.SameLine();
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - letterSpace * 2 - padding * 4 + scrollAdjust);
                     if (ImGui.Button("Import"))
                     {
                         var import = ImGui.GetClipboardText();
@@ -522,8 +545,7 @@ namespace Triggered.modules.panels
                         }
                     }
                     ImGui.SameLine();
-                    value = ImGui.GetWindowWidth() - letterSpace - padding * 2;
-                    ImGui.SetCursorPosX(isScrollable ? value - ImGui.GetStyle().ScrollbarSize : value);
+                    ImGui.SetCursorPosX(ImGui.GetWindowWidth() - letterSpace - padding * 2 + scrollAdjust);
                     if (ImGui.Button("Export"))
                     {
                         string json = group.ToJson();

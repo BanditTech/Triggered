@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -51,14 +52,27 @@ namespace Triggered.modules.wrapper
         /// <returns>True if valid JSON, False otherwise</returns>
         public static bool Validate(string json)
         {
-            using (var reader = new JsonTextReader(new StringReader(json)))
+            try
             {
-                while (reader.Read())
+                using (var reader = new JsonTextReader(new StringReader(json)))
                 {
-                    // Do nothing
+                    while (reader.Read())
+                    {
+                        // Do nothing
+                    }
+                    // if the final token is None, we have a valid string.
+                    return reader.TokenType == JsonToken.None;
                 }
-                // if the final token is None, we have a valid string.
-                return reader.TokenType == JsonToken.None;
+            }
+            catch (JsonReaderException)
+            {
+                // Return false if there is a JSON reader exception.
+                return false;
+            }
+            catch (Exception)
+            {
+                // Handle any other exceptions here.
+                return false;
             }
         }
         /// <summary>
