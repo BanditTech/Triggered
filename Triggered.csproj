@@ -32,7 +32,6 @@
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.7.0.5276" />
     <PackageReference Include="Emgu.CV.UI" Version="4.7.0.5276" />
     <PackageReference Include="ImGui.NET" Version="1.89.5" />
-    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.1.4" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
