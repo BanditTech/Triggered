@@ -199,7 +199,7 @@ namespace Triggered
             string win1 = "Primary Screen Capture Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             var options = App.Options.DemoCV;
-            var filteredChannelsInput = new VectorOfMat();
+            using var filteredChannelsInput = new VectorOfMat();
 
             // We create our named window
             CvInvoke.NamedWindow(win1);
@@ -259,7 +259,6 @@ namespace Triggered
                     {
                         channel.Dispose();
                     }
-                    filteredChannelsInput.Clear();
                 }
             }
             CvInvoke.DestroyWindow(win1);
