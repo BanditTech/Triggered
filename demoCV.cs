@@ -127,7 +127,7 @@ namespace Triggered
             string win1 = "Primary Screen Capture BW";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             using Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height);
-            using Mat frame = new Mat(screenBounds.Height / 2, screenBounds.Width / 2, DepthType.Cv8U, 3);
+            using Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3);
             using Mat screenMat = new Mat();
             var options = App.Options.DemoCV;
 
@@ -198,10 +198,6 @@ namespace Triggered
             // Construct our variables with `using` when possible
             string win1 = "Primary Screen Capture Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            using Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height);
-            using Mat frame = new Mat(screenBounds.Height / 2, screenBounds.Width / 2, DepthType.Cv8U, 3);
-            using Mat screenMat = new Mat();
-            using Mat filteredMat = new Mat();
             var options = App.Options.DemoCV;
 
             // We create our named window
@@ -210,45 +206,56 @@ namespace Triggered
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                var min1 = options.GetKey<int>("minFilterColorR");
-                var max1 = options.GetKey<int>("maxFilterColorR");
-                var min2 = options.GetKey<int>("minFilterColorG");
-                var max2 = options.GetKey<int>("maxFilterColorG");
-                var min3 = options.GetKey<int>("minFilterColorB");
-                var max3 = options.GetKey<int>("maxFilterColorB");
+                var min1 = 45;
+                var max1 = 45;
+                var min2 = 45;
+                var max2 = 45;
+                var min3 = 45;
+                var max3 = 45;
 
-                using (Graphics graphicAdjust = Graphics.FromImage(screenBitmap))
+
+                using (Mat screenMat = new Mat())
                 {
-                    graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
-                    BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                    using (Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height))
+                    {
+                        using (Graphics graphicAdjust = Graphics.FromImage(screenBitmap))
+                        {
+                            graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
+                            BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                        }
+                    }
+
+                    // Split the input Mat into its three channels
+                    Mat[] channels = screenMat.Split(); // ==> channels
+
+                    // Apply the specified color range to each channel
+                    ApplyColorFilter(ref channels[2], min1, max1);
+                    ApplyColorFilter(ref channels[1], min2, max2);
+                    ApplyColorFilter(ref channels[0], min3, max3);
+                    // Create an input array of arrays from the filtered color channels
+                    using (IInputArrayOfArrays filteredChannelsInput = new VectorOfMat(channels)) // ==> filteredChannelsInput
+                    {
+                        using (Mat filteredMat = new Mat())
+                        {
+                            // Merge the channels back into a single Mat
+                            CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
+                            // Resize the captured screen image
+                            using (Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3))
+                            {
+                                CvInvoke.Resize(filteredMat, frame, frame.Size);
+                                // Display the filtered image in the named window
+                                CvInvoke.Imshow(win1, frame);
+                            }
+                        }
+                    }
+                    channels = null;
                 }
-
-                // Split the input Mat into its three channels
-                Mat[] channels = screenMat.Split(); // ==> channels
-
-                // Apply the specified color range to each channel
-                ApplyColorFilter(channels[2], min1, max1);
-                ApplyColorFilter(channels[1], min2, max2);
-                ApplyColorFilter(channels[0], min3, max3);
-
-                // Create an input array of arrays from the filtered color channels
-                IInputArrayOfArrays filteredChannelsInput = new VectorOfMat(channels); // ==> filteredChannelsInput
-                channels = null;
-                // Merge the channels back into a single Mat
-                CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
-
-                // Resize the captured screen image and display it in the named window
-                CvInvoke.Resize(filteredMat, frame, frame.Size);
-
-                // Display the filtered image in the named window
-                CvInvoke.Imshow(win1, frame);
             }
-
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustColor", false);
         }
 
-        private static void ApplyColorFilter(Mat channel, int min, int max)
+        private static void ApplyColorFilter(ref Mat channel, int min, int max)
         {
             // Threshold the channel based on the specified color range
             CvInvoke.InRange(channel, new ScalarArray(min), new ScalarArray(max), channel);
