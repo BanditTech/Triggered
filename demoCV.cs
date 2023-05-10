@@ -2,18 +2,25 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
+using Emgu.CV.Util;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
 using ImGuiNET;
-using System.Linq;
-using System.Collections.Immutable;
-using Emgu.CV.Util;
 
 namespace Triggered
 {
+    /// <summary>
+    /// This class is a demonstration of what methods we can use from OpenCV using Emgu.CV.
+    /// Simple sections without controls only need to be called once.
+    /// For sections using ImGui controls, you will need to seperate them into another thread.
+    /// Follow the same formula as the other menus, do not try to open ImGui inside a thread with Forms.
+    /// </summary>
     public static class demoCV
     {
+        /// <summary>
+        /// Shows a blue screen with Hello, World
+        /// </summary>
         public static void ShowBlue()
         {
             //Create a 3 channel image of 400x200
@@ -51,6 +58,9 @@ namespace Triggered
                 }
             }
         }
+        /// <summary>
+        /// Displays the primary monitor with a wacky rectangle.
+        /// </summary>
         public static void Capture()
         {
             // Construct our variables with `using` when possible
@@ -121,6 +131,9 @@ namespace Triggered
             }
             CvInvoke.DestroyWindow(win1);
         }
+        /// <summary>
+        /// Displays a window of the Primary Monitor in black and white.
+        /// </summary>
         public static void AdjustBlackWhite()
         {
             // Construct our variables with `using` when possible
@@ -165,7 +178,9 @@ namespace Triggered
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustBW", false);
         }
-
+        /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
         public static void RenderBW()
         {
             ImGui.Begin("DemoCVBlackWhite");
@@ -193,6 +208,9 @@ namespace Triggered
 
             ImGui.End();
         }
+        /// <summary>
+        /// Displays a window of the Primary Monitor in color.
+        /// </summary>
         public static void AdjustColor()
         {
             // Construct our variables with `using` when possible
@@ -264,12 +282,20 @@ namespace Triggered
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustColor", false);
         }
-
+        /// <summary>
+        /// Applies the InRange filter to the matrix of colors.
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
         private static void ApplyColorFilter(ref Mat channel, int min, int max)
         {
             // Threshold the channel based on the specified color range
             CvInvoke.InRange(channel, new ScalarArray(min), new ScalarArray(max), channel);
         }
+        /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
         public static void RenderColor()
         {
             ImGui.Begin("DemoCVColor");
