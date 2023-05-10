@@ -43,6 +43,20 @@
                 }
             });
             optionThread.Start();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
+            {
+                Task.Run(() =>
+                {
+                    demoCV.AdjustBlackWhite();
+                });
+            }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
+            {
+                Task.Run(() =>
+                {
+                    demoCV.AdjustColor();
+                });
+            }
         }
         /// <summary>
         /// Logic operates 
@@ -53,7 +67,7 @@
         }
 
         /// <summary>
-        /// Render thread is run every frame
+        /// RenderBW thread is run every frame
         /// We can piggy back on the render thread for simple keybinds
         /// </summary>
         protected override void Render()
@@ -81,6 +95,10 @@
                 StashSorter.Render();
             if (App.Options.MainMenu.GetKey<bool>("Display_Log"))
                 RenderLogWindow();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
+                demoCV.RenderBW();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
+                demoCV.RenderColor();
 
             return;
         }
@@ -144,6 +162,24 @@
                     demoCV.Capture();
                 });
             }
+            if (ImGui.Button("Open B/W window"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustBW", true);
+                Task.Run(() =>
+                {
+                    demoCV.AdjustBlackWhite();
+                });
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Open Color window"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustColor", true);
+                Task.Run(() =>
+                {
+                    demoCV.AdjustColor();
+                });
+            }
+            ImGui.Separator();
 
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,

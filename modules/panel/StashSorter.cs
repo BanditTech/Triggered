@@ -1,12 +1,10 @@
 ﻿using ImGuiNET;
 using NLog;
 using System;
-using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Triggered.modules.wrapper;
 
 namespace Triggered.modules.panels
@@ -114,6 +112,9 @@ namespace Triggered.modules.panels
         }
         #endregion
 
+        /// <summary>
+        /// Primary ImGui menu loop for StashSorter
+        /// </summary>
         public static void Render()
         {
             var options = App.Options.StashSorter;
@@ -812,7 +813,7 @@ namespace Triggered.modules.panels
 
                     // Up/Down Button Section
                     bool filled = false;
-                    string up = filled ? "▲" + "↑" : "^";
+                    string   up = filled ? "▲" + "↑" : "^";
                     string down = filled ? "▼" + "↓" : "v";
                     var directionSpace = ImGui.CalcTextSize("  ").X;
                     ImGui.SameLine();
@@ -848,7 +849,7 @@ namespace Triggered.modules.panels
                 #endregion
 
                 // Only PopID after all logic is complete
-                ImGui.PopID();
+                    ImGui.PopID();
             }
             #endregion
             
@@ -856,6 +857,9 @@ namespace Triggered.modules.panels
                 App.Log("This should not display", NLog.LogLevel.Error);
         }
 
+        /// <summary>
+        /// Gives us a method for importing and exporting top level objects.
+        /// </summary>
         static void DrawMenuBar()
         {
             if (ImGui.BeginMenuBar())
