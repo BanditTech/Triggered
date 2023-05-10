@@ -199,6 +199,7 @@ namespace Triggered
             string win1 = "Primary Screen Capture Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             var options = App.Options.DemoCV;
+            var filteredChannelsInput = new VectorOfMat();
 
             // We create our named window
             CvInvoke.NamedWindow(win1);
@@ -206,13 +207,12 @@ namespace Triggered
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                var min1 = 45;
-                var max1 = 45;
-                var min2 = 45;
-                var max2 = 45;
-                var min3 = 45;
-                var max3 = 45;
-
+                var min1 = options.GetKey<int>("minFilterColorR");
+                var max1 = options.GetKey<int>("maxFilterColorR");
+                var min2 = options.GetKey<int>("minFilterColorG");
+                var max2 = options.GetKey<int>("maxFilterColorG");
+                var min3 = options.GetKey<int>("minFilterColorB");
+                var max3 = options.GetKey<int>("maxFilterColorB");
 
                 using (Mat screenMat = new Mat())
                 {
@@ -232,23 +232,34 @@ namespace Triggered
                     ApplyColorFilter(ref channels[2], min1, max1);
                     ApplyColorFilter(ref channels[1], min2, max2);
                     ApplyColorFilter(ref channels[0], min3, max3);
-                    // Create an input array of arrays from the filtered color channels
-                    using (IInputArrayOfArrays filteredChannelsInput = new VectorOfMat(channels)) // ==> filteredChannelsInput
+
+                    // Set the channels to the VectorOfMat object
+                    filteredChannelsInput.Clear();
+                    foreach (var channel in channels)
                     {
-                        using (Mat filteredMat = new Mat())
+                        filteredChannelsInput.Push(channel);
+                    }
+
+                    // Merge the channels back into a single Mat
+                    using (Mat filteredMat = new Mat())
+                    {
+                        CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
+
+                        // Resize the captured screen image
+                        using (Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3))
                         {
-                            // Merge the channels back into a single Mat
-                            CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
-                            // Resize the captured screen image
-                            using (Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3))
-                            {
-                                CvInvoke.Resize(filteredMat, frame, frame.Size);
-                                // Display the filtered image in the named window
-                                CvInvoke.Imshow(win1, frame);
-                            }
+                            CvInvoke.Resize(filteredMat, frame, frame.Size);
+                            // Display the filtered image in the named window
+                            CvInvoke.Imshow(win1, frame);
                         }
                     }
-                    channels = null;
+
+                    // Release the memory used by the channels and clear the VectorOfMat object
+                    foreach (var channel in channels)
+                    {
+                        channel.Dispose();
+                    }
+                    filteredChannelsInput.Clear();
                 }
             }
             CvInvoke.DestroyWindow(win1);
