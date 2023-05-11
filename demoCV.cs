@@ -220,7 +220,6 @@ namespace Triggered
             string win1 = "Primary Screen Capture Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             var options = App.Options.DemoCV;
-            using var filteredChannelsInput = new VectorOfMat();
 
             // We create our named window
             CvInvoke.NamedWindow(win1);
@@ -228,19 +227,9 @@ namespace Triggered
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                var filterUp = options.GetKey<int>("filterUp");
-                var filterDown = options.GetKey<int>("filterDown");
+                float up = options.GetKey<float>("filterup");
+                float down = options.GetKey<float>("filterdown");
                 Vector3 filterColor = options.GetKey<Vector3>("filterColorRGB");
-
-                // R Value up/down
-                var min1 = Math.Clamp(filterColor.X - filterDown / 255, 0f, 1f);
-                var max1 = Math.Clamp(filterColor.X + filterUp / 255, 0f, 1f);
-                // G Value up/down
-                var min2 = Math.Clamp(filterColor.Y - filterDown / 255, 0f, 1f);
-                var max2 = Math.Clamp(filterColor.Y + filterUp / 255, 0f, 1f);
-                // B Value up/down
-                var min3 = Math.Clamp(filterColor.Z - filterDown / 255, 0f, 1f);
-                var max3 = Math.Clamp(filterColor.Z + filterUp / 255, 0f, 1f);
 
                 using (Mat screenMat = new Mat())
                 {
@@ -250,39 +239,46 @@ namespace Triggered
                         {
                             graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
                             BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                            graphicAdjust.Dispose();
                         }
+                        screenBitmap.Dispose();
                     }
 
                     // Split the input Mat into its three channels
                     Mat[] channels = screenMat.Split(); // ==> channels
 
                     // Apply the specified color range to each channel
-                    CvInvoke.InRange(channels[2], new ScalarArray(min1), new ScalarArray(max1), channels[2]);
-                    CvInvoke.InRange(channels[1], new ScalarArray(min2), new ScalarArray(max2), channels[1]);
-                    CvInvoke.InRange(channels[0], new ScalarArray(min3), new ScalarArray(max3), channels[0]);
+                    CvInvoke.InRange(channels[2], new ScalarArray(Math.Clamp((filterColor.X - down), 0f, 1f)), new ScalarArray(Math.Clamp((filterColor.X + up), 0f, 1f)), channels[2]);
+                    CvInvoke.InRange(channels[1], new ScalarArray(Math.Clamp((filterColor.Y - down), 0f, 1f)), new ScalarArray(Math.Clamp((filterColor.Y + up), 0f, 1f)), channels[1]);
+                    CvInvoke.InRange(channels[0], new ScalarArray(Math.Clamp((filterColor.Z - down), 0f, 1f)), new ScalarArray(Math.Clamp((filterColor.Z + up), 0f, 1f)), channels[0]);
 
-                    // Set the channels to the VectorOfMat object
-                    filteredChannelsInput.Clear();
-                    foreach (var channel in channels)
-                        filteredChannelsInput.Push(channel);
-
-                    // Merge the channels back into a single Mat
-                    using (Mat filteredMat = new Mat())
+                    using (var filteredChannelsInput = new VectorOfMat())
                     {
-                        CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
-
-                        // Resize the captured screen image
-                        using (Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3))
+                        // Set the channels to the VectorOfMat object
+                        filteredChannelsInput.Clear();
+                        foreach (var channel in channels)
+                            filteredChannelsInput.Push(channel);
+                        // Release the memory used by the channels and clear the VectorOfMat object
+                        foreach (var channel in channels)
+                            channel.Dispose();
+                        // Merge the channels back into a single Mat
+                        using (Mat filteredMat = new Mat())
                         {
-                            CvInvoke.Resize(filteredMat, frame, frame.Size);
-                            // Display the filtered image in the named window
-                            CvInvoke.Imshow(win1, frame);
-                        }
-                    }
+                            CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
 
-                    // Release the memory used by the channels and clear the VectorOfMat object
-                    foreach (var channel in channels)
-                        channel.Dispose();
+                            // Resize the captured screen image
+                            using (Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3))
+                            {
+                                CvInvoke.Resize(filteredMat, frame, frame.Size);
+                                // Display the filtered image in the named window
+                                CvInvoke.Imshow(win1, frame);
+                                frame.Dispose();
+                            }
+                            filteredMat.Dispose();
+                        }
+                        filteredChannelsInput.Dispose();
+                    }
+                    screenMat.Dispose();
                 }
             }
             CvInvoke.DestroyWindow(win1);
@@ -298,14 +294,14 @@ namespace Triggered
             // This sets up an options for the DemoCV methods.
             var options = App.Options.DemoCV;
             // Get the current values from options
-            var up = options.GetKey<int>("filterup");
-            var down = options.GetKey<int>("filterdown");
+            var up = options.GetKey<float>("filterup");
+            var down = options.GetKey<float>("filterdown");
             var color = options.GetKey<Vector3>("filterColorRGB");
 
             // Adjustable range sliders from the base color
-            if (ImGui.SliderInt("Included Below", ref down, 0, 255))
+            if (ImGui.SliderFloat("Included Below", ref down, 0f, 1f))
                 options.SetKey("filterdown", down);
-            if (ImGui.SliderInt("Included Above", ref up, 0, 255))
+            if (ImGui.SliderFloat("Included Above", ref up, 0f, 1f))
                 options.SetKey("filterup", up);
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Color", ref color))
