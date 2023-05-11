@@ -4,9 +4,11 @@
     using NLog.Config;
     using System.Collections.Generic;
     using System.IO;
+    using System.Numerics;
     using System.Threading.Tasks;
     using Triggered.modules.options;
     using Triggered.modules.panels;
+    using Triggered.modules.wrapper;
 
     /// <summary>
     /// The is the main hub for the application.
@@ -48,12 +50,12 @@
             Directory.CreateDirectory("save");
             Directory.CreateDirectory("profile");
             // Load our Options before anything else
-            App.Options.Load();
-            // Now we can start our ImGui LogWindow
-            logimgui = new LogWindow();
-            // NLog requires some setup to begin logging to file
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logger = LogManager.GetCurrentClassLogger();
+            logimgui = new LogWindow();
+            App.Options.Load();
+            // Now we can start our ImGui LogWindow
+            // NLog requires some setup to begin logging to file
         }
 
         #region Log(string log, LogLevel level)

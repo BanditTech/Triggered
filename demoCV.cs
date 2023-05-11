@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using ImGuiNET;
+using System.Numerics;
 
 namespace Triggered
 {
@@ -225,12 +226,30 @@ namespace Triggered
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                var min1 = options.GetKey<int>("minFilterColorR");
-                var max1 = options.GetKey<int>("maxFilterColorR");
-                var min2 = options.GetKey<int>("minFilterColorG");
-                var max2 = options.GetKey<int>("maxFilterColorG");
-                var min3 = options.GetKey<int>("minFilterColorB");
-                var max3 = options.GetKey<int>("maxFilterColorB");
+                var filterUp = options.GetKey<int>("filterUp");
+                var filterDown = options.GetKey<int>("filterDown");
+                var filterColor = new Vector3(options.GetKey<float>("filterColorRGB.X"), options.GetKey<float>("filterColorRGB.Y"), options.GetKey<float>("filterColorRGB.Z"));
+
+
+                var min1 = filterColor.X - filterDown;
+                var max1 = filterColor.X + filterUp;
+                var min2 = filterColor.Y - filterDown;
+                var max2 = filterColor.Y + filterUp;
+                var min3 = filterColor.Z - filterDown;
+                var max3 = filterColor.Z + filterUp;
+
+                if (min1 < 0)
+                    min1 = 0;
+                if (min2 < 0)
+                    min2 = 0;
+                if (min3 < 0)
+                    min3 = 0;
+                if (max1 > 255)
+                    max1 = 255;
+                if (max2 > 255)
+                    max2 = 255;
+                if (max3 > 255)
+                    max3 = 255;
 
                 using (Mat screenMat = new Mat())
                 {
@@ -247,9 +266,9 @@ namespace Triggered
                     Mat[] channels = screenMat.Split(); // ==> channels
 
                     // Apply the specified color range to each channel
-                    ApplyColorFilter(ref channels[2], min1, max1);
-                    ApplyColorFilter(ref channels[1], min2, max2);
-                    ApplyColorFilter(ref channels[0], min3, max3);
+                    ApplyColorFilter(ref channels[2], (int)min1, (int)max1);
+                    ApplyColorFilter(ref channels[1], (int)min2, (int)max2);
+                    ApplyColorFilter(ref channels[0], (int)min3, (int)max3);
 
                     // Set the channels to the VectorOfMat object
                     filteredChannelsInput.Clear();
@@ -283,6 +302,37 @@ namespace Triggered
             options.SetKey("Display_AdjustColor", false);
         }
         /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
+        public static void RenderColor()
+        {
+            ImGui.Begin("DemoCVColor");
+
+            // This sets up an options for the DemoCV methods.
+            var options = App.Options.DemoCV;
+            // Get the current values from options
+            var up = options.GetKey<int>("filterup");
+            var down = options.GetKey<int>("filterdown");
+            var color = options.GetKey<Vector3>("filterColorRGB");
+
+            if (ImGui.SliderInt("Included Below", ref down, 0, 255))
+            {
+                options.SetKey("filterdown", down);
+            }
+            if (ImGui.SliderInt("Included Above", ref up, 0, 255))
+            {
+                options.SetKey("filterup", up);
+            }
+            // Render colorpicker widget
+            if (ImGui.ColorPicker3("Filter Color", ref color))
+            {
+                options.SetKey("filterColorRGB", color);
+            }
+
+            ImGui.End();
+        }
+
+        /// <summary>
         /// Applies the InRange filter to the matrix of colors.
         /// </summary>
         /// <param name="channel"></param>
@@ -293,76 +343,5 @@ namespace Triggered
             // Threshold the channel based on the specified color range
             CvInvoke.InRange(channel, new ScalarArray(min), new ScalarArray(max), channel);
         }
-        /// <summary>
-        /// ImGui menu for adjusting the Min/Max match values.
-        /// </summary>
-        public static void RenderColor()
-        {
-            ImGui.Begin("DemoCVColor");
-
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
-
-            // Get the current R, G, B min/max values from options
-            var minR = options.GetKey<int>("minFilterColorR");
-            var maxR = options.GetKey<int>("maxFilterColorR");
-            var minG = options.GetKey<int>("minFilterColorG");
-            var maxG = options.GetKey<int>("maxFilterColorG");
-            var minB = options.GetKey<int>("minFilterColorB");
-            var maxB = options.GetKey<int>("maxFilterColorB");
-
-            // Render R channel sliders
-            if (ImGui.SliderInt("Min R", ref minR, 0, 255))
-            {
-                if (minR < maxR)
-                    options.SetKey("minFilterColorR", minR);
-                else
-                    minR = maxR - 1;
-            }
-            if (ImGui.SliderInt("Max R", ref maxR, 0, 255))
-            {
-                if (maxR > minR)
-                    options.SetKey("maxFilterColorR", maxR);
-                else
-                    maxR = minR + 1;
-            }
-            ImGui.Separator();
-
-            // Render G channel sliders
-            if (ImGui.SliderInt("Min G", ref minG, 0, 255))
-            {
-                if (minG < maxG)
-                    options.SetKey("minFilterColorG", minG);
-                else
-                    minG = maxG - 1;
-            }
-            if (ImGui.SliderInt("Max G", ref maxG, 0, 255))
-            {
-                if (maxG > minG)
-                    options.SetKey("maxFilterColorG", maxG);
-                else
-                    maxG = minG + 1;
-            }
-            ImGui.Separator();
-
-            // Render B channel sliders
-            if (ImGui.SliderInt("Min B", ref minB, 0, 255))
-            {
-                if (minB < maxB)
-                    options.SetKey("minFilterColorB", minB);
-                else
-                    minB = maxB - 1;
-            }
-            if (ImGui.SliderInt("Max B", ref maxB, 0, 255))
-            {
-                if (maxB > minB)
-                    options.SetKey("maxFilterColorB", maxB);
-                else
-                    maxB = minB + 1;
-            }
-
-            ImGui.End();
-        }
-
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Triggered.modules.options
+﻿using System.Numerics;
+
+namespace Triggered.modules.options
 {
     /// <summary>
     /// Options class for the Demo CV.
@@ -15,18 +17,13 @@
             // Slider values
             SetKey("minFilterBlackWhite", 67);
             SetKey("maxFilterBlackWhite", 187);
+            SetKey("This.Key.Name", false);
+            SetKey("filterColorRGB", new Vector3(0.5f, 0.5f, 0.5f));
+            SetKey("filterup", 60);
+            SetKey("filterdown", 60);
             // visibility
             SetKey("Display_AdjustBW",false);
-            // Slider values
-            SetKey("minFilterColorR", 67);
-            SetKey("maxFilterColorR", 187);
-            SetKey("minFilterColorG", 67);
-            SetKey("maxFilterColorG", 187);
-            SetKey("minFilterColorB", 67);
-            SetKey("maxFilterColorB", 187);
-            // visibility
             SetKey("Display_AdjustColor",false);
-
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

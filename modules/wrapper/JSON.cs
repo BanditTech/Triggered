@@ -12,8 +12,7 @@ namespace Triggered.modules.wrapper
     {
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings
         {
-            Formatting = Formatting.Indented,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            Formatting = Formatting.Indented
         };
         /// <summary>
         /// Convert an object into a string.

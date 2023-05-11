@@ -1,8 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Emgu.CV.Flann;
+using ImGuiNET;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.Intrinsics;
 using Triggered.modules.wrapper;
 
 namespace Triggered.modules.options
@@ -42,72 +48,23 @@ namespace Triggered.modules.options
         /// <param name="keys">string</param>
         /// <param name="value">dynamic</param>
         /// <exception cref="ArgumentException"></exception>
-        public void SetKey(string keys, object value)
+        public void SetKey(string key, object value)
         {
-            int index;
-            string[] keyArray = keys.Split('.');
+            string[] keyArray = key.Split('.');
             JToken target = keyList;
             for (int i = 0; i < keyArray.Length - 1; i++)
             {
-                var key = keyArray[i];
-                var next = keyArray[i + 1];
-                if (target.Type == JTokenType.Array && int.TryParse(key, out index))
+                string currentKey = keyArray[i];
+                if (target[currentKey] == null)
                 {
-                    if (target[index] == null || target[index].Type == JTokenType.Null)
-                    {
-                        bool willInt = int.TryParse(next, out int _);
-                        target[index] = willInt ? new JArray(new object[20]) : new JObject();
-                    }
-                    target = target[index];
-                    continue;
+                    target[currentKey] = new JObject();
                 }
-                else if (target[key] == null)
-                {
-                    bool willInt = int.TryParse(next, out int _);
-                    target[key] = willInt ? new JArray(new object[20]) : new JObject();
-                }
-                target = target[key];
+                target = target[currentKey];
             }
-
-            // Determine if we are changing the value
-            switch (value)
-            {
-                case string stringValue:
-                    if (GetKey<string>(keys) != stringValue)
-                        _changed = true;
-                    break;
-                case int intValue:
-                    if (GetKey<int>(keys) != intValue)
-                        _changed = true;
-                    break;
-                case float floatValue:
-                    if (GetKey<float>(keys) != floatValue)
-                        _changed = true;
-                    break;
-                case bool boolValue:
-                    if (GetKey<bool>(keys) != boolValue)
-                        _changed = true;
-                    break;
-                case Vector4 v4Value:
-                    if (GetKey<Vector4>(keys) != v4Value)
-                        _changed = true;
-                    break;
-                default:
-                    _changed = true;
-                    break;
-            }
-
-            // Set the key to the value depending on type
-            if (target.Type == JTokenType.Array)
-            {
-                if (int.TryParse(keyArray.Last(), out index))
-                    target[index] = JToken.FromObject(value);
-                else
-                    throw new ArgumentException("The target is an Array but the index is not valid");
-            }
-            else
-                target[keyArray.Last()] = JToken.FromObject(value);
+            _changed = true;
+            target[keyArray.Last()] = JToken.FromObject(value);
         }
+
         /// <summary>
         /// Navigate the object structure using the dot notation keys string.<br/>
         /// You must state the type of the value which you are retrieving.
@@ -146,11 +103,24 @@ namespace Triggered.modules.options
 
             if (typeof(T) == typeof(Vector4) && value is JObject obj)
             {
-                var x = obj.GetValue("x").Value<float>();
-                var y = obj.GetValue("y").Value<float>();
-                var z = obj.GetValue("z").Value<float>();
-                var w = obj.GetValue("w").Value<float>();
+                var x = obj.GetValue("X").Value<float>();
+                var y = obj.GetValue("Y").Value<float>();
+                var z = obj.GetValue("Z").Value<float>();
+                var w = obj.GetValue("W").Value<float>();
                 return (T)(object)new Vector4(x, y, z, w);
+            }
+            else if (typeof(T) == typeof(Vector3) && value is JObject obj3)
+            {
+                var x = obj3.GetValue("X").Value<float>();
+                var y = obj3.GetValue("Y").Value<float>();
+                var z = obj3.GetValue("Z").Value<float>();
+                return (T)(object)new Vector3(x, y, z);
+            }
+            else if (typeof(T) == typeof(Vector3) && value is JObject obj2)
+            {
+                var x = obj2.GetValue("X").Value<float>();
+                var y = obj2.GetValue("Y").Value<float>();
+                return (T)(object)new Vector2(x, y);
             }
 
             if (value.Type == JTokenType.String)
@@ -227,6 +197,7 @@ namespace Triggered.modules.options
             var defaultOptions = Activator.CreateInstance(GetType());
             var saveObject = new JObject();
             CompareValuesAndAddToSaveFile(keyList, ((Options)defaultOptions).keyList, saveObject);
+            //return keyList;
             return saveObject;
         }
         /// <summary>
@@ -237,25 +208,29 @@ namespace Triggered.modules.options
         /// <param name="defaultObject">JToken</param>
         /// <param name="saveObject">JObject</param>
         /// <param name="depth">string</param>
-        private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JObject saveObject, string depth = "")
+        private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JToken saveObject)
         {
             if (currentObject.Type == JTokenType.Object)
             {
                 foreach (var prop in currentObject.Children<JProperty>())
                 {
-                    var path = string.IsNullOrEmpty(depth) ? prop.Name : $"{depth}.{prop.Name}";
                     var currentValue = prop.Value;
                     var defaultValue = defaultObject[prop.Name];
                     if (!JToken.DeepEquals(currentValue, defaultValue))
                     {
-                        if (currentValue.Type == JTokenType.Object)
+                        if (currentValue.Type == JTokenType.Array)
                         {
-                            saveObject.Add(prop.Name, new JObject());
-                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)saveObject[prop.Name], path);
+                            ((JObject)saveObject).Add(prop.Name, new JArray());
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, saveObject[prop.Name]);
+                        }
+                        else if (currentValue.Type == JTokenType.Object)
+                        {
+                            ((JObject)saveObject).Add(prop.Name, new JObject());
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, saveObject[prop.Name]);
                         }
                         else
                         {
-                            saveObject.Add(path, currentValue);
+                            ((JObject)saveObject).Add(prop.Name, currentValue);
                         }
                     }
                 }
@@ -264,20 +239,24 @@ namespace Triggered.modules.options
             {
                 for (int i = 0; i < currentObject.Count(); i++)
                 {
-                    var path = $"{depth}.{i}";
                     var currentValue = currentObject[i];
                     var defaultValue = defaultObject[i];
                     if (!JToken.DeepEquals(currentValue, defaultValue))
                     {
                         // We have a difference in JToken, determine type
-                        if (currentValue.Type == JTokenType.Object)
+                        if (currentValue.Type == JTokenType.Array)
                         {
-                            saveObject.Add(path, new JObject());
-                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, (JObject)saveObject[path], path);
+                            saveObject[i] = new JArray();
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, saveObject[i]);
+                        }
+                        else if (currentValue.Type == JTokenType.Object)
+                        {
+                            saveObject[i] = new JObject();
+                            CompareValuesAndAddToSaveFile(currentValue, defaultValue, saveObject[i]);
                         }
                         else
                         {
-                            saveObject.Add(path, currentValue);
+                            saveObject[i] = currentValue;
                         }
                     }
                 }
