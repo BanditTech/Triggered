@@ -248,9 +248,9 @@ namespace Triggered
                     Mat[] channels = screenMat.Split(); // ==> channels
 
                     // Apply the specified color range to each channel
-                    CvInvoke.InRange(channels[2], new ScalarArray(Math.Clamp((filterColor.X - down), 0f, 1f)), new ScalarArray(Math.Clamp((filterColor.X + up), 0f, 1f)), channels[2]);
-                    CvInvoke.InRange(channels[1], new ScalarArray(Math.Clamp((filterColor.Y - down), 0f, 1f)), new ScalarArray(Math.Clamp((filterColor.Y + up), 0f, 1f)), channels[1]);
-                    CvInvoke.InRange(channels[0], new ScalarArray(Math.Clamp((filterColor.Z - down), 0f, 1f)), new ScalarArray(Math.Clamp((filterColor.Z + up), 0f, 1f)), channels[0]);
+                    CvInvoke.InRange(channels[2], new ScalarArray(Math.Clamp((filterColor.X - down)*255, 0, 255)), new ScalarArray(Math.Clamp((filterColor.X + up)*255, 0, 255)), channels[2]);
+                    CvInvoke.InRange(channels[1], new ScalarArray(Math.Clamp((filterColor.Y - down)*255, 0, 255)), new ScalarArray(Math.Clamp((filterColor.Y + up)*255, 0, 255)), channels[1]);
+                    CvInvoke.InRange(channels[0], new ScalarArray(Math.Clamp((filterColor.Z - down)*255, 0, 255)), new ScalarArray(Math.Clamp((filterColor.Z + up)*255, 0, 255)), channels[0]);
 
                     using (var filteredChannelsInput = new VectorOfMat())
                     {
