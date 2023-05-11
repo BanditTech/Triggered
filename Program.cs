@@ -9,7 +9,7 @@
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
         static async Task Main()
         {
-            using var overlay = new TriggeredMenu();
+            using var overlay = new MainMenu();
             try
             {
                 await overlay.Run();

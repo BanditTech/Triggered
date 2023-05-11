@@ -8,6 +8,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using ImGuiNET;
 using System.Numerics;
+using Emgu.CV.Reg;
+using System.Threading.Channels;
 
 namespace Triggered
 {
@@ -226,30 +228,16 @@ namespace Triggered
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                var filterUp = options.GetKey<int>("filterUp");
-                var filterDown = options.GetKey<int>("filterDown");
-                var filterColor = new Vector3(options.GetKey<float>("filterColorRGB.X"), options.GetKey<float>("filterColorRGB.Y"), options.GetKey<float>("filterColorRGB.Z"));
+                var filterUp = options.GetKey<float>("filterUp");
+                var filterDown = options.GetKey<float>("filterDown");
+                Vector3 filterColor = options.GetKey<Vector3>("filterColorRGB");
 
-
-                var min1 = filterColor.X - filterDown;
-                var max1 = filterColor.X + filterUp;
-                var min2 = filterColor.Y - filterDown;
-                var max2 = filterColor.Y + filterUp;
-                var min3 = filterColor.Z - filterDown;
-                var max3 = filterColor.Z + filterUp;
-
-                if (min1 < 0)
-                    min1 = 0;
-                if (min2 < 0)
-                    min2 = 0;
-                if (min3 < 0)
-                    min3 = 0;
-                if (max1 > 255)
-                    max1 = 255;
-                if (max2 > 255)
-                    max2 = 255;
-                if (max3 > 255)
-                    max3 = 255;
+                var min1 = Math.Clamp(filterColor.X - filterDown, 0, 1);
+                var max1 = Math.Clamp(filterColor.X + filterUp, 0, 1);
+                var min2 = Math.Clamp(filterColor.Y - filterDown, 0, 1);
+                var max2 = Math.Clamp(filterColor.Y + filterUp, 0, 1);
+                var min3 = Math.Clamp(filterColor.Z - filterDown, 0, 1);
+                var max3 = Math.Clamp(filterColor.Z + filterUp, 0, 1);
 
                 using (Mat screenMat = new Mat())
                 {
@@ -266,9 +254,9 @@ namespace Triggered
                     Mat[] channels = screenMat.Split(); // ==> channels
 
                     // Apply the specified color range to each channel
-                    ApplyColorFilter(ref channels[2], (int)min1, (int)max1);
-                    ApplyColorFilter(ref channels[1], (int)min2, (int)max2);
-                    ApplyColorFilter(ref channels[0], (int)min3, (int)max3);
+                    CvInvoke.InRange(channels[0], new ScalarArray(min1), new ScalarArray(max1), channels[0]);
+                    CvInvoke.InRange(channels[1], new ScalarArray(min2), new ScalarArray(max2), channels[1]);
+                    CvInvoke.InRange(channels[2], new ScalarArray(min3), new ScalarArray(max3), channels[2]);
 
                     // Set the channels to the VectorOfMat object
                     filteredChannelsInput.Clear();
@@ -311,37 +299,20 @@ namespace Triggered
             // This sets up an options for the DemoCV methods.
             var options = App.Options.DemoCV;
             // Get the current values from options
-            var up = options.GetKey<int>("filterup");
-            var down = options.GetKey<int>("filterdown");
+            var up = options.GetKey<float>("filterup");
+            var down = options.GetKey<float>("filterdown");
             var color = options.GetKey<Vector3>("filterColorRGB");
 
-            if (ImGui.SliderInt("Included Below", ref down, 0, 255))
-            {
+            // Adjustable range sliders from the base color
+            if (ImGui.SliderFloat("Included Below", ref down, 0, 1))
                 options.SetKey("filterdown", down);
-            }
-            if (ImGui.SliderInt("Included Above", ref up, 0, 255))
-            {
+            if (ImGui.SliderFloat("Included Above", ref up, 0, 1))
                 options.SetKey("filterup", up);
-            }
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Color", ref color))
-            {
                 options.SetKey("filterColorRGB", color);
-            }
 
             ImGui.End();
-        }
-
-        /// <summary>
-        /// Applies the InRange filter to the matrix of colors.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        private static void ApplyColorFilter(ref Mat channel, int min, int max)
-        {
-            // Threshold the channel based on the specified color range
-            CvInvoke.InRange(channel, new ScalarArray(min), new ScalarArray(max), channel);
         }
     }
 }

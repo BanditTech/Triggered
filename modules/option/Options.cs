@@ -48,21 +48,45 @@ namespace Triggered.modules.options
         /// <param name="keys">string</param>
         /// <param name="value">dynamic</param>
         /// <exception cref="ArgumentException"></exception>
-        public void SetKey(string key, object value)
+        public void SetKey(string keys, object value)
         {
-            string[] keyArray = key.Split('.');
+            int index;
+            string[] keyArray = keys.Split('.');
             JToken target = keyList;
             for (int i = 0; i < keyArray.Length - 1; i++)
             {
-                string currentKey = keyArray[i];
-                if (target[currentKey] == null)
+                var key = keyArray[i];
+                var next = keyArray[i + 1];
+                if (target.Type == JTokenType.Array && int.TryParse(key, out index))
                 {
-                    target[currentKey] = new JObject();
+                    if (target[index] == null || target[index].Type == JTokenType.Null)
+                    {
+                        bool willInt = int.TryParse(next, out int _);
+                        target[index] = willInt ? new JArray(new object[20]) : new JObject();
+                    }
+                    target = target[index];
+                    continue;
                 }
-                target = target[currentKey];
+                else if (target[key] == null)
+                {
+                    bool willInt = int.TryParse(next, out int _);
+                    target[key] = willInt ? new JArray(new object[20]) : new JObject();
+                }
+                target = target[key];
             }
+
             _changed = true;
-            target[keyArray.Last()] = JToken.FromObject(value);
+
+            // Set the key to the value depending on type
+            if (target.Type == JTokenType.Array)
+            {
+                if (int.TryParse(keyArray.Last(), out index))
+                    target[index] = JToken.FromObject(value);
+                else
+                    throw new ArgumentException("The target is an Array but the index is not valid");
+            }
+            else
+                target[keyArray.Last()] = JToken.FromObject(value);
         }
 
         /// <summary>
@@ -101,12 +125,12 @@ namespace Triggered.modules.options
             if (value == null)
                 return default;
 
-            if (typeof(T) == typeof(Vector4) && value is JObject obj)
+            if (typeof(T) == typeof(Vector4) && value is JObject obj4)
             {
-                var x = obj.GetValue("X").Value<float>();
-                var y = obj.GetValue("Y").Value<float>();
-                var z = obj.GetValue("Z").Value<float>();
-                var w = obj.GetValue("W").Value<float>();
+                var x = obj4.GetValue("X").Value<float>();
+                var y = obj4.GetValue("Y").Value<float>();
+                var z = obj4.GetValue("Z").Value<float>();
+                var w = obj4.GetValue("W").Value<float>();
                 return (T)(object)new Vector4(x, y, z, w);
             }
             else if (typeof(T) == typeof(Vector3) && value is JObject obj3)
@@ -197,7 +221,8 @@ namespace Triggered.modules.options
             var defaultOptions = Activator.CreateInstance(GetType());
             var saveObject = new JObject();
             CompareValuesAndAddToSaveFile(keyList, ((Options)defaultOptions).keyList, saveObject);
-            //return keyList;
+            // Remember to trim the Array which have been initialized to 20 objects!
+            TrimNullValues(saveObject);
             return saveObject;
         }
         /// <summary>
@@ -210,17 +235,22 @@ namespace Triggered.modules.options
         /// <param name="depth">string</param>
         private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JToken saveObject)
         {
+            // This first logic block determines if the currentObject is an JArray or JObject
             if (currentObject.Type == JTokenType.Object)
             {
+                // Inside this block we know we are dealing with a JObject (Dict style)
                 foreach (var prop in currentObject.Children<JProperty>())
                 {
+
                     var currentValue = prop.Value;
                     var defaultValue = defaultObject[prop.Name];
+                    if (defaultValue == null)
+                        continue;
                     if (!JToken.DeepEquals(currentValue, defaultValue))
                     {
                         if (currentValue.Type == JTokenType.Array)
                         {
-                            ((JObject)saveObject).Add(prop.Name, new JArray());
+                            ((JObject)saveObject).Add(prop.Name, new JArray(new object[20]));
                             CompareValuesAndAddToSaveFile(currentValue, defaultValue, saveObject[prop.Name]);
                         }
                         else if (currentValue.Type == JTokenType.Object)
@@ -237,16 +267,19 @@ namespace Triggered.modules.options
             }
             else if (currentObject.Type == JTokenType.Array)
             {
+                // Inside this block we know we are dealing with a JArray (Index style)
                 for (int i = 0; i < currentObject.Count(); i++)
                 {
                     var currentValue = currentObject[i];
-                    var defaultValue = defaultObject[i];
+                    var defaultValue = defaultObject.ElementAtOrDefault(i);
+                    if (defaultValue == null)
+                        continue;
                     if (!JToken.DeepEquals(currentValue, defaultValue))
                     {
                         // We have a difference in JToken, determine type
                         if (currentValue.Type == JTokenType.Array)
                         {
-                            saveObject[i] = new JArray();
+                            saveObject[i] = new JArray(new object[20]);
                             CompareValuesAndAddToSaveFile(currentValue, defaultValue, saveObject[i]);
                         }
                         else if (currentValue.Type == JTokenType.Object)
@@ -290,7 +323,7 @@ namespace Triggered.modules.options
         {
             if (_changed)
             {
-                App.Log($"We changed something inside {Name}");
+                App.Log($"Running save on {Name} because of changed settings.",0);
                 Save();
             }
         }

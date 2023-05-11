@@ -14,13 +14,13 @@ namespace Triggered.modules.options
         {
             // Assign the name we will use to save the file
             Name = "DemoCV";
-            // Slider values
+            // Black/White values
             SetKey("minFilterBlackWhite", 67);
             SetKey("maxFilterBlackWhite", 187);
-            SetKey("This.Key.Name", false);
+            // Color Values
             SetKey("filterColorRGB", new Vector3(0.5f, 0.5f, 0.5f));
-            SetKey("filterup", 60);
-            SetKey("filterdown", 60);
+            SetKey("filterup", 0.5f);
+            SetKey("filterdown", 0.5f);
             // visibility
             SetKey("Display_AdjustBW",false);
             SetKey("Display_AdjustColor",false);

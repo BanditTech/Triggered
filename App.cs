@@ -50,12 +50,12 @@
             Directory.CreateDirectory("save");
             Directory.CreateDirectory("profile");
             // Load our Options before anything else
-            LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
-            logger = LogManager.GetCurrentClassLogger();
-            logimgui = new LogWindow();
             App.Options.Load();
             // Now we can start our ImGui LogWindow
+            logimgui = new LogWindow();
             // NLog requires some setup to begin logging to file
+            LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
+            logger = LogManager.GetCurrentClassLogger();
         }
 
         #region Log(string log, LogLevel level)

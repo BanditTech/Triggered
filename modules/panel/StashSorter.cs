@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -493,7 +492,7 @@ namespace Triggered.modules.panels
                     {
                         _shiftHeld = ImGui.GetIO().KeyShift;
                         _dragFinalize = true;
-                        App.Log($"{_dragSource} was dragged to {_dragTarget}" + (_shiftHeld ? " and it was duplicated." : "."),LogLevel.Trace);
+                        App.Log($"{_dragSource} was dragged to {_dragTarget}" + (_shiftHeld ? " and it was duplicated." : "."), 0);
                     }
                     ImGui.EndDragDropTarget();
                 }
@@ -612,7 +611,7 @@ namespace Triggered.modules.panels
                     {
                         string json = group.ToJson();
                         ImGui.SetClipboardText(json);
-                        App.Log(json);
+                        App.Log(json,0);
                     }
                     // Remove the opacity increase on the buttons
                     ImGui.PopStyleColor(3);
@@ -840,7 +839,7 @@ namespace Triggered.modules.panels
                     {
                         string json = leaf.ToJson();
                         ImGui.SetClipboardText(json);
-                        App.Log(json);
+                        App.Log(json,0);
                     }
                     EditElement(parentType);
                     // 
@@ -854,7 +853,7 @@ namespace Triggered.modules.panels
             #endregion
             
             else
-                App.Log("This should not display", NLog.LogLevel.Error);
+                App.Log("This should not display", 4);
         }
 
         /// <summary>
@@ -884,12 +883,12 @@ namespace Triggered.modules.panels
                             string dir = Path.GetDirectoryName(_selectedFile);
                             // We need to check if the path is null, blank, or invalid.
                             if (returnPath == null || returnPath == "")
-                                App.Log($"File selection was canceled.", LogLevel.Info);
+                                App.Log($"File selection was canceled.");
                             else if (!Directory.Exists(dir))
-                                App.Log($"File selection of {returnPath} returned an invalid directory: {dir}", LogLevel.Error);
+                                App.Log($"File selection of {returnPath} returned an invalid directory: {dir}", 4);
                             else
                             {
-                                App.Log($"Loaded file path has been changed to {returnPath}",LogLevel.Trace);
+                                App.Log($"Loaded file path has been changed to {returnPath}", 0);
                                 _selectedFile = returnPath;
                                 UpdateStashSorterFile();
                             }
@@ -913,7 +912,7 @@ namespace Triggered.modules.panels
                             // if we have loaded a valid location then we will want to continue to use it
                             string path = validSelection ? _selectedFile : defaultPath;
                             File.WriteAllText(path, JSON.Str(App.StashSorterList));
-                            App.Log($"Saved file to {path}", LogLevel.Trace);
+                            App.Log($"Saved file to {path}", 0);
                             // We end by unlocking file operations
                             _fileOperation = false;
                         });
@@ -934,11 +933,11 @@ namespace Triggered.modules.panels
                             if (validSelection)
                             {
                                 _selectedFile = result;
-                                App.Log($"Saving file to selected path at {_selectedFile}", LogLevel.Trace);
+                                App.Log($"Saving file to selected path at {_selectedFile}", 0);
                                 File.WriteAllText(_selectedFile, JSON.Str(App.StashSorterList));
                             }
                             else
-                                App.Log($"File selection was canceled.", LogLevel.Info);
+                                App.Log($"File selection was canceled.");
                             // We end by unlocking file operations
                             _fileOperation = false;
                         });
@@ -953,7 +952,7 @@ namespace Triggered.modules.panels
                             // determine the target file for the log message
                             bool isSelected = _selectedFile != null && _selectedFile != "" && File.Exists(_selectedFile);
                             string path = isSelected ? _selectedFile : Path.Combine(AppContext.BaseDirectory, "save", "StashSorter.json");
-                            App.Log($"Reloading from {path}", LogLevel.Trace);
+                            App.Log($"Reloading from {path}", 0);
                             // Load the file without saving
                             UpdateStashSorterFile();
                             // We end by unlocking file operations
@@ -981,18 +980,18 @@ namespace Triggered.modules.panels
                                 if (Jobj is Group _group)
                                 {
                                     App.Log($"Importing group from clipboard:\n" +
-                                        $"{import}", LogLevel.Trace);
+                                        $"{import}", 0);
                                     ((TopGroup)App.StashSorterList[key]).Add(_group);
                                 }
                                 else if (Jobj is Element _element)
                                 {
                                     App.Log($"Importing element from clipboard:\n" +
-                                        $"{import}", LogLevel.Trace);
+                                        $"{import}", 0);
                                     ((TopGroup)App.StashSorterList[key]).Add(_element);
                                 }
                                 else
                                     App.Log($"The clipboard contents were not valid Group or Element:\n" +
-                                        $"{import}", LogLevel.Trace);
+                                        $"{import}", 0);
                             }
                             else
                             {
@@ -1011,7 +1010,7 @@ namespace Triggered.modules.panels
                                 return;
                             Task.Run(() =>
                             {
-                                App.Log($"", LogLevel.Trace);
+                                App.Log($"", 0);
                                 // We end by unlocking file operations
                                 _fileOperation = false;
                             });
@@ -1023,7 +1022,7 @@ namespace Triggered.modules.panels
                                 return;
                             Task.Run(() =>
                             {
-                                App.Log($"", LogLevel.Trace);
+                                App.Log($"", 0);
                                 // We end by unlocking file operations
                                 _fileOperation = false;
                             });
@@ -1040,7 +1039,7 @@ namespace Triggered.modules.panels
                             return;
                         Task.Run(() =>
                         {
-                            App.Log($"", LogLevel.Trace);
+                            App.Log($"", 0);
                             // We end by unlocking file operations
                             _fileOperation = false;
                         });
@@ -1052,7 +1051,7 @@ namespace Triggered.modules.panels
                             return;
                         Task.Run(() =>
                         {
-                            App.Log($"", LogLevel.Trace);
+                            App.Log($"", 0);
                             // We end by unlocking file operations
                             _fileOperation = false;
                         });

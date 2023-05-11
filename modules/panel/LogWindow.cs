@@ -99,7 +99,7 @@ namespace Triggered.modules.panels
             if (ImGui.Combo(">= Level", ref _minLevel, logLevelNames, logLevelNames.Length))
             {
                 options.SetKey("SelectedLogLevelIndex", _minLevel);
-                App.Log($"Changing minimum log level to {logLevelNames[_minLevel]}", LogLevel.Fatal);
+                App.Log($"Changing minimum log level to {logLevelNames[_minLevel]}", 5);
             }
             ImGui.Separator();
             // We start a scroll area to contain the text data

@@ -11,7 +11,7 @@
     /// <summary>
     /// The main brains of the App Behavior
     /// </summary>
-    public class TriggeredMenu : Overlay
+    public class MainMenu : Overlay
     {
         /// <summary>
         /// Running logic thread for handling decision making.
@@ -24,7 +24,7 @@
         /// <summary>
         /// Constructing the menu class also initiates our threads.
         /// </summary>
-        public TriggeredMenu()
+        public MainMenu()
         {
             logicThread = new Thread(() =>
             {
@@ -179,11 +179,16 @@
                     demoCV.AdjustColor();
                 });
             }
+            // This is just a test for serializing properly
             ImGui.Separator();
-            if (ImGui.Button("Test SetKey"))
+            if (ImGui.Button("Set Array Test to True"))
             {
-                var demoCV = App.Options.DemoCV;
-                demoCV.SetKey("This.Key.Name", true);
+                options.SetKey("This.0.Name", true);
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Set Array Test to False"))
+            {
+                options.SetKey("This.0.Name", false);
             }
 
             // This is to show the menu bar that will change the config settings at runtime.
