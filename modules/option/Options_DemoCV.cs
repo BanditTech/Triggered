@@ -18,9 +18,9 @@ namespace Triggered.modules.options
             SetKey("minFilterBlackWhite", 67);
             SetKey("maxFilterBlackWhite", 187);
             // Color Values
-            SetKey("filterColorRGB", new Vector3(0.5f, 0.5f, 0.5f));
-            SetKey("filterup", 0.5f);
-            SetKey("filterdown", 0.5f);
+            SetKey("filterColorRGB", new Vector3(0f, 0f, 1f));
+            SetKey("filterup", 127);
+            SetKey("filterdown", 127);
             // visibility
             SetKey("Display_AdjustBW",false);
             SetKey("Display_AdjustColor",false);
