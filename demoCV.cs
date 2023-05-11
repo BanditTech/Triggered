@@ -232,12 +232,12 @@ namespace Triggered
                 var filterDown = options.GetKey<float>("filterDown");
                 Vector3 filterColor = options.GetKey<Vector3>("filterColorRGB");
 
-                var min1 = Math.Clamp(filterColor.X - filterDown, 0, 1);
-                var max1 = Math.Clamp(filterColor.X + filterUp, 0, 1);
-                var min2 = Math.Clamp(filterColor.Y - filterDown, 0, 1);
-                var max2 = Math.Clamp(filterColor.Y + filterUp, 0, 1);
-                var min3 = Math.Clamp(filterColor.Z - filterDown, 0, 1);
-                var max3 = Math.Clamp(filterColor.Z + filterUp, 0, 1);
+                var min1 = Math.Clamp(filterColor.X - filterDown, 0f, 1f);
+                var max1 = Math.Clamp(filterColor.X + filterUp, 0f, 1f);
+                var min2 = Math.Clamp(filterColor.Y - filterDown, 0f, 1f);
+                var max2 = Math.Clamp(filterColor.Y + filterUp, 0f, 1f);
+                var min3 = Math.Clamp(filterColor.Z - filterDown, 0f, 1f);
+                var max3 = Math.Clamp(filterColor.Z + filterUp, 0f, 1f);
 
                 using (Mat screenMat = new Mat())
                 {
