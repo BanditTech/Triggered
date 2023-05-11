@@ -309,5 +309,269 @@ namespace Triggered
 
             ImGui.End();
         }
+        /// <summary>
+        /// Displays a window of the Primary Monitor in color.
+        /// </summary>
+        public static void AdjustIndColor()
+        {
+            string win1 = "Primary Screen Capture Individual Color";
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            var options = App.Options.DemoCV;
+            
+            // We create our named window
+            CvInvoke.NamedWindow(win1);
+            // Exit the loop when you press the Escape Key
+            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
+            {
+                // Set up our local variables
+                float r = options.GetKey<float>("filterR");
+                float g = options.GetKey<float>("filterG");
+                float b = options.GetKey<float>("filterB");
+                Vector3 filterColor = options.GetKey<Vector3>("filterColorIndRGB");
+                ScalarArray rMin, rMax, gMin, gMax, bMin, bMax;
+                
+                // Take color points and produce ranges from them
+                (rMin, rMax) = ProduceRange(r, filterColor.X);
+                (gMin, gMax) = ProduceRange(g, filterColor.Y);
+                (bMin, bMax) = ProduceRange(b, filterColor.Z);
+                // We use this style of `using` structure to visualize the disposables
+                using (Mat screenMat = new Mat())
+                {
+                    // Produce bounds to capture the primary screen
+                    using (Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height))
+                    {
+                        // Prepare our graphics context
+                        using (Graphics graphicAdjust = Graphics.FromImage(screenBitmap))
+                        {
+                            // Copy the image from the location into the top left corner of screenBitmap
+                            graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size); // ==> screenBitmap
+                            // Release Memory
+                            graphicAdjust.Dispose();
+                        }
+                        // Convert the graphics context into a bitmap
+                        BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                        // Release Memory
+                        screenBitmap.Dispose();
+                    }
+                    // We now have a bitmap matrix of our screen contained in `screenMat`
+                    // Split the input Mat into B G R channels
+                    Mat[] channels = screenMat.Split(); // ==> channels
+                    // Release Memory
+                    screenMat.Dispose();
+                    // Apply the specified color range to each channel
+                    CvInvoke.InRange(channels[2], rMin, rMax, channels[2]);
+                    CvInvoke.InRange(channels[1], gMin, gMax, channels[1]);
+                    CvInvoke.InRange(channels[0], bMin, bMax, channels[0]);
+
+                    using (var filteredChannelsInput = new VectorOfMat())
+                    {
+                        // Set the channels to the VectorOfMat object
+                        filteredChannelsInput.Clear();
+                        foreach (var channel in channels)
+                            filteredChannelsInput.Push(channel);
+                        // Release the memory used by the channels and clear the VectorOfMat object
+                        foreach (var channel in channels)
+                            channel.Dispose();
+                        // Merge the channels back into a single Mat
+                        using (Mat filteredMat = new Mat())
+                        {
+                            CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
+                            // Release Memory
+                            filteredChannelsInput.Dispose();
+
+                            // Resize the captured screen image
+                            using (Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3))
+                            {
+                                CvInvoke.Resize(filteredMat, frame, frame.Size); // ==> frame
+                                // Release Memory
+                                filteredMat.Dispose();
+                                // Display the filtered image in the named window
+                                CvInvoke.Imshow(win1, frame);
+                                // Release Memory
+                                frame.Dispose();
+                            }
+                        }
+                    }
+                }
+            }
+            CvInvoke.DestroyWindow(win1);
+            options.SetKey("Display_AdjustIndColor", false);
+        }
+        /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
+        public static void RenderIndColor()
+        {
+            ImGui.Begin("DemoCVIndColor");
+
+            // This sets up an options for the DemoCV methods.
+            var options = App.Options.DemoCV;
+            // Get the current values from options
+            var r = options.GetKey<float>("filterR");
+            var g = options.GetKey<float>("filterG");
+            var b = options.GetKey<float>("filterB");
+            var color = options.GetKey<Vector3>("filterColorIndRGB");
+
+            // Adjustable range sliders from the base color
+            if (ImGui.SliderFloat("Range for R", ref r, 0f, 1f))
+                options.SetKey("filterR", r);
+            if (ImGui.SliderFloat("Range for G", ref g, 0f, 1f))
+                options.SetKey("filterG", g);
+            if (ImGui.SliderFloat("Range for B", ref b, 0f, 1f))
+                options.SetKey("filterB", b);
+            // Render colorpicker widget
+            if (ImGui.ColorPicker3("Filter Color", ref color))
+                options.SetKey("filterColorIndRGB", color);
+
+            ImGui.End();
+        }
+        public static void AdjustHSVColor()
+        {
+            string win1 = "Primary Screen Capture HSV Color";
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            var options = App.Options.DemoCV;
+
+            // We create our named window
+            CvInvoke.NamedWindow(win1);
+            // Exit the loop when you press the Escape Key
+            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
+            {
+                // Set up our local variables
+                float h = options.GetKey<float>("filterH");
+                float s = options.GetKey<float>("filterS");
+                float v = options.GetKey<float>("filterV");
+                Vector3 filterColor = options.GetKey<Vector3>("filterColorHSV");
+                ScalarArray hMin, hMax, sMin, sMax, vMin, vMax;
+
+                // Take color points and produce ranges from them
+                (hMin, hMax) = ProduceRange(h, filterColor.X);
+                (sMin, sMax) = ProduceRange(s, filterColor.Y);
+                (vMin, vMax) = ProduceRange(v, filterColor.Z);
+                // We use this style of `using` structure to visualize the disposables
+                using (Mat screenMat = new Mat())
+                {
+                    // Produce bounds to capture the primary screen
+                    using (Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height))
+                    {
+                        // Prepare our graphics context
+                        using (Graphics graphicAdjust = Graphics.FromImage(screenBitmap))
+                        {
+                            // Copy the image from the location into the top left corner of screenBitmap
+                            graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size); // ==> screenBitmap
+                            // Release Memory
+                            graphicAdjust.Dispose();
+                        }
+                        // Convert the graphics context into a bitmap
+                        BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                        // Release Memory
+                        screenBitmap.Dispose();
+                        // Convert into HSV color space
+                        using (Mat hsvMat = new Mat())
+                        {
+                            CvInvoke.CvtColor(screenMat, hsvMat, ColorConversion.Bgr2Hsv);
+                            // Release Memory
+                            screenMat.Dispose();
+                            // Split the input Mat into H S V channels
+                            Mat[] channels = hsvMat.Split(); // ==> channels
+                            // Release Memory
+                            hsvMat.Dispose();
+                            // Apply the specified color range to each channel
+                            CvInvoke.InRange(channels[0], hMin, hMax, channels[0]);
+                            CvInvoke.InRange(channels[1], sMin, sMax, channels[1]);
+                            CvInvoke.InRange(channels[2], vMin, vMax, channels[2]);
+                            //
+                            using (var filteredChannelsInput = new VectorOfMat())
+                            {
+                                // Set the channels to the VectorOfMat object
+                                filteredChannelsInput.Clear();
+                                foreach (var channel in channels)
+                                    filteredChannelsInput.Push(channel);
+                                // Release the memory used by the channels and clear the VectorOfMat object
+                                foreach (var channel in channels)
+                                    channel.Dispose();
+                                // Merge the channels back into a single Mat
+                                using (Mat filteredMat = new Mat())
+                                {
+                                    CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
+                                    // Release Memory
+                                    filteredChannelsInput.Dispose();
+
+                                    // Resize the captured screen image
+                                    using (Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3))
+                                    {
+                                        CvInvoke.Resize(filteredMat, frame, frame.Size); // ==> frame
+                                        // Release Memory
+                                        filteredMat.Dispose();
+                                        // Display the filtered image in the named window
+                                        CvInvoke.Imshow(win1, frame);
+                                        // Release Memory
+                                        frame.Dispose();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            CvInvoke.DestroyWindow(win1);
+            options.SetKey("Display_AdjustHSVColor", false);
+        }
+        public static void RenderHSVColor()
+        {
+            ImGui.Begin("DemoCVHSVColor");
+
+            // This sets up an options for the DemoCV methods.
+            var options = App.Options.DemoCV;
+            // Get the current values from options
+            var h = options.GetKey<float>("filterH");
+            var s = options.GetKey<float>("filterS");
+            var v = options.GetKey<float>("filterV");
+            var color = options.GetKey<Vector3>("filterColorHSV");
+
+            // Adjustable range sliders from the base color
+            if (ImGui.SliderFloat("Hue", ref h, 0f, 1f))
+                options.SetKey("filterH", h);
+            if (ImGui.SliderFloat("Saturation", ref s, 0f, 1f))
+                options.SetKey("filterS", s);
+            if (ImGui.SliderFloat("Vibrance", ref v, 0f, 1f))
+                options.SetKey("filterV", v);
+            // Render colorpicker widget
+            if (ImGui.ColorPicker3("Filter Color", ref color, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
+                options.SetKey("filterColorHSV", color);
+
+            ImGui.End();
+        }
+        /// <summary>
+        /// Takes a point and splits the range onto either side.
+        /// When below 0f or above 1f it moves that value to the opposite side.
+        /// Always returns set of points with a sum equivalent to provided range.
+        /// </summary>
+        /// <param name="range"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static (ScalarArray, ScalarArray) ProduceRange(float range, float point)
+        {
+            float halfRange = range / 2f;
+            float min = point - halfRange;
+            float max = point + halfRange;
+
+            if (min < 0f)
+            {
+                max -= min;
+                min = 0f;
+            }
+
+            if (max > 1f)
+            {
+                min -= (max - 1f);
+                max = 1f;
+            }
+
+            if (min < 0f)
+                min = 0f;
+            min = Math.Clamp(min * 255, 0, 255);
+            max = Math.Clamp(max * 255, 0, 255);
+            return (new ScalarArray(min), new ScalarArray(max));
+        }
     }
 }

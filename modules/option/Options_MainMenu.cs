@@ -25,7 +25,6 @@
             SetKey("Padding", false);
             // Logic
             SetKey("LogicTickDelayInMilliseconds", 100);
-            SetKey("This.0.Name", false);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

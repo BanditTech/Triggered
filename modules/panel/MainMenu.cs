@@ -43,6 +43,8 @@
                 }
             });
             optionThread.Start();
+
+            // if we have set these options to true, open the window when we start the menu
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
             {
                 Task.Run(() =>
@@ -55,6 +57,20 @@
                 Task.Run(() =>
                 {
                     demoCV.AdjustColor();
+                });
+            }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
+            {
+                Task.Run(() =>
+                {
+                    demoCV.AdjustIndColor();
+                });
+            }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
+            {
+                Task.Run(() =>
+                {
+                    demoCV.AdjustHSVColor();
                 });
             }
         }
@@ -99,6 +115,10 @@
                 demoCV.RenderBW();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
                 demoCV.RenderColor();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
+                demoCV.RenderIndColor();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
+                demoCV.RenderHSVColor();
 
             return;
         }
@@ -179,16 +199,22 @@
                     demoCV.AdjustColor();
                 });
             }
-            // This is just a test for serializing properly
-            ImGui.Separator();
-            if (ImGui.Button("Set Array Test to True"))
-            {
-                options.SetKey("This.0.Name", true);
-            }
             ImGui.SameLine();
-            if (ImGui.Button("Set Array Test to False"))
+            if (ImGui.Button("Open Ind RGB window"))
             {
-                options.SetKey("This.0.Name", false);
+                App.Options.DemoCV.SetKey("Display_AdjustIndColor", true);
+                Task.Run(() =>
+                {
+                    demoCV.AdjustIndColor();
+                });
+            }
+            if (ImGui.Button("Open HSV window"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustHSVColor", true);
+                Task.Run(() =>
+                {
+                    demoCV.AdjustHSVColor();
+                });
             }
 
             // This is to show the menu bar that will change the config settings at runtime.
