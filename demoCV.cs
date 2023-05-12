@@ -569,7 +569,7 @@ namespace Triggered
             var options = App.Options.DemoCV;
 
             // We create our named window
-            CvInvoke.NamedWindow(win1);
+            CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
@@ -599,8 +599,6 @@ namespace Triggered
                 // Convert into HSV color space
                 Mat hsvMat = new();
                 CvInvoke.CvtColor(screenMat, hsvMat, ColorConversion.Bgr2Hsv);
-                // Release Memory
-                screenMat.Dispose();
                 // Split the input Mat into H S V channels
                 Mat[] channels = hsvMat.Split(); // ==> channels
                 // Release Memory
@@ -609,27 +607,42 @@ namespace Triggered
                 CvInvoke.InRange(channels[0], hMin, hMax, channels[0]);
                 CvInvoke.InRange(channels[1], sMin, sMax, channels[1]);
                 CvInvoke.InRange(channels[2], vMin, vMax, channels[2]);
-
+                // Recombine the channels
                 var filteredChannelsInput = new VectorOfMat();
                 filteredChannelsInput.Clear();
                 foreach (var channel in channels)
                     filteredChannelsInput.Push(channel);
-                // Release the memory used by the channels and clear the VectorOfMat object
+                // Release Memory
                 foreach (var channel in channels)
                     channel.Dispose();
-
+                // Create the destination for the VectorOfMat
                 Mat filteredMat = new();
+                // Merge the VectorOfMat into a Mat
                 CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
                 // Release Memory
                 filteredChannelsInput.Dispose();
-
-                // Resize the captured screen image
-                Mat frame = new(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3);
-                CvInvoke.Resize(filteredMat, frame, frame.Size); // ==> frame
+                // Produce the target mask Mat
+                Mat hsvMask = new();
+                // Convert to gray
+                CvInvoke.CvtColor(filteredMat,hsvMask,ColorConversion.Bgr2Gray);
                 // Release Memory
                 filteredMat.Dispose();
-
-                // Display the filtered image in the named window
+                // Strip non-white pixels
+                CvInvoke.InRange(hsvMask, new ScalarArray(255), new ScalarArray(255), hsvMask);
+                // Create a Mat for the result
+                Mat copied = new();
+                // Copy the image from within the masked area
+                screenMat.CopyTo(copied, hsvMask);
+                // Release Memory
+                screenMat.Dispose();
+                // Create a destination for the resized image
+                Mat frame = new(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3);
+                // Move the image data into another shape
+                CvInvoke.Resize(copied, frame, frame.Size); // ==> frame
+                // Release Memory
+                hsvMask.Dispose();
+                copied.Dispose();
+                // Display the image
                 CvInvoke.Imshow(win1, frame);
                 // Release Memory
                 frame.Dispose();
