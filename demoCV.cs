@@ -660,6 +660,28 @@ namespace Triggered
             ImGui.End();
         }
 
+        public static void DisplayImage(string name,Mat mat, int height = 0, int width = 0, int channels = 3, DepthType type = DepthType.Cv8U)
+        {
+            // First we establish some defaults for the display size
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            if (width <= 0 || height <= 0)
+            {
+                height = screenBounds.Height / 4;
+                width = screenBounds.Width / 4;
+            }
+            else if (width < 10 && height < 10)
+            {
+                height = screenBounds.Height / height;
+                width = screenBounds.Width / width;
+            }
+
+            // Produce the target frame for the image
+            Mat frame = new(height, width, type, channels);
+            CvInvoke.Resize(mat, frame, frame.Size); // ==> frame
+            CvInvoke.Imshow(name, frame);
+            frame.Dispose();
+        }
+
         public static Mat GetScreenMat(Rectangle screenBounds)
         {
             // Produce bounds to capture the primary screen
