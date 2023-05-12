@@ -700,6 +700,28 @@ namespace Triggered
             return screenMat;
         }
 
+        public static Mat GetMergedMat(Mat[] channels)
+        {
+            // Produce the target VectorOfMat to merge
+            var channelsInput = new VectorOfMat();
+            // Ensure the memory is not occupied (memory leak)
+            channelsInput.Clear();
+            // Recombine the channels
+            foreach (var channel in channels)
+                channelsInput.Push(channel);
+            // Release Memory
+            foreach (var channel in channels)
+                channel.Dispose();
+            // Create the destination for the VectorOfMat
+            Mat mat = new();
+            // Merge the VectorOfMat into a Mat
+            CvInvoke.Merge(channelsInput, mat); // ==> filteredMat
+            // Release Memory
+            channelsInput.Dispose();
+            // We have a Mat produced from our channels
+            return mat;
+        }
+
         public static Mat GetBlackWhiteMaskMat(Mat filteredMat)
         {
             // Produce the target mask Mat
