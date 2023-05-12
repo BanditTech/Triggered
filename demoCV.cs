@@ -595,9 +595,11 @@ namespace Triggered
                 CvInvoke.InRange(channels[0], hMin, hMax, channels[0]);
                 CvInvoke.InRange(channels[1], sMin, sMax, channels[1]);
                 CvInvoke.InRange(channels[2], vMin, vMax, channels[2]);
-                // Recombine the channels
+                // Produce the target VectorOfMat to merge
                 var filteredChannelsInput = new VectorOfMat();
+                // Ensure the memory is not occupied (memory leak)
                 filteredChannelsInput.Clear();
+                // Recombine the channels
                 foreach (var channel in channels)
                     filteredChannelsInput.Push(channel);
                 // Release Memory
@@ -610,13 +612,9 @@ namespace Triggered
                 // Release Memory
                 filteredChannelsInput.Dispose();
                 // Produce the target mask Mat
-                Mat hsvMask = new();
-                // Convert to gray
-                CvInvoke.CvtColor(filteredMat,hsvMask,ColorConversion.Bgr2Gray);
+                Mat hsvMask = GetBlackWhiteMaskMat(filteredMat);
                 // Release Memory
                 filteredMat.Dispose();
-                // Strip non-white pixels
-                CvInvoke.InRange(hsvMask, new ScalarArray(255), new ScalarArray(255), hsvMask);
                 // Create a Mat for the result
                 Mat copied = new();
                 // Copy the image from within the masked area
@@ -678,6 +676,19 @@ namespace Triggered
                                                             // Release Memory
             screenBitmap.Dispose();
             return screenMat;
+        }
+
+        public static Mat GetBlackWhiteMaskMat(Mat filteredMat)
+        {
+            // Produce the target mask Mat
+            Mat mask = new();
+            // Convert to gray
+            CvInvoke.CvtColor(filteredMat, mask, ColorConversion.Bgr2Gray);
+            // Release Memory
+            filteredMat.Dispose();
+            // Strip non-white pixels
+            CvInvoke.InRange(mask, new ScalarArray(255), new ScalarArray(255), mask);
+            return mask;
         }
 
         public static (ScalarArray, ScalarArray) ProduceMinMax(float min, float max, bool hue = false)
