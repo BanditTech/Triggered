@@ -27,7 +27,7 @@ namespace Triggered.modules.options
             SetKey("filterG", 0.5f);
             SetKey("filterB", 0.5f);
             // HSV Color Values
-            SetKey("filterColorHSV", new Vector3(0f, 1f, 0f));
+            SetKey("filterColorHSV", new Vector3(0.5f, 0.5f, 0.5f));
             SetKey("filterH", 0.5f);
             SetKey("filterS", 0.5f);
             SetKey("filterV", 0.5f);
