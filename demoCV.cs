@@ -583,19 +583,7 @@ namespace Triggered
                 (sMin, sMax) = ProduceMinMax(min.Y, max.Y);
                 (vMin, vMax) = ProduceMinMax(min.Z, max.Z);
 
-                Mat screenMat = new();
-                // Produce bounds to capture the primary screen
-                Bitmap screenBitmap = new(screenBounds.Width, screenBounds.Height);
-                // Prepare our graphics context
-                Graphics graphicAdjust = Graphics.FromImage(screenBitmap);
-                // Copy the image from the location into the top left corner of screenBitmap
-                graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size); // ==> screenBitmap
-                // Release Memory
-                graphicAdjust.Dispose();
-                // Convert the graphics context into a bitmap
-                BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
-                // Release Memory
-                screenBitmap.Dispose();
+                Mat screenMat = GetScreenMat(screenBounds);
                 // Convert into HSV color space
                 Mat hsvMat = new();
                 CvInvoke.CvtColor(screenMat, hsvMat, ColorConversion.Bgr2Hsv);
@@ -674,6 +662,23 @@ namespace Triggered
             ImGui.End();
         }
 
+        public static Mat GetScreenMat(Rectangle screenBounds)
+        {
+            // Produce bounds to capture the primary screen
+            Bitmap screenBitmap = new(screenBounds.Width, screenBounds.Height);
+            // Prepare our graphics context
+            Graphics graphicAdjust = Graphics.FromImage(screenBitmap);
+            // Copy the image from the location into the top left corner of screenBitmap
+            graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size); // ==> screenBitmap
+                                                                                                 // Release Memory
+            graphicAdjust.Dispose();
+            // Convert the graphics context into a bitmap
+            Mat screenMat = new();
+            BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                                                            // Release Memory
+            screenBitmap.Dispose();
+            return screenMat;
+        }
 
         public static (ScalarArray, ScalarArray) ProduceMinMax(float min, float max, bool hue = false)
         {
