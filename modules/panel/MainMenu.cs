@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using ClickableTransparentOverlay;
     using ClickableTransparentOverlay.Win32;
+    using Emgu.CV;
     using ImGuiNET;
     using Triggered.modules.wrapper;
 
@@ -13,14 +14,17 @@
     /// </summary>
     public class MainMenu : Overlay
     {
+
         /// <summary>
         /// Running logic thread for handling decision making.
         /// </summary>
         private readonly Thread logicThread;
+
         /// <summary>
         /// Running option thread for saving any changed variables.
         /// </summary>
         private readonly Thread optionThread;
+
         /// <summary>
         /// Constructing the menu class also initiates our threads.
         /// </summary>
@@ -49,31 +53,39 @@
             {
                 Task.Run(() =>
                 {
-                    demoCV.AdjustBlackWhite();
+                    demoCV.DemoBlackWhite();
                 });
             }
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
             {
                 Task.Run(() =>
                 {
-                    demoCV.AdjustColor();
+                    demoCV.DemoColor();
                 });
             }
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
             {
                 Task.Run(() =>
                 {
-                    demoCV.AdjustIndColor();
+                    demoCV.DemoIndColor();
                 });
             }
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
             {
                 Task.Run(() =>
                 {
-                    demoCV.AdjustHSVColor();
+                    demoCV.DemoHSVColor();
+                });
+            }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
+            {
+                Task.Run(() =>
+                {
+                    demoCV.DemoHSVColorDual();
                 });
             }
         }
+
         /// <summary>
         /// Logic operates 
         /// </summary>
@@ -86,6 +98,7 @@
         /// RenderBW thread is run every frame
         /// We can piggy back on the render thread for simple keybinds
         /// </summary>
+
         protected override void Render()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
@@ -119,13 +132,15 @@
                 demoCV.RenderIndColor();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
                 demoCV.RenderHSVColor();
-
-            return;
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
+                demoCV.RenderHSVColorDual();
         }
+
         private void RenderLogWindow()
         {
             App.logimgui.Draw("Log Window");
         }
+
         private void RenderMainMenu()
         {
             var options = App.Options.MainMenu;
@@ -187,7 +202,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustBW", true);
                 Task.Run(() =>
                 {
-                    demoCV.AdjustBlackWhite();
+                    demoCV.DemoBlackWhite();
                 });
             }
             ImGui.SameLine();
@@ -196,7 +211,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustColor", true);
                 Task.Run(() =>
                 {
-                    demoCV.AdjustColor();
+                    demoCV.DemoColor();
                 });
             }
             ImGui.SameLine();
@@ -205,7 +220,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustIndColor", true);
                 Task.Run(() =>
                 {
-                    demoCV.AdjustIndColor();
+                    demoCV.DemoIndColor();
                 });
             }
             if (ImGui.Button("Open HSV window"))
@@ -213,7 +228,28 @@
                 App.Options.DemoCV.SetKey("Display_AdjustHSVColor", true);
                 Task.Run(() =>
                 {
-                    demoCV.AdjustHSVColor();
+                    demoCV.DemoHSVColor();
+                });
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Open HSV Dual window"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustHSVColorDual", true);
+                Task.Run(() =>
+                {
+                    demoCV.DemoHSVColorDual();
+                });
+            }
+            ImGui.Separator();
+
+            if (ImGui.Button("Planar Subdivision Image"))
+            {
+                Task.Run(() =>
+                {
+                    using Mat image = DrawSubdivision.Draw(900f, 60);
+                    CvInvoke.Imshow("Planar Subdivision",image);
+                    image.Dispose();
+                    CvInvoke.WaitKey();
                 });
             }
 
@@ -244,6 +280,7 @@
             // Menu definition complete
             ImGui.End();
         }
+
         private void RenderViewPort()
         {
             // Load our options for the main menu

@@ -22,10 +22,12 @@ namespace Triggered.modules.options
         /// We save the values within a JObject for flexibility
         /// </summary>
         public JObject keyList = new JObject();
+
         /// <summary>
         /// We use the Name key to build the filename
         /// </summary>
         public string Name = "";
+
         /// <summary>
         /// We track any changes that occur to the options.
         /// Any changes are saved each second.
@@ -41,6 +43,7 @@ namespace Triggered.modules.options
             // We trim the keyList to remove extra JArray Null objects 
             TrimNullValues(keyList);
         }
+
         /// <summary>
         /// Set the object located at keys to the content of value.
         /// This uses dot notation to navigate the object structure.
@@ -164,6 +167,7 @@ namespace Triggered.modules.options
 
             throw new InvalidOperationException($"Unsupported JTokenType {value.Type}");
         }
+
         /// <summary>
         /// Serialize the keyList into a string.
         /// </summary>
@@ -172,6 +176,7 @@ namespace Triggered.modules.options
         {
             return JSON.Str(keyList);
         }
+
         /// <summary>
         /// A bandaid function that allows us to build arrays of unknown length.<br/>
         /// Is run automatically by the class finalizer.
@@ -200,6 +205,7 @@ namespace Triggered.modules.options
                     break;
             }
         }
+
         /// <summary>
         /// Utilize the merge method available within Newtonsoft JSON package.
         /// This will only replace values which we have present in the origin.
@@ -212,6 +218,7 @@ namespace Triggered.modules.options
             var mergeSettings = new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace };
             internalTarget.Merge(importTarget,mergeSettings);
         }
+
         /// <summary>
         /// Prepare a stripped down file which only contains changes from default
         /// </summary>
@@ -225,6 +232,7 @@ namespace Triggered.modules.options
             TrimNullValues(saveObject);
             return saveObject;
         }
+
         /// <summary>
         /// This is a recursive function which navigates the two object structures.
         /// We preserve the location using dot notation. 
@@ -295,6 +303,7 @@ namespace Triggered.modules.options
                 }
             }
         }
+
         /// <summary>
         /// Allows the inherited classes to save their options to file.
         /// </summary>
@@ -304,6 +313,7 @@ namespace Triggered.modules.options
             var saveObj = PrepareSaveObject();
             File.WriteAllText($"save\\{Name}.json", JSON.Str(saveObj));
         }
+
         /// <summary>
         /// Allows the inherited classes to merge the saved option subset.
         /// </summary>
@@ -316,6 +326,7 @@ namespace Triggered.modules.options
                 Merge(obj);
             }
         }
+
         /// <summary>
         /// We determine if the options have been changed, in order to save to file.
         /// </summary>

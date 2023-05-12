@@ -31,11 +31,15 @@ namespace Triggered.modules.options
             SetKey("filterH", 0.5f);
             SetKey("filterS", 0.5f);
             SetKey("filterV", 0.5f);
+            // HSV Dual Color Values
+            SetKey("filterColorHSVMin", new Vector3(0.4f, 0f, 0f));
+            SetKey("filterColorHSVMax", new Vector3(0.5f, 1f, 1f));
             // visibility
             SetKey("Display_AdjustBW",false);
             SetKey("Display_AdjustColor",false);
             SetKey("Display_AdjustIndColor", false);
             SetKey("Display_AdjustHSVColor", false);
+            SetKey("Display_AdjustHSVColorDual", false);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

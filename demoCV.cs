@@ -10,6 +10,8 @@ using ImGuiNET;
 using System.Numerics;
 using Emgu.CV.Reg;
 using System.Threading.Channels;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Security.Cryptography;
 
 namespace Triggered
 {
@@ -61,6 +63,7 @@ namespace Triggered
                 }
             }
         }
+
         /// <summary>
         /// Displays the primary monitor with a wacky rectangle.
         /// </summary>
@@ -134,10 +137,11 @@ namespace Triggered
             }
             CvInvoke.DestroyWindow(win1);
         }
+
         /// <summary>
         /// Displays a window of the Primary Monitor in black and white.
         /// </summary>
-        public static void AdjustBlackWhite()
+        public static void DemoBlackWhite()
         {
             // Construct our variables with `using` when possible
             string win1 = "Primary Screen Capture BW";
@@ -181,6 +185,7 @@ namespace Triggered
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustBW", false);
         }
+
         /// <summary>
         /// ImGui menu for adjusting the Min/Max match values.
         /// </summary>
@@ -211,10 +216,11 @@ namespace Triggered
 
             ImGui.End();
         }
+
         /// <summary>
         /// Displays a window of the Primary Monitor in color.
         /// </summary>
-        public static void AdjustColor()
+        public static void DemoColor()
         {
             // Construct our variables with `using` when possible
             string win1 = "Primary Screen Capture Color";
@@ -284,6 +290,7 @@ namespace Triggered
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustColor", false);
         }
+
         /// <summary>
         /// ImGui menu for adjusting the Min/Max match values.
         /// </summary>
@@ -309,10 +316,11 @@ namespace Triggered
 
             ImGui.End();
         }
+
         /// <summary>
         /// Displays a window of the Primary Monitor in color.
         /// </summary>
-        public static void AdjustIndColor()
+        public static void DemoIndColor()
         {
             string win1 = "Primary Screen Capture Individual Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
@@ -397,6 +405,7 @@ namespace Triggered
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustIndColor", false);
         }
+
         /// <summary>
         /// ImGui menu for adjusting the Min/Max match values.
         /// </summary>
@@ -425,7 +434,11 @@ namespace Triggered
 
             ImGui.End();
         }
-        public static void AdjustHSVColor()
+
+        /// <summary>
+        /// Displays a window of the Primary Monitor in HSV.
+        /// </summary>
+        public static void DemoHSVColor()
         {
             string win1 = "Primary Screen Capture HSV Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
@@ -444,7 +457,7 @@ namespace Triggered
                 ScalarArray hMin, hMax, sMin, sMax, vMin, vMax;
 
                 // Take color points and produce ranges from them
-                (hMin, hMax) = ProduceRange(h, filterColor.X);
+                (hMin, hMax) = ProduceRange(h, filterColor.X, true);
                 (sMin, sMax) = ProduceRange(s, filterColor.Y);
                 (vMin, vMax) = ProduceRange(v, filterColor.Z);
                 // We use this style of `using` structure to visualize the disposables
@@ -479,7 +492,7 @@ namespace Triggered
                             CvInvoke.InRange(channels[0], hMin, hMax, channels[0]);
                             CvInvoke.InRange(channels[1], sMin, sMax, channels[1]);
                             CvInvoke.InRange(channels[2], vMin, vMax, channels[2]);
-                            //
+                            // Combine them again
                             using (var filteredChannelsInput = new VectorOfMat())
                             {
                                 // Set the channels to the VectorOfMat object
@@ -516,6 +529,10 @@ namespace Triggered
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustHSVColor", false);
         }
+
+        /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
         public static void RenderHSVColor()
         {
             ImGui.Begin("DemoCVHSVColor");
@@ -541,6 +558,125 @@ namespace Triggered
 
             ImGui.End();
         }
+
+        /// <summary>
+        /// Displays a window of the Primary Monitor in HSV.
+        /// </summary>
+        public static void DemoHSVColorDual()
+        {
+            string win1 = "Primary Screen Capture HSV Dual Color";
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            var options = App.Options.DemoCV;
+
+            // We create our named window
+            CvInvoke.NamedWindow(win1);
+            // Exit the loop when you press the Escape Key
+            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
+            {
+                // Set up our local variables
+                Vector3 min = options.GetKey<Vector3>("filterColorHSVMin");
+                Vector3 max = options.GetKey<Vector3>("filterColorHSVMax");
+                ScalarArray hMin, hMax, sMin, sMax, vMin, vMax;
+
+                // Take color points and produce ranges from them
+                (hMin, hMax) = ProduceMinMax(min.X, max.X, true);
+                (sMin, sMax) = ProduceMinMax(min.Y, max.Y);
+                (vMin, vMax) = ProduceMinMax(min.Z, max.Z);
+
+                Mat screenMat = new();
+                // Produce bounds to capture the primary screen
+                Bitmap screenBitmap = new(screenBounds.Width, screenBounds.Height);
+                // Prepare our graphics context
+                Graphics graphicAdjust = Graphics.FromImage(screenBitmap);
+                // Copy the image from the location into the top left corner of screenBitmap
+                graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size); // ==> screenBitmap
+                // Release Memory
+                graphicAdjust.Dispose();
+                // Convert the graphics context into a bitmap
+                BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                // Release Memory
+                screenBitmap.Dispose();
+                // Convert into HSV color space
+                Mat hsvMat = new();
+                CvInvoke.CvtColor(screenMat, hsvMat, ColorConversion.Bgr2Hsv);
+                // Release Memory
+                screenMat.Dispose();
+                // Split the input Mat into H S V channels
+                Mat[] channels = hsvMat.Split(); // ==> channels
+                // Release Memory
+                hsvMat.Dispose();
+                // Apply the specified color range to each channel
+                CvInvoke.InRange(channels[0], hMin, hMax, channels[0]);
+                CvInvoke.InRange(channels[1], sMin, sMax, channels[1]);
+                CvInvoke.InRange(channels[2], vMin, vMax, channels[2]);
+
+                var filteredChannelsInput = new VectorOfMat();
+                filteredChannelsInput.Clear();
+                foreach (var channel in channels)
+                    filteredChannelsInput.Push(channel);
+                // Release the memory used by the channels and clear the VectorOfMat object
+                foreach (var channel in channels)
+                    channel.Dispose();
+
+                Mat filteredMat = new();
+                CvInvoke.Merge(filteredChannelsInput, filteredMat); // ==> filteredMat
+                // Release Memory
+                filteredChannelsInput.Dispose();
+
+                // Resize the captured screen image
+                Mat frame = new(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3);
+                CvInvoke.Resize(filteredMat, frame, frame.Size); // ==> frame
+                // Release Memory
+                filteredMat.Dispose();
+
+                // Display the filtered image in the named window
+                CvInvoke.Imshow(win1, frame);
+                // Release Memory
+                frame.Dispose();
+            }
+            CvInvoke.DestroyWindow(win1);
+            options.SetKey("Display_AdjustHSVColorDual", false);
+        }
+
+        /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
+        public static void RenderHSVColorDual()
+        {
+            ImGui.Begin("DemoCVHSVColorDual");
+
+            // This sets up an options for the DemoCV methods.
+            var options = App.Options.DemoCV;
+            // Get the current values from options
+            var min = options.GetKey<Vector3>("filterColorHSVMin");
+            var max = options.GetKey<Vector3>("filterColorHSVMax");
+
+            // Render colorpicker widget
+            if (ImGui.ColorPicker3("Filter Min", ref min, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
+                options.SetKey("filterColorHSVMin", min);
+
+            if (ImGui.ColorPicker3("Filter Max", ref max, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
+                options.SetKey("filterColorHSVMax", max);
+
+            ImGui.End();
+        }
+
+
+        public static (ScalarArray, ScalarArray) ProduceMinMax(float min, float max, bool hue = false)
+        {
+            if (hue)
+            {
+                min = Math.Clamp(min * 180, 0, 180);
+                max = Math.Clamp(max * 180, 0, 180);
+            }
+            else
+            {
+                min = Math.Clamp(min * 255, 0, 255);
+                max = Math.Clamp(max * 255, 0, 255);
+            }
+            return (new ScalarArray(min), new ScalarArray(max));
+        }
+
         /// <summary>
         /// Takes a point and splits the range onto either side.
         /// When below 0f or above 1f it moves that value to the opposite side.
@@ -549,7 +685,7 @@ namespace Triggered
         /// <param name="range"></param>
         /// <param name="point"></param>
         /// <returns></returns>
-        public static (ScalarArray, ScalarArray) ProduceRange(float range, float point)
+        public static (ScalarArray, ScalarArray) ProduceRange(float range, float point, bool hue = false)
         {
             float halfRange = range / 2f;
             float min = point - halfRange;
@@ -569,8 +705,17 @@ namespace Triggered
 
             if (min < 0f)
                 min = 0f;
-            min = Math.Clamp(min * 255, 0, 255);
-            max = Math.Clamp(max * 255, 0, 255);
+            
+            if (hue)
+            {
+                min = Math.Clamp(min * 180, 0, 180);
+                max = Math.Clamp(max * 180, 0, 180);
+            }
+            else
+            {
+                min = Math.Clamp(min * 255, 0, 255);
+                max = Math.Clamp(max * 255, 0, 255);
+            }
             return (new ScalarArray(min), new ScalarArray(max));
         }
     }
