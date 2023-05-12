@@ -682,6 +682,24 @@ namespace Triggered
             frame.Dispose();
         }
 
+        public static Mat GetFilteredMat(Mat mat, Vector3 min, Vector3 max, bool hsv = false, bool flip = false)
+        {
+            // produce target variables
+            ScalarArray hMin, hMax, sMin, sMax, vMin, vMax;
+            // Take color points and produce ranges from them
+            (hMin, hMax) = ProduceMinMax(min.X, max.X, hsv);
+            (sMin, sMax) = ProduceMinMax(min.Y, max.Y);
+            (vMin, vMax) = ProduceMinMax(min.Z, max.Z);
+            // Split the input Mat into H S V channels
+            Mat[] channels = mat.Split(); // ==> channels
+            // Apply the specified color range to each channel
+            CvInvoke.InRange(channels[0], hMin, hMax, channels[0]);
+            CvInvoke.InRange(channels[1], sMin, sMax, channels[1]);
+            CvInvoke.InRange(channels[2], vMin, vMax, channels[2]);
+            // Merge the channels back into a Mat
+            return GetMergedMat(channels);
+        }
+
         public static Mat GetScreenMat(Rectangle screenBounds)
         {
             // Produce bounds to capture the primary screen
