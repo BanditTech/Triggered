@@ -182,7 +182,7 @@
                 thread.Start();
             }
             ImGui.SameLine();
-            if (ImGui.Button("Open Blue window"))
+            if (ImGui.Button("Hello World"))
             {
                 Task.Run(() =>
                 {
@@ -190,14 +190,14 @@
                 });
             }
             ImGui.SameLine();
-            if (ImGui.Button("Open Capture window"))
+            if (ImGui.Button("Capture demo"))
             {
                 Task.Run(() =>
                 {
                     demoCV.Capture();
                 });
             }
-            if (ImGui.Button("Open B/W window"))
+            if (ImGui.Button("B/W demo"))
             {
                 App.Options.DemoCV.SetKey("Display_AdjustBW", true);
                 Task.Run(() =>
@@ -206,7 +206,7 @@
                 });
             }
             ImGui.SameLine();
-            if (ImGui.Button("Open Color window"))
+            if (ImGui.Button("Color demo"))
             {
                 App.Options.DemoCV.SetKey("Display_AdjustColor", true);
                 Task.Run(() =>
@@ -215,7 +215,7 @@
                 });
             }
             ImGui.SameLine();
-            if (ImGui.Button("Open Ind RGB window"))
+            if (ImGui.Button("Ind RGB demo"))
             {
                 App.Options.DemoCV.SetKey("Display_AdjustIndColor", true);
                 Task.Run(() =>
@@ -223,7 +223,7 @@
                     demoCV.DemoIndColor();
                 });
             }
-            if (ImGui.Button("Open HSV window"))
+            if (ImGui.Button("HSV demo"))
             {
                 App.Options.DemoCV.SetKey("Display_AdjustHSVColor", true);
                 Task.Run(() =>
@@ -232,7 +232,7 @@
                 });
             }
             ImGui.SameLine();
-            if (ImGui.Button("Open HSV Dual window"))
+            if (ImGui.Button("HSV Dual demo"))
             {
                 App.Options.DemoCV.SetKey("Display_AdjustHSVColorDual", true);
                 Task.Run(() =>

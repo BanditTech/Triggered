@@ -597,7 +597,7 @@ namespace Triggered
                 screenMat.Dispose();
                 hsvMask.Dispose();
                 // Display the Masked image
-                DisplayImage(win1,copied);
+                DisplayImage(win1,copied,2,2);
                 // Release Memory
                 copied.Dispose();
             }
