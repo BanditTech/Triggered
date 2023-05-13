@@ -1,14 +1,8 @@
-﻿using Emgu.CV.Flann;
-using ImGuiNET;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.Intrinsics;
 using Triggered.modules.wrapper;
 
 namespace Triggered.modules.options

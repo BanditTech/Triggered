@@ -4,7 +4,6 @@ using Emgu.CV.Util;
 using System;
 using System.Drawing;
 using System.Numerics;
-using System.Windows.Forms;
 
 namespace Triggered.modules.wrapper
 {
