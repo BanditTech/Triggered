@@ -76,6 +76,13 @@
                     DemoCV.DemoHSVColorDual();
                 });
             }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
+            {
+                Task.Run(() =>
+                {
+                    DemoCV.DemoShapeRectangle();
+                });
+            }
         }
 
         /// <summary>
@@ -128,6 +135,8 @@
                 DemoCV.RenderHSVColorDual();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustShape"))
                 DemoCV.RenderShapeDetection();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
+                DemoCV.RenderShapeRectangle();
         }
 
         private void RenderLogWindow()
@@ -241,6 +250,14 @@
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeDetection();
+                });
+            }
+            if (ImGui.Button("Rectangle demo"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustRectangle", true);
+                Task.Run(() =>
+                {
+                    DemoCV.DemoShapeRectangle();
                 });
             }
             ImGui.Separator();

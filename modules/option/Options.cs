@@ -149,7 +149,12 @@ namespace Triggered.modules.options
             else if (value.Type == JTokenType.Integer)
                 return (T)Convert.ChangeType(value.Value<int>(), typeof(T));
             else if (value.Type == JTokenType.Float)
-                return (T)Convert.ChangeType(value.Value<float>(), typeof(T));
+            {
+                if (typeof(T) == typeof(float))
+                    return (T)Convert.ChangeType(value.Value<float>(), typeof(T));
+                else if (typeof(T) == typeof(double))
+                    return (T)Convert.ChangeType(value.Value<double>(), typeof(T));
+            }
             else if (value.Type == JTokenType.Boolean)
                 return (T)Convert.ChangeType(value.Value<bool>(), typeof(T));
             else if (value.Type == JTokenType.Object)

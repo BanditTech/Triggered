@@ -637,17 +637,20 @@ namespace Triggered.modules.demo
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             var options = App.Options.DemoCV;
 
-            // Capture the screen
-            Mat screenMat = GetScreenMat(screenBounds);
-            // Resize the image
-            Mat frame = new(screenMat.Rows / 4, screenMat.Cols / 4, DepthType.Cv8U, 3);
-            CvInvoke.Resize(screenMat, frame, frame.Size); // ==> frame
-            Mat result = ProcessImage(frame);
-            screenMat.Dispose();
-            frame.Dispose();
 
-            while (CvInvoke.WaitKey(1000) != (int)Keys.Escape)
+            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
+            {
+                // Capture the screen
+                Mat screenMat = GetScreenMat(screenBounds);
+                // Resize the image
+                Mat frame = new(screenMat.Rows / 4, screenMat.Cols / 4, DepthType.Cv8U, 3);
+                CvInvoke.Resize(screenMat, frame, frame.Size); // ==> frame
+                Mat result = ProcessImage(frame);
+                screenMat.Dispose();
+                frame.Dispose();
+
                 DisplayImage(win1, result);
+            }
 
             CvInvoke.DestroyWindow(win1);
             options.SetKey("Display_AdjustShape", false);
@@ -657,7 +660,6 @@ namespace Triggered.modules.demo
         {
             using (UMat gray = new UMat())
             using (UMat cannyEdges = new UMat())
-            using (Mat blank = new Mat(img.Size, DepthType.Cv8U, 3)) //blank image
             using (Mat triangleRectangleImage = new Mat(img.Size, DepthType.Cv8U, 3)) //image to draw triangles and rectangles on
             using (Mat circleImage = new Mat(img.Size, DepthType.Cv8U, 3)) //image to draw circles on
             using (Mat lineImage = new Mat(img.Size, DepthType.Cv8U, 3)) //image to drtaw lines on
@@ -800,12 +802,145 @@ namespace Triggered.modules.demo
             }
         }
 
+        public static void DemoShapeRectangle()
+        {
+            var options = App.Options.DemoCV;
+            string win1 = "Rectangle Detection";
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+
+            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
+            {
+                // Capture the screen
+                Mat screenMat = GetScreenMat(screenBounds);
+                // Resize the image
+                Mat frame = new(screenMat.Rows / 4, screenMat.Cols / 4, DepthType.Cv8U, 3);
+                CvInvoke.Resize(screenMat, frame, frame.Size); // ==> frame
+                Mat result = ProcessRectangles(frame);
+                screenMat.Dispose();
+                frame.Dispose();
+
+                DisplayImage(win1, result);
+                result.Dispose();
+            }
+
+            CvInvoke.DestroyWindow(win1);
+            options.SetKey("Display_AdjustShape", false);
+        }
+
+        public static Mat ProcessRectangles(Mat img)
+        {
+            var options = App.Options.DemoCV;
+            // Get the current values from options
+            var area = options.GetKey<int>("rectangleArea");
+            double cannyThreshold = options.GetKey<float>("cannyThreshold");
+            double cannyThresholdLinking = options.GetKey<float>("cannyThresholdLinking");
+            Stopwatch watch = Stopwatch.StartNew();
+
+            using (UMat gray = new UMat())
+            using (UMat cannyEdges = new UMat())
+            {
+                //Convert the image to grayscale and filter out the noise
+                CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
+
+                //Remove noise
+                CvInvoke.GaussianBlur(gray, gray, new Size(3, 3), 1);
+
+                // Produce Edges
+                CvInvoke.Canny(gray, cannyEdges, cannyThreshold, cannyThresholdLinking);
+
+                #region Find triangles and rectangles
+                List<Triangle2DF> triangleList = new List<Triangle2DF>();
+                List<RotatedRect> boxList = new List<RotatedRect>(); //a box is a rotated rectangle
+                using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+                {
+                    CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List,
+                        ChainApproxMethod.ChainApproxSimple);
+                    int count = contours.Size;
+                    for (int i = 0; i < count; i++)
+                    {
+                        using (VectorOfPoint contour = contours[i])
+                        using (VectorOfPoint approxContour = new VectorOfPoint())
+                        {
+                            CvInvoke.ApproxPolyDP(contour, approxContour, CvInvoke.ArcLength(contour, true) * 0.05,
+                                true);
+                            if (CvInvoke.ContourArea(approxContour, false) > area && approxContour.Size == 4 )
+                            {
+                                #region determine if all the angles in the contour are within [80, 100] degree
+                                bool isRectangle = true;
+                                Point[] pts = approxContour.ToArray();
+                                LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+
+                                for (int j = 0; j < edges.Length; j++)
+                                {
+                                    double angle = Math.Abs(
+                                        edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
+                                    if (angle < 80 || angle > 100)
+                                    {
+                                        isRectangle = false;
+                                        break;
+                                    }
+                                }
+
+                                #endregion
+
+                                if (isRectangle) boxList.Add(CvInvoke.MinAreaRect(approxContour));
+                            }
+                        }
+                    }
+                }
+                #endregion
+
+                #region Draw triangles and rectangles
+                Mat triangleRectangleImage = new Mat(img.Size, DepthType.Cv8U, 3);
+                triangleRectangleImage.SetTo(new MCvScalar(0));
+                foreach (Triangle2DF triangle in triangleList)
+                {
+                    CvInvoke.Polylines(triangleRectangleImage, Array.ConvertAll(triangle.GetVertices(), Point.Round),
+                        true, new Bgr(Color.DarkBlue).MCvScalar, 2);
+                }
+
+                foreach (RotatedRect box in boxList)
+                {
+                    CvInvoke.Polylines(triangleRectangleImage, Array.ConvertAll(box.GetVertices(), Point.Round), true,
+                        new Bgr(Color.DarkOrange).MCvScalar, 2);
+                }
+
+                //Drawing a light gray frame around the image
+                CvInvoke.Rectangle(triangleRectangleImage,
+                    new Rectangle(Point.Empty,
+                        new Size(triangleRectangleImage.Width - 1, triangleRectangleImage.Height - 1)),
+                    new MCvScalar(120, 120, 120));
+                //Draw the labels
+                CvInvoke.PutText(triangleRectangleImage, "Rectangles", new Point(20, 20),
+                    FontFace.HersheyDuplex, 0.5, new MCvScalar(120, 120, 120));
+                #endregion
+
+                return triangleRectangleImage;
+            }
+        }
+
         /// <summary>
         /// ImGui menu for adjusting the Min/Max match values.
         /// </summary>
         public static void RenderShapeDetection()
         {
 
+        }
+        public static void RenderShapeRectangle()
+        {
+            // This sets up an options for the DemoCV methods.
+            var options = App.Options.DemoCV;
+            // Get the current values from options
+            var area = options.GetKey<int>("rectangleArea");
+            var cannyThreshold = options.GetKey<float>("cannyThreshold");
+            var cannyThresholdLinking = options.GetKey<float>("cannyThresholdLinking");
+
+            if (ImGui.SliderInt("Area", ref area, 10, 250))
+                options.SetKey("rectangleArea", area);
+            if (ImGui.SliderFloat("cannyThreshold", ref cannyThreshold, 10, 250))
+                options.SetKey("cannyThreshold", cannyThreshold);
+            if (ImGui.SliderFloat("cannyThresholdLinking", ref cannyThresholdLinking, 10, 250))
+                options.SetKey("cannyThresholdLinking", cannyThresholdLinking);
         }
     }
 }
