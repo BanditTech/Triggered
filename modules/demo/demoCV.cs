@@ -9,8 +9,11 @@ using System.Windows.Forms;
 using ImGuiNET;
 using System.Numerics;
 using static Triggered.modules.wrapper.OpenCV;
+using System.Text;
+using System.Diagnostics;
+using System.Collections.Generic;
 
-namespace Triggered
+namespace Triggered.modules.demo
 {
     /// <summary>
     /// This class is a demonstration of what methods we can use from OpenCV using Emgu.CV.
@@ -34,7 +37,7 @@ namespace Triggered
                 CvInvoke.PutText(
                    img,
                    "Hello,",
-                   new System.Drawing.Point(10, 80),
+                   new Point(10, 80),
                    FontFace.HersheyComplex,
                    3,
                    new Bgr(0, 255, 0).MCvScalar,
@@ -42,7 +45,7 @@ namespace Triggered
                 CvInvoke.PutText(
                    img,
                    "world",
-                   new System.Drawing.Point(10, 160),
+                   new Point(10, 160),
                    FontFace.HersheyComplex,
                    3,
                    new Bgr(0, 255, 0).MCvScalar,
@@ -91,7 +94,7 @@ namespace Triggered
                     graphicsCapture.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
                     // Convert the bitmap to an Emgu.CV Mat object
                     // screenMat is the output Mat object
-                    BitmapExtension.ToMat(screenBitmap, screenMat);
+                    screenBitmap.ToMat(screenMat);
                 }
 
                 // The Graphics object has been released
@@ -160,7 +163,7 @@ namespace Triggered
                 {
                     graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
                     // Load Bitmap into Mat
-                    BitmapExtension.ToMat(screenBitmap, screenMat);
+                    screenBitmap.ToMat(screenMat);
                 }
 
                 // Convert to grayscale
@@ -241,7 +244,7 @@ namespace Triggered
                         using (Graphics graphicAdjust = Graphics.FromImage(screenBitmap))
                         {
                             graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
-                            BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                            screenBitmap.ToMat(screenMat); // ==> screenMat
                             graphicAdjust.Dispose();
                         }
                         screenBitmap.Dispose();
@@ -354,7 +357,7 @@ namespace Triggered
                             graphicAdjust.Dispose();
                         }
                         // Convert the graphics context into a bitmap
-                        BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                        screenBitmap.ToMat(screenMat); // ==> screenMat
                         // Release Memory
                         screenBitmap.Dispose();
                     }
@@ -472,7 +475,7 @@ namespace Triggered
                             graphicAdjust.Dispose();
                         }
                         // Convert the graphics context into a bitmap
-                        BitmapExtension.ToMat(screenBitmap, screenMat); // ==> screenMat
+                        screenBitmap.ToMat(screenMat); // ==> screenMat
                         // Release Memory
                         screenBitmap.Dispose();
                         // Convert into HSV color space
@@ -579,7 +582,7 @@ namespace Triggered
                 Mat hsvMat = new();
                 CvInvoke.CvtColor(screenMat, hsvMat, ColorConversion.Bgr2Hsv);
                 // Filter the image according to the range values.
-                Mat filteredMat = GetFilteredMat(hsvMat,min,max,true);
+                Mat filteredMat = GetFilteredMat(hsvMat, min, max, true);
                 // Release Memory
                 hsvMat.Dispose();
                 // Produce the target mask Mat
@@ -594,7 +597,7 @@ namespace Triggered
                 screenMat.Dispose();
                 hsvMask.Dispose();
                 // Display the Masked image
-                DisplayImage(win1,copied,2,2);
+                DisplayImage(win1, copied, 2, 2);
                 // Release Memory
                 copied.Dispose();
             }
@@ -623,6 +626,186 @@ namespace Triggered
                 options.SetKey("filterColorHSVMax", max);
 
             ImGui.End();
+        }
+
+        /// <summary>
+        /// Display a window of Primary Monitor for shape detection
+        /// </summary>
+        public static void DemoShapeDetection()
+        {
+            string win1 = "Shape Detection";
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            var options = App.Options.DemoCV;
+
+            // Capture the screen
+            Mat screenMat = GetScreenMat(screenBounds);
+            // Resize the image
+            Mat frame = new(screenMat.Rows / 4, screenMat.Cols / 4, DepthType.Cv8U, 3);
+            CvInvoke.Resize(screenMat, frame, frame.Size); // ==> frame
+            Mat result = ProcessImage(frame);
+            screenMat.Dispose();
+            frame.Dispose();
+
+            while (CvInvoke.WaitKey(1000) != (int)Keys.Escape)
+                DisplayImage(win1, result);
+
+            CvInvoke.DestroyWindow(win1);
+            options.SetKey("Display_AdjustShape", false);
+        }
+
+        public static Mat ProcessImage(Mat img)
+        {
+            using (UMat gray = new UMat())
+            using (UMat cannyEdges = new UMat())
+            using (Mat blank = new Mat(img.Size, DepthType.Cv8U, 3)) //blank image
+            using (Mat triangleRectangleImage = new Mat(img.Size, DepthType.Cv8U, 3)) //image to draw triangles and rectangles on
+            using (Mat circleImage = new Mat(img.Size, DepthType.Cv8U, 3)) //image to draw circles on
+            using (Mat lineImage = new Mat(img.Size, DepthType.Cv8U, 3)) //image to drtaw lines on
+            {
+                //Convert the image to grayscale and filter out the noise
+                CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
+
+                //Remove noise
+                CvInvoke.GaussianBlur(gray, gray, new Size(3, 3), 1);
+
+                #region circle detection
+                double cannyThreshold = 180.0;
+                double circleAccumulatorThreshold = 120;
+                CircleF[] circles = CvInvoke.HoughCircles(gray, HoughModes.Gradient, 2.0, 20.0, cannyThreshold,
+                    circleAccumulatorThreshold, 5);
+                #endregion
+
+                #region Canny and edge detection
+                double cannyThresholdLinking = 120.0;
+                CvInvoke.Canny(gray, cannyEdges, cannyThreshold, cannyThresholdLinking);
+                LineSegment2D[] lines = CvInvoke.HoughLinesP(
+                    cannyEdges,
+                    1, //Distance resolution in pixel-related units
+                    Math.PI / 45.0, //Angle resolution measured in radians.
+                    20, //threshold
+                    30, //min Line width
+                    10); //gap between lines
+                #endregion
+
+                #region Find triangles and rectangles
+                List<Triangle2DF> triangleList = new List<Triangle2DF>();
+                List<RotatedRect> boxList = new List<RotatedRect>(); //a box is a rotated rectangle
+                using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+                {
+                    CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List,
+                        ChainApproxMethod.ChainApproxSimple);
+                    int count = contours.Size;
+                    for (int i = 0; i < count; i++)
+                    {
+                        using (VectorOfPoint contour = contours[i])
+                        using (VectorOfPoint approxContour = new VectorOfPoint())
+                        {
+                            CvInvoke.ApproxPolyDP(contour, approxContour, CvInvoke.ArcLength(contour, true) * 0.05,
+                                true);
+                            if (CvInvoke.ContourArea(approxContour, false) > 250
+                            ) //only consider contours with area greater than 250
+                            {
+                                if (approxContour.Size == 3) //The contour has 3 vertices, it is a triangle
+                                {
+                                    Point[] pts = approxContour.ToArray();
+                                    triangleList.Add(new Triangle2DF(
+                                        pts[0],
+                                        pts[1],
+                                        pts[2]
+                                    ));
+                                }
+                                else if (approxContour.Size == 4) //The contour has 4 vertices.
+                                {
+                                    #region determine if all the angles in the contour are within [80, 100] degree
+                                    bool isRectangle = true;
+                                    Point[] pts = approxContour.ToArray();
+                                    LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+
+                                    for (int j = 0; j < edges.Length; j++)
+                                    {
+                                        double angle = Math.Abs(
+                                            edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
+                                        if (angle < 80 || angle > 100)
+                                        {
+                                            isRectangle = false;
+                                            break;
+                                        }
+                                    }
+
+                                    #endregion
+
+                                    if (isRectangle) boxList.Add(CvInvoke.MinAreaRect(approxContour));
+                                }
+                            }
+                        }
+                    }
+                }
+                #endregion
+
+                #region draw triangles and rectangles
+                triangleRectangleImage.SetTo(new MCvScalar(0));
+                foreach (Triangle2DF triangle in triangleList)
+                {
+                    CvInvoke.Polylines(triangleRectangleImage, Array.ConvertAll(triangle.GetVertices(), Point.Round),
+                        true, new Bgr(Color.DarkBlue).MCvScalar, 2);
+                }
+
+                foreach (RotatedRect box in boxList)
+                {
+                    CvInvoke.Polylines(triangleRectangleImage, Array.ConvertAll(box.GetVertices(), Point.Round), true,
+                        new Bgr(Color.DarkOrange).MCvScalar, 2);
+                }
+
+                //Drawing a light gray frame around the image
+                CvInvoke.Rectangle(triangleRectangleImage,
+                    new Rectangle(Point.Empty,
+                        new Size(triangleRectangleImage.Width - 1, triangleRectangleImage.Height - 1)),
+                    new MCvScalar(120, 120, 120));
+                //Draw the labels
+                CvInvoke.PutText(triangleRectangleImage, "Triangles and Rectangles", new Point(20, 20),
+                    FontFace.HersheyDuplex, 0.5, new MCvScalar(120, 120, 120));
+                #endregion
+
+                #region draw circles
+                circleImage.SetTo(new MCvScalar(0));
+                foreach (CircleF circle in circles)
+                    CvInvoke.Circle(circleImage, Point.Round(circle.Center), (int)circle.Radius,
+                        new Bgr(Color.Brown).MCvScalar, 2);
+
+                //Drawing a light gray frame around the image
+                CvInvoke.Rectangle(circleImage,
+                    new Rectangle(Point.Empty, new Size(circleImage.Width - 1, circleImage.Height - 1)),
+                    new MCvScalar(120, 120, 120));
+                //Draw the labels
+                CvInvoke.PutText(circleImage, "Circles", new Point(20, 20), FontFace.HersheyDuplex, 0.5,
+                    new MCvScalar(120, 120, 120));
+                #endregion
+
+                #region draw lines
+                lineImage.SetTo(new MCvScalar(0));
+                foreach (LineSegment2D line in lines)
+                    CvInvoke.Line(lineImage, line.P1, line.P2, new Bgr(Color.Green).MCvScalar, 2);
+                //Drawing a light gray frame around the image
+                CvInvoke.Rectangle(lineImage,
+                    new Rectangle(Point.Empty, new Size(lineImage.Width - 1, lineImage.Height - 1)),
+                    new MCvScalar(120, 120, 120));
+                //Draw the labels
+                CvInvoke.PutText(lineImage, "Lines", new Point(20, 20), FontFace.HersheyDuplex, 0.5,
+                    new MCvScalar(120, 120, 120));
+                #endregion
+
+                Mat result = new Mat();
+                CvInvoke.VConcat(new Mat[] { triangleRectangleImage, circleImage, lineImage }, result);
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
+        public static void RenderShapeDetection()
+        {
+
         }
     }
 }

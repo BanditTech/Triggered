@@ -15,7 +15,7 @@ namespace Triggered.modules.options
         /// <summary>
         /// We save the values within a JObject for flexibility
         /// </summary>
-        public JObject keyList = new JObject();
+        public JObject keyList = new();
 
         /// <summary>
         /// We use the Name key to build the filename

@@ -40,6 +40,7 @@ namespace Triggered.modules.options
             SetKey("Display_AdjustIndColor", false);
             SetKey("Display_AdjustHSVColor", false);
             SetKey("Display_AdjustHSVColorDual", false);
+            SetKey("Display_AdjustShape", false);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

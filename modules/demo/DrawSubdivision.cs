@@ -5,7 +5,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 
-namespace Triggered
+namespace Triggered.modules.demo
 {
     /// <summary>
     /// Demonstration Class for showing subdivided areas.
@@ -61,7 +61,7 @@ namespace Triggered
 #if NETFX_CORE
             Point[] polyline = Extensions.ConvertAll<PointF, Point>(facet.Vertices, Point.Round);
 #else
-                Point[] polyline = Array.ConvertAll<PointF, Point>(facet.Vertices, Point.Round);
+                Point[] polyline = Array.ConvertAll(facet.Vertices, Point.Round);
 #endif
                 using (VectorOfPoint vp = new VectorOfPoint(polyline))
                 using (VectorOfVectorOfPoint vvp = new VectorOfVectorOfPoint(vp))
@@ -84,7 +84,7 @@ namespace Triggered
 #if NETFX_CORE
             Point[] vertices = Extensions.ConvertAll<PointF, Point>(triangle.GetVertices(), Point.Round);
 #else
-                Point[] vertices = Array.ConvertAll<PointF, Point>(triangle.GetVertices(), Point.Round);
+                Point[] vertices = Array.ConvertAll(triangle.GetVertices(), Point.Round);
 #endif
                 using (VectorOfPoint vp = new VectorOfPoint(vertices))
                 {

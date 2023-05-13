@@ -7,6 +7,7 @@
     using ClickableTransparentOverlay.Win32;
     using Emgu.CV;
     using ImGuiNET;
+    using Triggered.modules.demo;
     using Triggered.modules.wrapper;
 
     /// <summary>
@@ -125,6 +126,8 @@
                 DemoCV.RenderHSVColor();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
                 DemoCV.RenderHSVColorDual();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustShape"))
+                DemoCV.RenderShapeDetection();
         }
 
         private void RenderLogWindow()
@@ -229,6 +232,15 @@
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColorDual();
+                });
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Shape demo"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustShape", true);
+                Task.Run(() =>
+                {
+                    DemoCV.DemoShapeDetection();
                 });
             }
             ImGui.Separator();
