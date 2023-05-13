@@ -4,11 +4,8 @@
     using NLog.Config;
     using System.Collections.Generic;
     using System.IO;
-    using System.Numerics;
-    using System.Threading.Tasks;
     using Triggered.modules.options;
     using Triggered.modules.panels;
-    using Triggered.modules.wrapper;
 
     /// <summary>
     /// The is the main hub for the application.

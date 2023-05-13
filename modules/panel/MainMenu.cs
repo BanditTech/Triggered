@@ -14,22 +14,13 @@
     /// </summary>
     public class MainMenu : Overlay
     {
-
-        /// <summary>
-        /// Running logic thread for handling decision making.
-        /// </summary>
-        private readonly Thread logicThread;
-
-        /// <summary>
-        /// Running option thread for saving any changed variables.
-        /// </summary>
-        private readonly Thread optionThread;
-
         /// <summary>
         /// Constructing the menu class also initiates our threads.
         /// </summary>
         public MainMenu()
         {
+            Thread logicThread;
+            Thread optionThread;
             logicThread = new Thread(() =>
             {
                 while (App.IsRunning)
@@ -53,35 +44,35 @@
             {
                 Task.Run(() =>
                 {
-                    demoCV.DemoBlackWhite();
+                    DemoCV.DemoBlackWhite();
                 });
             }
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
             {
                 Task.Run(() =>
                 {
-                    demoCV.DemoColor();
+                    DemoCV.DemoColor();
                 });
             }
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
             {
                 Task.Run(() =>
                 {
-                    demoCV.DemoIndColor();
+                    DemoCV.DemoIndColor();
                 });
             }
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
             {
                 Task.Run(() =>
                 {
-                    demoCV.DemoHSVColor();
+                    DemoCV.DemoHSVColor();
                 });
             }
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
             {
                 Task.Run(() =>
                 {
-                    demoCV.DemoHSVColorDual();
+                    DemoCV.DemoHSVColorDual();
                 });
             }
         }
@@ -125,15 +116,15 @@
             if (App.Options.MainMenu.GetKey<bool>("Display_Log"))
                 RenderLogWindow();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
-                demoCV.RenderBW();
+                DemoCV.RenderBW();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
-                demoCV.RenderColor();
+                DemoCV.RenderColor();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
-                demoCV.RenderIndColor();
+                DemoCV.RenderIndColor();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
-                demoCV.RenderHSVColor();
+                DemoCV.RenderHSVColor();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
-                demoCV.RenderHSVColorDual();
+                DemoCV.RenderHSVColorDual();
         }
 
         private void RenderLogWindow()
@@ -186,7 +177,7 @@
             {
                 Task.Run(() =>
                 {
-                    demoCV.ShowBlue();
+                    DemoCV.ShowBlue();
                 });
             }
             ImGui.SameLine();
@@ -194,7 +185,7 @@
             {
                 Task.Run(() =>
                 {
-                    demoCV.Capture();
+                    DemoCV.Capture();
                 });
             }
             if (ImGui.Button("B/W demo"))
@@ -202,7 +193,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustBW", true);
                 Task.Run(() =>
                 {
-                    demoCV.DemoBlackWhite();
+                    DemoCV.DemoBlackWhite();
                 });
             }
             ImGui.SameLine();
@@ -211,7 +202,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustColor", true);
                 Task.Run(() =>
                 {
-                    demoCV.DemoColor();
+                    DemoCV.DemoColor();
                 });
             }
             ImGui.SameLine();
@@ -220,7 +211,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustIndColor", true);
                 Task.Run(() =>
                 {
-                    demoCV.DemoIndColor();
+                    DemoCV.DemoIndColor();
                 });
             }
             if (ImGui.Button("HSV demo"))
@@ -228,7 +219,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustHSVColor", true);
                 Task.Run(() =>
                 {
-                    demoCV.DemoHSVColor();
+                    DemoCV.DemoHSVColor();
                 });
             }
             ImGui.SameLine();
@@ -237,7 +228,7 @@
                 App.Options.DemoCV.SetKey("Display_AdjustHSVColorDual", true);
                 Task.Run(() =>
                 {
-                    demoCV.DemoHSVColorDual();
+                    DemoCV.DemoHSVColorDual();
                 });
             }
             ImGui.Separator();
@@ -246,7 +237,7 @@
             {
                 Task.Run(() =>
                 {
-                    using Mat image = DrawSubdivision.Draw(900f, 60);
+                    Mat image = DrawSubdivision.Draw(900f, 60);
                     CvInvoke.Imshow("Planar Subdivision",image);
                     image.Dispose();
                     CvInvoke.WaitKey();

@@ -9,6 +9,9 @@ using Emgu.CV.Util;
 
 namespace Triggered
 {
+    /// <summary>
+    /// Demonstration Class for showing subdivided areas.
+    /// </summary>
     public static class DrawSubdivision
     {
         /// <summary>
@@ -16,6 +19,8 @@ namespace Triggered
         /// </summary>
         /// <param name="maxValue">The points contains values between [0, maxValue)</param>
         /// <param name="pointCount">The total number of points to create</param>
+        /// <param name="delaunayTriangles"></param>
+        /// <param name="voronoiFacets"></param>
         public static void CreateSubdivision(float maxValue, int pointCount, out Triangle2DF[] delaunayTriangles, out VoronoiFacet[] voronoiFacets)
         {
             #region create random points in the range of [0, maxValue]
@@ -27,10 +32,10 @@ namespace Triggered
 
             using (Subdiv2D subdivision = new Subdiv2D(pts))
             {
-                //Obtain the delaunay's triangulation from the set of points;
+                // Obtain the delaunay's triangulation from the set of points
                 delaunayTriangles = subdivision.GetDelaunayTriangles();
 
-                //Obtain the voronoi facets from the set of points
+                // Obtain the voronoi facets from the set of points
                 voronoiFacets = subdivision.GetVoronoiFacets();
             }
         }

@@ -240,7 +240,6 @@ namespace Triggered.modules.options
         /// <param name="currentObject">JToken</param>
         /// <param name="defaultObject">JToken</param>
         /// <param name="saveObject">JObject</param>
-        /// <param name="depth">string</param>
         private void CompareValuesAndAddToSaveFile(JToken currentObject, JToken defaultObject, JToken saveObject)
         {
             // This first logic block determines if the currentObject is an JArray or JObject
