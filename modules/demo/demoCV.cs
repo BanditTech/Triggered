@@ -848,8 +848,7 @@ namespace Triggered.modules.demo
                 // Produce Edges
                 CvInvoke.Canny(gray, cannyEdges, cannyThreshold, cannyThresholdLinking);
 
-                #region Find triangles and rectangles
-                List<Triangle2DF> triangleList = new List<Triangle2DF>();
+                #region Find and rectangles
                 List<RotatedRect> boxList = new List<RotatedRect>(); //a box is a rotated rectangle
                 using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
                 {
@@ -890,14 +889,9 @@ namespace Triggered.modules.demo
                 }
                 #endregion
 
-                #region Draw triangles and rectangles
+                #region Draw rectangles
                 Mat triangleRectangleImage = new Mat(img.Size, DepthType.Cv8U, 3);
                 triangleRectangleImage.SetTo(new MCvScalar(0));
-                foreach (Triangle2DF triangle in triangleList)
-                {
-                    CvInvoke.Polylines(triangleRectangleImage, Array.ConvertAll(triangle.GetVertices(), Point.Round),
-                        true, new Bgr(Color.DarkBlue).MCvScalar, 2);
-                }
 
                 foreach (RotatedRect box in boxList)
                 {
@@ -915,6 +909,8 @@ namespace Triggered.modules.demo
                     FontFace.HersheyDuplex, 0.5, new MCvScalar(120, 120, 120));
                 #endregion
 
+                watch.Stop();
+                App.Log($"Rectangle Detection took: {watch.ElapsedMilliseconds}ms",0);
                 return triangleRectangleImage;
             }
         }
@@ -935,11 +931,11 @@ namespace Triggered.modules.demo
             var cannyThreshold = options.GetKey<float>("cannyThreshold");
             var cannyThresholdLinking = options.GetKey<float>("cannyThresholdLinking");
 
-            if (ImGui.SliderInt("Area", ref area, 10, 250))
+            if (ImGui.SliderInt("Area", ref area, 10, 1000))
                 options.SetKey("rectangleArea", area);
-            if (ImGui.SliderFloat("cannyThreshold", ref cannyThreshold, 10, 250))
+            if (ImGui.SliderFloat("cannyThreshold", ref cannyThreshold, 0f, 1000f))
                 options.SetKey("cannyThreshold", cannyThreshold);
-            if (ImGui.SliderFloat("cannyThresholdLinking", ref cannyThresholdLinking, 10, 250))
+            if (ImGui.SliderFloat("cannyThresholdLinking", ref cannyThresholdLinking, 0f, 1000f))
                 options.SetKey("cannyThresholdLinking", cannyThresholdLinking);
         }
     }
