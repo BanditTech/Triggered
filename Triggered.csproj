@@ -33,9 +33,6 @@
     <PackageReference Include="ImGui.NET" Version="1.89.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.1.4" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
-    <PackageReference Include="Vortice.D3DCompiler" Version="2.4.2" />
-    <PackageReference Include="Vortice.Direct3D11" Version="2.4.2" />
   </ItemGroup>
 
   <ItemGroup>
