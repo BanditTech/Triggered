@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoHotkey.Interop" Version="1.0.0.1" />
-    <PackageReference Include="ClickableTransparentOverlay" Version="8.1.0" />
     <PackageReference Include="Doxygen" Version="1.8.14">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -30,9 +29,14 @@
     <PackageReference Include="Emgu.CV" Version="4.7.0.5276" />
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.7.0.5276" />
     <PackageReference Include="Emgu.CV.UI" Version="4.7.0.5276" />
-    <PackageReference Include="ImGui.NET" Version="1.89.5" />
+    <PackageReference Include="HexaEngine.ImGui" Version="1.0.0" />
+    <PackageReference Include="HexaEngine.ImNodes" Version="1.0.0" />
+    <PackageReference Include="HexaEngine.ImPlot" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.1.4" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+    <PackageReference Include="Vortice.D3DCompiler" Version="2.4.2" />
+    <PackageReference Include="Vortice.Direct3D11" Version="2.4.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,6 +49,16 @@
     <None Update="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ClickableTransparentOverlay">
+      <HintPath>lib\ClickableTransparentOverlay.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties example_1json__JsonSchema="https://json.schemastore.org/jsconfig.json" /></VisualStudio></ProjectExtensions>
