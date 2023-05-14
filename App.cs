@@ -6,6 +6,7 @@
     using System.IO;
     using Triggered.modules.options;
     using Triggered.modules.panels;
+    using ImNodesNET;
 
     /// <summary>
     /// The is the main hub for the application.
@@ -36,13 +37,18 @@
         /// <summary>
         /// Options are loaded as a group using a Manager.
         /// </summary>
-        public static Options_Manager Options = new Options_Manager();
+        public static Options_Manager Options = new();
+        /// <summary>
+        /// ImNode context pointer
+        /// </summary>
+        private static nint _nodeContext = ImNodes.CreateContext();
 
         /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
         /// </summary>
         static App()
         {
+            ImNodes.CreateContext();
             // Create the default folders if they do not exist
             Directory.CreateDirectory("save");
             Directory.CreateDirectory("profile");
@@ -74,9 +80,9 @@
             // Only send message to the log window above Debug level
             if (level.Ordinal >= selectedLogLevelIndex)
             {
-                logimgui.AddLog(string.Format("{0}: {1}", level.ToString(), log),level);
+                logimgui.AddLog(string.Format("{0}: {1}", level.ToString(), log), level);
             }
-            logger.Log(level,log);
+            logger.Log(level, log);
         }
         /// <summary>
         /// Simplify the format of creating info log entries.<br/>
@@ -101,5 +107,13 @@
             Log(log, levelType);
         }
         #endregion
+
+        /// <summary>
+        /// Destroy the ImNode Context
+        /// </summary>
+        public static void DestroyImNodeContext()
+        {
+            ImNodes.DestroyContext(_nodeContext);
+        }
     }
 }

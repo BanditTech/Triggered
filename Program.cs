@@ -3,6 +3,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using Triggered.modules.panels;
+    using ImNodesNET;
 
     class Program
     {
@@ -23,6 +24,7 @@
         {
             // Begin to release resources
             App.Log("Final execution block initiated. Releasing memory resources.");
+            App.DestroyImNodeContext();
         }
     }
 }
