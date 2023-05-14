@@ -9,7 +9,6 @@ using System.Windows.Forms;
 using ImGuiNET;
 using System.Numerics;
 using static Triggered.modules.wrapper.OpenCV;
-using System.Text;
 using System.Diagnostics;
 using System.Collections.Generic;
 
@@ -898,7 +897,6 @@ namespace Triggered.modules.demo
                     CvInvoke.Polylines(triangleRectangleImage, Array.ConvertAll(box.GetVertices(), Point.Round), true,
                         new Bgr(Color.DarkOrange).MCvScalar, 2);
                 }
-
                 //Drawing a light gray frame around the image
                 CvInvoke.Rectangle(triangleRectangleImage,
                     new Rectangle(Point.Empty,
