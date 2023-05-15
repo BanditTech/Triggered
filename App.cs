@@ -38,17 +38,14 @@
         /// Options are loaded as a group using a Manager.
         /// </summary>
         public static Options_Manager Options = new();
-        /// <summary>
-        /// ImNode context pointer
-        /// </summary>
-        private static nint _nodeContext = ImNodes.CreateContext();
+
+        private static int internalIndex = 0;
 
         /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
         /// </summary>
         static App()
         {
-            ImNodes.CreateContext();
             // Create the default folders if they do not exist
             Directory.CreateDirectory("save");
             Directory.CreateDirectory("profile");
@@ -60,6 +57,12 @@
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logger = LogManager.GetCurrentClassLogger();
         }
+
+        /// <summary>
+        /// Produce an index int for each node object
+        /// </summary>
+        /// <returns></returns>
+        public static int GetUniqueId() { return internalIndex++; }
 
         #region Log(string log, LogLevel level)
         /// <summary>
@@ -107,13 +110,5 @@
             Log(log, levelType);
         }
         #endregion
-
-        /// <summary>
-        /// Destroy the ImNode Context
-        /// </summary>
-        public static void DestroyImNodeContext()
-        {
-            ImNodes.DestroyContext(_nodeContext);
-        }
     }
 }

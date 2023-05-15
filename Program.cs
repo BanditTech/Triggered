@@ -24,7 +24,6 @@
         {
             // Begin to release resources
             App.Log("Final execution block initiated. Releasing memory resources.");
-            App.DestroyImNodeContext();
         }
     }
 }

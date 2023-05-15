@@ -137,6 +137,8 @@
                 DemoCV.RenderShapeDetection();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
                 DemoCV.RenderShapeRectangle();
+
+            demoImNode.Render();
         }
 
         private void RenderLogWindow()

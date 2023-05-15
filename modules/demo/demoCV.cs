@@ -823,7 +823,7 @@ namespace Triggered.modules.demo
             }
 
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustShape", false);
+            options.SetKey("Display_AdjustRectangle", false);
         }
 
         public static Mat ProcessRectangles(Mat img)
