@@ -39,8 +39,6 @@
         /// </summary>
         public static Options_Manager Options = new();
 
-        private static int internalIndex = 0;
-
         /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
         /// </summary>
@@ -57,12 +55,6 @@
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logger = LogManager.GetCurrentClassLogger();
         }
-
-        /// <summary>
-        /// Produce an index int for each node object
-        /// </summary>
-        /// <returns></returns>
-        public static int GetUniqueId() { return internalIndex++; }
 
         #region Log(string log, LogLevel level)
         /// <summary>

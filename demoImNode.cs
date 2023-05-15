@@ -1,8 +1,10 @@
 ﻿using Emgu.CV;
 using ImGuiNET;
 using ImNodesNET;
-using System;
+using Triggered.modules.struct_nodes;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Triggered
 {
@@ -203,23 +205,109 @@ namespace Triggered
             }
         }
     }
-    abstract class Node
+    /// <summary>
+    /// Represents an object in our editor space.
+    /// </summary>
+    public abstract class Node
     {
-        internal int id = App.GetUniqueId();
-        internal int[] NodeIn { get; set; } = new int[] { };
-        internal int[] NodeOut { get; set; } = new int[] { };
+        /// <summary>
+        /// The ID of the Node
+        /// </summary>
+        public int Id { get; set; }
+        
+        // Internal values for handling object list
+        internal static int internalIndex = 0;
+        internal static List<int> occupiedKeys = new List<int>();
+        internal static List<(int, string)> Tags;
+        internal static List<(int, int)> nodeList = new();
 
-        public int GetId() { return id; }
-
-        public bool IsInNode(int nodeId)
+        /// <summary>
+        /// Default constructor produces any missing ID.
+        /// </summary>
+        protected Node(int nodeId = 0)
         {
-            if (id == nodeId) return true;
-            if (Array.IndexOf(NodeIn, nodeId) != -1) return true;
-            if (Array.IndexOf(NodeOut, nodeId) != -1) return true;
+            if (nodeId == 0)
+                nodeId = GetUniqueId();
+            else
+                RegisterKey(nodeId);
+            Id = nodeId;
+            AddRef(Id, Id);
+        }
+
+        private static void RegisterKey(int key)
+        {
+            if (!occupiedKeys.Contains(key))
+                occupiedKeys.Add(key);
+        }
+
+        public static void AddRef(int componentId, int nodeId)
+        {
+            if (!occupiedKeys.Contains(componentId))
+            {
+                nodeList.Add((componentId, nodeId));
+                RegisterKey(componentId);
+            }
+        }
+
+        public static void DelRef(int intId)
+        {
+            nodeList.RemoveAll(node => node.Item1 == intId);
+        }
+
+        public static int GetNodeId(int intId)
+        {
+            foreach (var (id, node) in nodeList)
+                if (id == intId)
+                    return node;
+            Node.GetTags(intId);
+            return 0;
+        }
+
+        static bool ContainsReference(int intId)
+        {
+            foreach (var (id, _) in nodeList)
+                if (id == intId)
+                    return true;
             return false;
         }
+
+        private static int GetUniqueId()
+        {
+            // Incriment until unoccupied
+            internalIndex += 10;
+            while (occupiedKeys.Contains(internalIndex))
+                internalIndex += 10;
+            // Register the generated key as occupied
+            RegisterKey(internalIndex); 
+            return internalIndex;
+        }
+
+        public static string GetTags(int nodeId)
+        {
+            foreach (var (intId, tag) in Tags)
+                if (intId == nodeId) return tag;
+            return "";
+        }
+
+        public void SetTags(int nodeId, string tags)
+        {
+            AddRef(nodeId, Id);
+            RegisterKey(nodeId);
+            // Check if the node already has a tag, and update it
+            for (int i = 0; i < Tags.Count; i++)
+            {
+                if (Tags[i].Item1 == nodeId)
+                {
+                    Tags[i] = (nodeId, tags);
+                    return;
+                }
+            }
+
+            // If the node doesn't have a tag, add a new one
+            Tags.Add((nodeId, tags));
+        }
     }
-    class nPlayer : Node
+    class NPlayer : Node
     {
         /// <summary>
         /// The zone of the player
@@ -237,25 +325,30 @@ namespace Triggered
         /// Energy Shield value in a range of 0f to 1f
         /// </summary>
         public float EnergyShield;
-        internal int[] NodeOut { get; set; } = new int[] { App.GetUniqueId(), App.GetUniqueId(), App.GetUniqueId(), App.GetUniqueId() };
+
+        internal new List<(int, string)> Tags = new();
+        public NPlayer(int nodeId = 0) : base(nodeId)
+        {
+            SetTags(Id + 1, "Output,T(string),Location");
+        }
         public void Node()
         {
             // Draw
-            ImNodes.BeginNode(id);
+            ImNodes.BeginNode(Id);
             ImNodes.BeginNodeTitleBar();
             ImGui.Indent(50);
             ImGui.Text("Player");
             ImNodes.EndNodeTitleBar();
-            ImNodes.BeginOutputAttribute(NodeOut[0]);
+            ImNodes.BeginOutputAttribute(Id + 1);
             ImGui.Text("(string) Location");
             ImNodes.EndOutputAttribute();
-            ImNodes.BeginOutputAttribute(NodeOut[1]);
+            ImNodes.BeginOutputAttribute(Id + 2);
             ImGui.Text("(float) Health");
             ImNodes.EndOutputAttribute();
-            ImNodes.BeginOutputAttribute(NodeOut[2]);
+            ImNodes.BeginOutputAttribute(Id + 3);
             ImGui.Text("(float) Mana");
             ImNodes.EndOutputAttribute();
-            ImNodes.BeginOutputAttribute(NodeOut[3]);
+            ImNodes.BeginOutputAttribute(Id + 4);
             ImGui.Text("(float) Energy Shield");
             ImNodes.EndOutputAttribute();
             ImNodes.EndNode();
