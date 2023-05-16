@@ -115,6 +115,7 @@
         }
         #endregion
     }
+
     /// <summary>
     /// Represents the Player status
     /// </summary>
@@ -124,14 +125,17 @@
         /// The player's current location.
         /// </summary>
         public string Location { get; set; } = "";
+
         /// <summary>
         /// The currently determined health.
         /// </summary>
         public float Health {get; set;} = 1f;
+
         /// <summary>
         /// The currently determined Mana.
         /// </summary>
         public float Mana {get; set;} = 1f;
+
         /// <summary>
         /// The currently determined Energy Shield.
         /// </summary>
@@ -148,6 +152,7 @@
             new Flask(5),
         };
     }
+
     /// <summary>
     /// Represents each individual flask.
     /// </summary>
@@ -212,6 +217,7 @@
             EndsAt = EndsAt.AddSeconds(Duration);
             // Fire boundKey or add it to keystroke manager
         }
+
         /// <summary>
         /// Check if any slot has expired
         /// </summary>
