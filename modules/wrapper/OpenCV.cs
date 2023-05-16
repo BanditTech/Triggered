@@ -102,6 +102,8 @@ namespace Triggered.modules.wrapper
 
                 // Combine the two X masks
                 CvInvoke.BitwiseOr(xMask1, xMask2, channels[x]);
+                xMask1.Dispose();
+                xMask2.Dispose();
             }
             else
             {
