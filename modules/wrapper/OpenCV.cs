@@ -71,14 +71,10 @@ namespace Triggered.modules.wrapper
         public static Mat GetFilteredMat(Mat mat, Vector3 min, Vector3 max, bool hsv = false, bool flipXZ = false)
         {
             // produce target variables
-            ScalarArray xMin, xMax, yMin, yMax, zMin, zMax;
+            ScalarArray xMin, xMax, xMin2, xMax2, yMin, yMax, zMin, zMax;
             int x = flipXZ ? 2 : 0;
             int y = 1;
             int z = flipXZ ? 0 : 2;
-
-            // Take color points and produce ranges from them
-            (yMin, yMax) = ProduceMinMax(min.Y, max.Y);
-            (zMin, zMax) = ProduceMinMax(min.Z, max.Z);
 
             // Split the input Mat into H S V channels
             Mat[] channels = mat.Split(); // ==> channels
@@ -88,13 +84,12 @@ namespace Triggered.modules.wrapper
             if (hsv && min.X > max.X)
             {
                 // Apply two filters for X channel when hsv is true and min > max
-                ScalarArray xMin1, xMax1, xMin2, xMax2;
-                (xMin1, xMax1) = ProduceMinMax(min.X, 1f, true);
+                (xMin, xMax) = ProduceMinMax(min.X, 1f, true);
                 (xMin2, xMax2) = ProduceMinMax(0f, max.X, true);
 
                 // Apply InRange to the first copy of the X channel
                 Mat xMask1 = new Mat();
-                CvInvoke.InRange(channels[x], xMin1, xMax1, xMask1);
+                CvInvoke.InRange(channels[x], xMin, xMax, xMask1);
 
                 // Apply InRange to the second copy of the X channel
                 Mat xMask2 = new Mat();
@@ -110,6 +105,10 @@ namespace Triggered.modules.wrapper
                 (xMin, xMax) = ProduceMinMax(min.X, max.X, hsv);
                 CvInvoke.InRange(channels[x], xMin, xMax, channels[x]);
             }
+
+            // Take color points and produce ranges from them
+            (yMin, yMax) = ProduceMinMax(min.Y, max.Y);
+            (zMin, zMax) = ProduceMinMax(min.Z, max.Z);
 
             CvInvoke.InRange(channels[y], yMin, yMax, channels[y]);
             CvInvoke.InRange(channels[z], zMin, zMax, channels[z]);
