@@ -173,19 +173,19 @@ namespace Triggered.modules.struct_node
         /// <summary>
         /// The zone of the player
         /// </summary>
-        public string Location { get; }
+        public string Location => App.Player.Location;
         /// <summary>
         /// Health value in a range of 0f to 1f
         /// </summary>
-        public float Health { get; }
+        public float Health => App.Player.Health;
         /// <summary>
         /// Mana value in a range of 0f to 1f
         /// </summary>
-        public float Mana { get; }
+        public float Mana => App.Player.Mana;
         /// <summary>
         /// Energy Shield value in a range of 0f to 1f
         /// </summary>
-        public float EnergyShield { get; }
+        public float EnergyShield => App.Player.EnergyShield;
         internal override List<(int, string)> Tags { get; set; } = new();
 
         public NPlayer(int nodeId = 0) : base(nodeId)
