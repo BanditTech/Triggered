@@ -72,26 +72,46 @@ namespace Triggered.modules.wrapper
         {
             // produce target variables
             ScalarArray xMin, xMax, yMin, yMax, zMin, zMax;
+            int x = flipXZ ? 2 : 0;
+            int y = 1;
+            int z = flipXZ ? 0 : 2;
+
             // Take color points and produce ranges from them
-            (xMin, xMax) = ProduceMinMax(min.X, max.X, hsv);
             (yMin, yMax) = ProduceMinMax(min.Y, max.Y);
             (zMin, zMax) = ProduceMinMax(min.Z, max.Z);
+
             // Split the input Mat into H S V channels
             Mat[] channels = mat.Split(); // ==> channels
-            if (flipXZ)
+
+            // If we have an HSV its possible to wrap around Hue
+            // We want to allow a large min and low max
+            if (hsv && min.X > max.X)
             {
-                // Here we flip the position of the X and Z channels
-                CvInvoke.InRange(channels[2], xMin, xMax, channels[2]);
-                CvInvoke.InRange(channels[1], yMin, yMax, channels[1]);
-                CvInvoke.InRange(channels[0], zMin, zMax, channels[0]);
+                // Apply two filters for X channel when hsv is true and min > max
+                ScalarArray xMin1, xMax1, xMin2, xMax2;
+                (xMin1, xMax1) = ProduceMinMax(min.X, 1f, true);
+                (xMin2, xMax2) = ProduceMinMax(0f, max.X, true);
+
+                // Apply InRange to the first copy of the X channel
+                Mat xMask1 = new Mat();
+                CvInvoke.InRange(channels[x], xMin1, xMax1, xMask1);
+
+                // Apply InRange to the second copy of the X channel
+                Mat xMask2 = new Mat();
+                CvInvoke.InRange(channels[x], xMin2, xMax2, xMask2);
+
+                // Combine the two X masks
+                CvInvoke.BitwiseOr(xMask1, xMask2, channels[x]);
             }
             else
             {
-                // Apply the specified color range to each channel
-                CvInvoke.InRange(channels[0], xMin, xMax, channels[0]);
-                CvInvoke.InRange(channels[1], yMin, yMax, channels[1]);
-                CvInvoke.InRange(channels[2], zMin, zMax, channels[2]);
+                (xMin, xMax) = ProduceMinMax(min.X, max.X, hsv);
+                CvInvoke.InRange(channels[x], xMin, xMax, channels[x]);
             }
+
+            CvInvoke.InRange(channels[y], yMin, yMax, channels[y]);
+            CvInvoke.InRange(channels[z], zMin, zMax, channels[z]);
+
             // Merge the channels back into a Mat
             return GetMergedMat(channels);
         }
