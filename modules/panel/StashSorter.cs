@@ -5,6 +5,7 @@ using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
 using Triggered.modules.wrapper;
+using Triggered.modules.struct_filter;
 
 namespace Triggered.modules.panels
 {

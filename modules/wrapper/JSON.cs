@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Triggered.modules.struct_filter;
 
 namespace Triggered.modules.wrapper
 {

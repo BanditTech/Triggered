@@ -53,7 +53,6 @@
 
   <ItemGroup>
     <Folder Include="lib\" />
-    <Folder Include="modules\struct_nodes\" />
   </ItemGroup>
 
   <ItemGroup>
