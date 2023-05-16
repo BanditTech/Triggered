@@ -3,11 +3,14 @@ using ImNodesNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Triggered.modules.struct_node
 {
+    /// <summary>
+    /// Generic shape of all Nodes which will occupy the editor.
+    /// Node abstract superclass handles the internal Id scheme.
+    /// Uses the tag list to draw the object, provides methods for adding 
+    /// </summary>
     public abstract class Node
     {
         /// <summary>
@@ -84,6 +87,7 @@ namespace Triggered.modules.struct_node
         /// <summary>
         /// Set the Tag for a nodeId.
         /// A Tag determines valid links.
+        /// This also determines how to draw the object.
         /// </summary>
         /// <param name="nodeId"></param>
         /// <param name="tags"></param>
@@ -110,9 +114,9 @@ namespace Triggered.modules.struct_node
         /// <param name="parts"></param>
         internal void HandleFlags(string[] parts)
         {
-            if (parts.Any(flag => flag.ToLower().Contains("spacing")))
+            if (parts.Any(flag => flag.ToLower().StartsWith("spacing")))
                 ImGui.Spacing();
-            if (parts.Any(flag => flag.ToLower().Contains("sameline")))
+            if (parts.Any(flag => flag.ToLower().StartsWith("sameline")))
                 ImGui.SameLine();
             if (parts.Any(flag => flag.ToLower().StartsWith("indent ")))
             {
@@ -123,7 +127,7 @@ namespace Triggered.modules.struct_node
             }
         }
         /// <summary>
-        /// Provides a template for all Node to use
+        /// Draw the Title bar, and Attribute (Input, Output) fields.
         /// </summary>
         public void DrawTitleAndIO()
         {
@@ -132,17 +136,17 @@ namespace Triggered.modules.struct_node
             // Use the List<(int, string)> Tags to construct
             foreach (var (nodeId, tag) in Tags)
             {
-                string[] parts = tag.Split(',');
-                switch (parts[0])
+                string[] parts = tag.Split(',', StringSplitOptions.TrimEntries);
+                switch (parts[0].ToLower())
                 {
-                    case "TitleBar":
+                    case "titlebar":
                         string title = parts[1];
                         ImNodes.BeginNodeTitleBar();
                         HandleFlags(parts);
                         ImGui.Text(title);
                         ImNodes.EndNodeTitleBar();
                         break;
-                    case "Output":
+                    case "output":
                         string outType = parts[1];
                         string outName = parts[2];
                         ImNodes.BeginOutputAttribute(nodeId);
@@ -150,13 +154,15 @@ namespace Triggered.modules.struct_node
                         ImGui.Text($"{outType} {outName}");
                         ImNodes.EndOutputAttribute();
                         break;
-                    case "Input":
+                    case "input":
                         string inType = parts[1];
                         string inName = parts[2];
                         ImNodes.BeginInputAttribute(nodeId);
                         HandleFlags(parts);
                         ImGui.Text($"{inType} {inName}");
                         ImNodes.EndInputAttribute();
+                        break;
+                    case "dropdown":
                         break;
                     default:
                         break;

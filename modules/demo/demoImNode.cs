@@ -4,7 +4,7 @@ using ImNodesNET;
 using System.Collections.Generic;
 using Triggered.modules.struct_node;
 
-namespace Triggered
+namespace Triggered.modules.demo
 {
     internal static class demoImNode
     {
@@ -45,7 +45,7 @@ namespace Triggered
                 UpdateLinks();
             }
             else
-                App.Log("Node editor initialized to 0",4);
+                App.Log("Node editor initialized to 0", 4);
 
             ImGui.End();
         }
