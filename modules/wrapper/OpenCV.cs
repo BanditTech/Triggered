@@ -4,6 +4,7 @@ using Emgu.CV.Util;
 using System;
 using System.Drawing;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Triggered.modules.wrapper
 {
@@ -165,6 +166,41 @@ namespace Triggered.modules.wrapper
             // Release Memory
             screenBitmap.Dispose();
             return screenMat;
+        }
+
+        /// <summary>
+        /// Determine how many rows before a non-zero pixel.
+        /// </summary>
+        /// <returns>Number of Empty Rows</returns>
+        public static int GetEmptyRows(Mat bwMask)
+        {
+            // Find the first white pixel
+            int totalRows = bwMask.Rows;
+            int emptyRows = 0;
+            for (int row = 0; row < totalRows; row++)
+            {
+                VectorOfPoint nonZeroPoints = new VectorOfPoint();
+                CvInvoke.FindNonZero(bwMask.Row(row), nonZeroPoints);
+
+                if (nonZeroPoints.Size > 0)
+                    break;
+                else
+                    emptyRows++;
+            }
+            return emptyRows;
+        }
+
+        /// <summary>
+        /// Return a float representing the percentage from the top until non zero.
+        /// </summary>
+        /// <param name="bwMask"></param>
+        /// <returns>Float value between 0f and 1f</returns>
+        public static float GetMaskPercentage(Mat bwMask)
+        {
+            float totalRows = bwMask.Rows;
+            float emptyRows = GetEmptyRows(bwMask);
+            float result = (totalRows - emptyRows) / totalRows;
+            return result;
         }
 
         /// <summary>
