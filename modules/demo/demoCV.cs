@@ -655,6 +655,11 @@ namespace Triggered.modules.demo
             options.SetKey("Display_AdjustShape", false);
         }
 
+        /// <summary>
+        /// Method from Emgu.CV Wiki that demonstrates Edge, circle and rectangle detection.
+        /// </summary>
+        /// <param name="img"></param>
+        /// <returns></returns>
         public static Mat ProcessImage(Mat img)
         {
             using (UMat gray = new UMat())
@@ -801,6 +806,9 @@ namespace Triggered.modules.demo
             }
         }
 
+        /// <summary>
+        /// See how fast we can make rectangle detection alone.
+        /// </summary>
         public static void DemoShapeRectangle()
         {
             var options = App.Options.DemoCV;
@@ -826,6 +834,11 @@ namespace Triggered.modules.demo
             options.SetKey("Display_AdjustRectangle", false);
         }
 
+        /// <summary>
+        /// Rectangle Processing and benchmark.
+        /// </summary>
+        /// <param name="img"></param>
+        /// <returns></returns>
         public static Mat ProcessRectangles(Mat img)
         {
             var options = App.Options.DemoCV;
@@ -918,8 +931,12 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderShapeDetection()
         {
-
+            // There are no settings for this
         }
+
+        /// <summary>
+        /// ImGui menu for adjusting the Min/Max match values.
+        /// </summary>
         public static void RenderShapeRectangle()
         {
             // This sets up an options for the DemoCV methods.
