@@ -83,6 +83,13 @@
                     DemoCV.DemoShapeRectangle();
                 });
             }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVSubset"))
+            {
+                Task.Run(() =>
+                {
+                    DemoCV.DemoHSVSubset();
+                });
+            }
         }
 
         /// <summary>
@@ -137,6 +144,8 @@
                 DemoCV.RenderShapeDetection();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
                 DemoCV.RenderShapeRectangle();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVSubset"))
+                DemoCV.RenderHSVSubset();
 
             // demoImNode.Render();
         }
@@ -246,6 +255,14 @@
                 });
             }
             ImGui.SameLine();
+            if (ImGui.Button("HSV Subset demo"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustHSVSubset", true);
+                Task.Run(() =>
+                {
+                    DemoCV.DemoHSVSubset();
+                });
+            }
             if (ImGui.Button("Shape demo"))
             {
                 App.Options.DemoCV.SetKey("Display_AdjustShape", true);
@@ -254,6 +271,7 @@
                     DemoCV.DemoShapeDetection();
                 });
             }
+            ImGui.SameLine();
             if (ImGui.Button("Rectangle demo"))
             {
                 App.Options.DemoCV.SetKey("Display_AdjustRectangle", true);
