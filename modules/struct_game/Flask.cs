@@ -5,7 +5,7 @@
     /// <summary>
     /// Represents each individual flask.
     /// </summary>
-    public class Flask
+    public class Flask : Triggerable
     {
         /// <summary>
         /// The slot of the Flask
