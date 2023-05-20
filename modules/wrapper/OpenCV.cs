@@ -4,7 +4,12 @@ using Emgu.CV.Util;
 using System;
 using System.Drawing;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using System.Windows.Forms;
+using Triggered.modules.panels;
+using Vortice;
 
 namespace Triggered.modules.wrapper
 {
@@ -53,10 +58,13 @@ namespace Triggered.modules.wrapper
         {
             // Produce the target mask Mat
             Mat mask = new();
+            // produce gray mask
+            Mat grayImage = new Mat();
             // Convert to gray
-            CvInvoke.CvtColor(filteredMat, mask, ColorConversion.Bgr2Gray);
+            CvInvoke.CvtColor(filteredMat, grayImage, ColorConversion.Bgr2Gray);
             // Strip non-white pixels
-            CvInvoke.InRange(mask, new ScalarArray(255), new ScalarArray(255), mask);
+            CvInvoke.InRange(grayImage, new ScalarArray(255), new ScalarArray(255), mask);
+            grayImage.Dispose();
             return mask;
         }
 
@@ -174,19 +182,40 @@ namespace Triggered.modules.wrapper
         /// <returns>Number of Empty Rows</returns>
         public static int GetEmptyRows(Mat bwMask)
         {
+            // Ensure bwMask is single-channel
+            Mat grayMask = new Mat();
+            if (bwMask.NumberOfChannels > 1)
+                CvInvoke.CvtColor(bwMask, grayMask, ColorConversion.Bgr2Gray);
+            else
+                grayMask = bwMask.Clone();
+
+            // Convert grayMask to Image
+            Bitmap bitmap = grayMask.ToBitmap();
+            grayMask.Dispose();
             // Find the first white pixel
-            int totalRows = bwMask.Rows;
+            int totalRows = bitmap.Height;
             int emptyRows = 0;
+
             for (int row = 0; row < totalRows; row++)
             {
-                VectorOfPoint nonZeroPoints = new VectorOfPoint();
-                CvInvoke.FindNonZero(bwMask.Row(row), nonZeroPoints);
+                bool isRowEmpty = true;
+                for (int col = 0; col < bitmap.Width; col++)
+                {
+                    Color pixelColor = bitmap.GetPixel(col, row);
+                    if (pixelColor.R == 255 && pixelColor.G == 255 && pixelColor.B == 255)
+                    {
+                        isRowEmpty = false;
+                        break;
+                    }
+                }
 
-                if (nonZeroPoints.Size > 0)
-                    break;
-                else
+                if (isRowEmpty)
                     emptyRows++;
+                else
+                    break;
             }
+            bitmap.Dispose();
+
             return emptyRows;
         }
 

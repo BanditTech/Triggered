@@ -41,6 +41,7 @@ namespace Triggered.modules.options
             SetKey("filterSubsetY", 100);
             SetKey("filterSubsetW", 100);
             SetKey("filterSubsetH", 100);
+            SetKey("filterSubsetPercentage", 1f);
             // Shape Detection
             SetKey("rectangleArea",250);
             SetKey("cannyThreshold", 180.0f);

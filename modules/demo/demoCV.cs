@@ -954,6 +954,7 @@ namespace Triggered.modules.demo
                 options.SetKey("cannyThresholdLinking", cannyThresholdLinking);
         }
 
+        private static float _percentage = 1f;
         /// <summary>
         /// Displays a window of a subset of the Primary Monitor in HSV.
         /// </summary>
@@ -989,6 +990,12 @@ namespace Triggered.modules.demo
                 hsvMat.Dispose();
                 // Produce the target mask Mat
                 Mat hsvMask = GetBlackWhiteMaskMat(filteredMat);
+                var percentage = GetMaskPercentage(filteredMat);
+                if (_percentage != percentage)
+                {
+                    _percentage = percentage;
+                    options.SetKey("filterSubsetPercentage", percentage);
+                }
                 // Release Memory
                 filteredMat.Dispose();
                 // Create a Mat for the result
@@ -1024,6 +1031,7 @@ namespace Triggered.modules.demo
             var y = options.GetKey<int>("filterSubsetY");
             var w = options.GetKey<int>("filterSubsetW");
             var h = options.GetKey<int>("filterSubsetH");
+            var percentage = options.GetKey<float>("filterSubsetPercentage");
 
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Min", ref min, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
@@ -1052,15 +1060,17 @@ namespace Triggered.modules.demo
                 options.SetKey("filterSubsetY", y);
             }
 
-            if (ImGui.SliderInt("W", ref w, 0, screen.Width - x))
+            if (ImGui.SliderInt("W", ref w, 1, screen.Width - x))
             {
                 options.SetKey("filterSubsetW", w);
             }
 
-            if (ImGui.SliderInt("H", ref h, 0, screen.Height - y))
+            if (ImGui.SliderInt("H", ref h, 1, screen.Height - y))
             {
                 options.SetKey("filterSubsetH", h);
             }
+
+            ImGui.LabelText("% ",$"{percentage}");
 
             ImGui.End();
         }
