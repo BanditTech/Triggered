@@ -6,37 +6,38 @@ namespace Triggered.modules.struct_game
     /// Provides a uniform system for Flask and Ability slots.
     /// I realized they often require the exact same properties.
     /// </summary>
-    public class Triggerable
+    public abstract class Triggerable
     {
         /// <summary>
         /// The slot of the triggerable
         /// </summary>
-        protected int Slot;
+        public int Slot { get; set; }
 
         /// <summary>
         /// Assign the bound key for this triggerable slot.
         /// </summary>
-        public string boundKey { get; set; } = string.Empty;
+        public string BoundKey { get; set; }
 
         /// <summary>
-        /// Provide a public method for determining ready state.
+        /// Sets the duration of a triggerable in seconds.
+        /// </summary>
+        public float Duration { get; set; } = 1f;
+
+        /// <summary>
+        /// Set the expiration timestamp.
+        /// Uses the Now timestamp + Duration.
+        /// </summary>
+        public DateTime EndsAt { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// Provide a public property for checking ready state.
         /// </summary>
         public bool IsReady { get { return !IsActive && IsAvailable; } }
         internal bool IsActive { get; set; } = false;
         internal bool IsAvailable { get; set; } = true;
 
         /// <summary>
-        /// Sets the duration of a triggerable in seconds.
-        /// </summary>
-        public float Duration { get; set; } = 6.0f;
-
-        /// <summary>
-        /// Determines the ending timestamp of a triggerable.
-        /// </summary>
-        public DateTime EndsAt { get; set; } = DateTime.Now;
-
-        /// <summary>
-        /// Determine if the flasks
+        /// Determine if the triggerable can fire
         /// </summary>
         public void Fire()
         {
@@ -46,8 +47,9 @@ namespace Triggered.modules.struct_game
             EndsAt = EndsAt.AddSeconds(Duration);
             // Fire boundKey or add it to keystroke manager
         }
+
         /// <summary>
-        /// Check if any slot has expired
+        /// Check if this Slot has expired
         /// </summary>
         public void Check()
         {
