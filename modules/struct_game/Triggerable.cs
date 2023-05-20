@@ -25,7 +25,7 @@ namespace Triggered.modules.struct_game
         /// <summary>
         /// Determine the position to check for availability.
         /// Available options: top, bottom, left, right, center
-        /// Available ending math: +#x / -#x or +#y / -#y
+        /// Add or subtract: +10y, -2x, +3x, -10y, etc..
         /// </summary>
         public string Anchor { get; set; } = "center";
         internal Point DetermineCenterOffset()
