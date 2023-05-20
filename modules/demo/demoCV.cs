@@ -1005,6 +1005,7 @@ namespace Triggered.modules.demo
                 // Release Memory
                 screenMat.Dispose();
                 hsvMask.Dispose();
+                capture.Dispose();
                 // Display the Masked image
                 DisplayImage(win1, copied);
                 // Release Memory
