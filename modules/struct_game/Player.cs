@@ -26,6 +26,16 @@
         public float EnergyShield { get; set; } = 1f;
 
         /// <summary>
+        /// Comma seperated list of all found buff samples.
+        /// </summary>
+        public string Buffs { get; set; } = "";
+
+        /// <summary>
+        /// Comma seperated list of all found debuff samples.
+        /// </summary>
+        public string Debuffs { get; set; } = "";
+
+        /// <summary>
         /// The current Flask states
         /// </summary>
         public Flask[] Flasks { get; set; } = {
