@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Drawing;
+using System.Linq;
+using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Triggered.modules.struct_game
 {
@@ -17,6 +21,78 @@ namespace Triggered.modules.struct_game
         /// Assign the bound key for this triggerable slot.
         /// </summary>
         public string BoundKey { get; set; }
+
+        /// <summary>
+        /// Determine the position to check for availability.
+        /// Available options: top, bottom, left, right, center
+        /// Available ending math: +#x / -#x or +#y / -#y
+        /// </summary>
+        public string Anchor { get; set; } = "center";
+        internal Point DetermineCenterOffset()
+        {
+            Point offset = new(0,0);
+            var parts = Anchor.Split(" ");
+
+            if (parts[0].ToLower() == "top" )
+                offset.Y -= 20;
+            else if (parts[0].ToLower() == "bottom" )
+                offset.Y += 20;
+            else if (parts[0].ToLower() == "left" )
+                offset.X -= 20;
+            else if (parts[0].ToLower() == "right" )
+                offset.X += 20;
+            else if (parts[0].ToLower() == "center" && parts[1].ToLower() == "left")
+                offset.X -= 10;
+            else if (parts[0].ToLower() == "center" && parts[1].ToLower() == "right")
+                offset.X += 10;
+            else if (parts[0].ToLower() == "center" && parts[1].ToLower() == "top")
+                offset.Y -= 10;
+            else if (parts[0].ToLower() == "center" && parts[1].ToLower() == "bottom")
+                offset.Y += 10;
+
+            if (parts[0].ToLower() != "center")
+            {
+                if (parts[1].ToLower() == "left")
+                    offset.X -= 20;
+                else if (parts[1].ToLower() == "right")
+                    offset.X += 20;
+                else if (parts[1].ToLower() == "top")
+                    offset.Y -= 20;
+                else if (parts[1].ToLower() == "bottom")
+                    offset.Y += 20;
+                else if (parts[1].ToLower() == "center" && parts[2].ToLower() == "left")
+                    offset.X -= 10;
+                else if (parts[1].ToLower() == "center" && parts[2].ToLower() == "right")
+                    offset.X += 10;
+                else if (parts[1].ToLower() == "center" && parts[2].ToLower() == "top")
+                    offset.Y -= 10;
+                else if (parts[1].ToLower() == "center" && parts[2].ToLower() == "bottom")
+                    offset.Y += 10;
+            }
+
+            var offsetGroups = parts.SelectMany(part => Regex.Matches(part, @"([+-])(\d+)([xXyY])").Cast<Match>().Select(match => match.Groups));
+
+            foreach (var groups in offsetGroups)
+            {
+                char operation = groups[1].Value[0];
+                int value = int.Parse(groups[2].Value);
+                char dimension = char.ToLower(groups[3].Value[0]);
+
+                AddSubtractFromPoint(operation, value, dimension, ref offset);
+            }
+
+            return offset;
+        }
+
+        private void AddSubtractFromPoint(char operation, int value, char dimension, ref Point offset)
+        {
+            if (operation == '-')
+                value = value * -1;
+            if (dimension == 'x')
+                offset.X += value;
+            else
+                offset.Y += value;
+        }
 
         /// <summary>
         /// Sets the duration of a triggerable in seconds.
