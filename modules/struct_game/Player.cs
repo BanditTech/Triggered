@@ -35,5 +35,30 @@
             new Flask(4),
             new Flask(5),
         };
+
+        /// <summary>
+        /// The current Ability states
+        /// </summary>
+        public Ability[] Abilities { get; set; } = {
+            new Ability(1),
+            new Ability(2),
+            new Ability(3),
+            new Ability(4),
+            new Ability(5),
+            new Ability(6),
+            new Ability(7),
+            new Ability(8)
+        };
+
+        /// <summary>
+        /// The current Bonus Bar states
+        /// </summary>
+        public Ability[] BonusBar { get; set; } = {
+            new Ability(1),
+            new Ability(2),
+            new Ability(3),
+            new Ability(4),
+            new Ability(5)
+        };
     }
 }
