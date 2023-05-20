@@ -1,12 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Triggered.modules.struct_game
+﻿namespace Triggered.modules.struct_game
 {
     /// <summary>
-    /// Define the shape of an ability object
+    /// Represent an ability object.
     /// </summary>
     public class Ability : Triggerable
     {

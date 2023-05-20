@@ -1,9 +1,7 @@
 ﻿namespace Triggered.modules.struct_game
 {
-    using System;
-
     /// <summary>
-    /// Represents each individual flask.
+    /// Represents a flask object.
     /// </summary>
     public class Flask : Triggerable
     {
