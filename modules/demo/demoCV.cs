@@ -964,6 +964,7 @@ namespace Triggered.modules.demo
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             var options = App.Options.DemoCV;
 
+
             // We create our named window
             CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
             // Exit the loop when you press the Escape Key
@@ -990,7 +991,10 @@ namespace Triggered.modules.demo
                 hsvMat.Dispose();
                 // Produce the target mask Mat
                 Mat hsvMask = GetBlackWhiteMaskMat(filteredMat);
+                Stopwatch watch = Stopwatch.StartNew();
                 var percentage = GetMaskPercentage(filteredMat);
+                watch.Stop();
+                App.Log($"Mask Percentage Detection took: {watch.ElapsedMilliseconds}ms", 0);
                 if (_percentage != percentage)
                 {
                     _percentage = percentage;

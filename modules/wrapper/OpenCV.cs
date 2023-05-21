@@ -4,12 +4,6 @@ using Emgu.CV.Util;
 using System;
 using System.Drawing;
 using System.Numerics;
-using System.Threading;
-using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
-using System.Windows.Forms;
-using Triggered.modules.panels;
-using Vortice;
 
 namespace Triggered.modules.wrapper
 {
@@ -180,43 +174,57 @@ namespace Triggered.modules.wrapper
         /// Determine how many rows before a non-zero pixel.
         /// </summary>
         /// <returns>Number of Empty Rows</returns>
-        public static int GetEmptyRows(Mat bwMask)
+        public static int GetEmptyRowsFromTop(Mat bwMask)
         {
-            // Ensure bwMask is single-channel
-            Mat grayMask = new Mat();
-            if (bwMask.NumberOfChannels > 1)
-                CvInvoke.CvtColor(bwMask, grayMask, ColorConversion.Bgr2Gray);
-            else
-                grayMask = bwMask.Clone();
-
             // Convert grayMask to Image
-            Bitmap bitmap = grayMask.ToBitmap();
-            grayMask.Dispose();
-            // Find the first white pixel
-            int totalRows = bitmap.Height;
-            int emptyRows = 0;
-
-            for (int row = 0; row < totalRows; row++)
+            using (Bitmap bitmap = bwMask.ToBitmap())
             {
-                bool isRowEmpty = true;
-                for (int col = 0; col < bitmap.Width; col++)
+                // Find the first white pixel
+                int totalRows = bitmap.Height;
+                int emptyRows = 0;
+
+                for (int row = 0; row < totalRows; row++)
                 {
-                    Color pixelColor = bitmap.GetPixel(col, row);
-                    if (pixelColor.R == 255 && pixelColor.G == 255 && pixelColor.B == 255)
+                    for (int col = 0; col < bitmap.Width; col++)
                     {
-                        isRowEmpty = false;
-                        break;
+                        Color pixelColor = bitmap.GetPixel(col, row);
+                        if (pixelColor.R == 255 && pixelColor.G == 255 && pixelColor.B == 255)
+                            return emptyRows;
                     }
-                }
-
-                if (isRowEmpty)
                     emptyRows++;
-                else
-                    break;
+                }
+                return emptyRows;
             }
-            bitmap.Dispose();
+        }
 
-            return emptyRows;
+        public static int GetMatchingRowsFromBottom(Mat bwMask)
+        {
+            // Convert grayMask to Image
+            using (Bitmap bitmap = bwMask.ToBitmap())
+            {
+                // Find the first white pixel
+                int totalRows = bitmap.Height;
+                int matchRows = 0;
+
+                for (int row = 0; row < totalRows; row++)
+                {
+                    bool found = false;
+                    for (int col = 0; col < bitmap.Width; col++)
+                    {
+                        Color pixelColor = bitmap.GetPixel(col, row);
+                        if (pixelColor.R == 255 && pixelColor.G == 255 && pixelColor.B == 255)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        matchRows++;
+                    else
+                        break;
+                }
+                return matchRows;
+            }
         }
 
         /// <summary>
@@ -227,8 +235,10 @@ namespace Triggered.modules.wrapper
         public static float GetMaskPercentage(Mat bwMask)
         {
             float totalRows = bwMask.Rows;
-            float emptyRows = GetEmptyRows(bwMask);
+            float emptyRows = GetEmptyRowsFromTop(bwMask);
+            //float matchRows = GetMatchingRowsFromBottom(bwMask);
             float result = (totalRows - emptyRows) / totalRows;
+            //float result = matchRows / totalRows;
             return result;
         }
 
