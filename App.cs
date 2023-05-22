@@ -6,6 +6,7 @@ using Triggered.modules.options;
 using Triggered.modules.panels;
 using Triggered.modules.struct_game;
 using Triggered.modules.struct_filter;
+using Emgu.CV.OCR;
 
 namespace Triggered
 {

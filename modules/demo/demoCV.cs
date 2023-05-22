@@ -3,6 +3,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using Emgu.CV.Util;
+using Emgu.CV.OCR;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -11,6 +12,7 @@ using System.Numerics;
 using static Triggered.modules.wrapper.OpenCV;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Triggered.modules.demo
 {
@@ -22,6 +24,7 @@ namespace Triggered.modules.demo
     /// </summary>
     public static class DemoCV
     {
+        static string _resultOCR = "";
         /// <summary>
         /// Shows a blue screen with Hello, World
         /// </summary>
@@ -1080,5 +1083,122 @@ namespace Triggered.modules.demo
             ImGui.End();
         }
 
+        public static void DemoOCR()
+        {
+            string win1 = "OCR Matching";
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            var options = App.Options.DemoCV;
+            Tesseract OCR = new();
+            OCR.Init(Path.Join(AppContext.BaseDirectory,"tessdata"),"eng",OcrEngineMode.TesseractOnly);
+            // We create our named window
+            CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
+            // Exit the loop when you press the Escape Key
+            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
+            {
+                // Set up our local variables
+                Vector3 min = options.GetKey<Vector3>("OCR.Min");
+                Vector3 max = options.GetKey<Vector3>("OCR.Max");
+                int x = options.GetKey<int>("OCR.X");
+                int y = options.GetKey<int>("OCR.Y");
+                int w = options.GetKey<int>("OCR.W");
+                int h = options.GetKey<int>("OCR.H");
+
+                Rectangle subset = new Rectangle(x, y, w, h);
+                // Capture the screen
+                Mat capture = GetScreenMat(screenBounds);
+                Mat screenMat = new Mat(capture, subset);
+                // Convert into HSV color space
+                Mat hsvMat = new();
+                CvInvoke.CvtColor(screenMat, hsvMat, ColorConversion.Bgr2Hsv);
+                // Filter the image according to the range values.
+                Mat filteredMat = GetFilteredMat(hsvMat, min, max, true);
+                // Release Memory
+                hsvMat.Dispose();
+                // Produce the target mask Mat
+                Mat hsvMask = GetBlackWhiteMaskMat(filteredMat);
+                OCR.SetImage(hsvMask);
+                string result = OCR.GetUTF8Text().Trim();
+                if (_resultOCR != result)
+                {
+                    App.Log($"Text detection resulted in {result}",0);
+                    _resultOCR = result;
+                }
+                // Release Memory
+                filteredMat.Dispose();
+                // Create a Mat for the result
+                Mat copied = new();
+                // Copy the image from within the masked area
+                screenMat.CopyTo(copied, hsvMask);
+                // Release Memory
+                screenMat.Dispose();
+                hsvMask.Dispose();
+                capture.Dispose();
+                // Display the Masked image
+                DisplayImage(win1, copied);
+                // Release Memory
+                copied.Dispose();
+            }
+            CvInvoke.DestroyWindow(win1);
+            options.SetKey("Display_AdjustOCR", false);
+            OCR.Dispose();
+        }
+
+        public static void RenderOCR()
+        {
+            ImGui.Begin("DemoCVOCR");
+
+            // This sets up an options for the DemoCV methods.
+            var options = App.Options.DemoCV;
+            var screen = Screen.PrimaryScreen.Bounds;
+            // Get the current values from options
+            var min = options.GetKey<Vector3>("OCR.Min");
+            var max = options.GetKey<Vector3>("OCR.Max");
+            var x = options.GetKey<int>("OCR.X");
+            var y = options.GetKey<int>("OCR.Y");
+            var w = options.GetKey<int>("OCR.W");
+            var h = options.GetKey<int>("OCR.H");
+            var percentage = options.GetKey<float>("OCR.Percentage");
+
+            // Render colorpicker widget
+            if (ImGui.ColorPicker3("Filter Min", ref min, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
+                options.SetKey("OCR.Min", min);
+
+            if (ImGui.ColorPicker3("Filter Max", ref max, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
+                options.SetKey("OCR.Max", max);
+
+            if (ImGui.SliderInt("X", ref x, 0, screen.Width - 1))
+            {
+                if (x + w > screen.Width)
+                {
+                    w = screen.Width - x;
+                    options.SetKey("OCR.W", w);
+                }
+                options.SetKey("OCR.X", x);
+            }
+
+            if (ImGui.SliderInt("Y", ref y, 0, screen.Height - 1))
+            {
+                if (y + h > screen.Height)
+                {
+                    h = screen.Height - y;
+                    options.SetKey("OCR.H", h);
+                }
+                options.SetKey("OCR.Y", y);
+            }
+
+            if (ImGui.SliderInt("W", ref w, 1, screen.Width - x))
+            {
+                options.SetKey("OCR.W", w);
+            }
+
+            if (ImGui.SliderInt("H", ref h, 1, screen.Height - y))
+            {
+                options.SetKey("OCR.H", h);
+            }
+
+            ImGui.LabelText("% ", $"{percentage}");
+
+            ImGui.End();
+        }
     }
 }

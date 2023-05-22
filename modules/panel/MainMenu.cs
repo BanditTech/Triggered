@@ -90,6 +90,13 @@
                     DemoCV.DemoHSVSubset();
                 });
             }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustOCR"))
+            {
+                Task.Run(() =>
+                {
+                    DemoCV.DemoOCR();
+                });
+            }
         }
 
         /// <summary>
@@ -146,6 +153,8 @@
                 DemoCV.RenderShapeRectangle();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVSubset"))
                 DemoCV.RenderHSVSubset();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustOCR"))
+                DemoCV.RenderOCR();
 
             // demoImNode.Render();
         }
@@ -278,6 +287,15 @@
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeRectangle();
+                });
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("OCR demo"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustOCR", true);
+                Task.Run(() =>
+                {
+                    DemoCV.DemoOCR();
                 });
             }
             ImGui.Separator();
