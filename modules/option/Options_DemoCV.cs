@@ -41,7 +41,6 @@ namespace Triggered.modules.options
             SetKey("OCR.Y", 100);
             SetKey("OCR.W", 100);
             SetKey("OCR.H", 100);
-            SetKey("OCR.Percentage", 1f);
             // HSV Subset Values
             SetKey("filterSubsetHSVMin", new Vector3(0.4f, 0f, 0f));
             SetKey("filterSubsetHSVMax", new Vector3(0.5f, 1f, 1f));

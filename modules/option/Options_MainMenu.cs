@@ -23,6 +23,7 @@
             // Viewport options
             SetKey("Fullscreen", true);
             SetKey("Padding", false);
+            SetKey("VSync", true);
             // Logic
             SetKey("LogicTickDelayInMilliseconds", 100);
             // Reset the changed flag to avoid saving again
