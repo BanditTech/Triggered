@@ -108,6 +108,16 @@
         }
 
         /// <summary>
+        /// Enable VSync
+        /// </summary>
+        /// <returns></returns>
+        protected override Task PostInitialized()
+        {
+            this.VSync = App.Options.MainMenu.GetKey<bool>("VSync");
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// RenderBW thread is run every frame
         /// We can piggy back on the render thread for simple keybinds
         /// </summary>
@@ -326,6 +336,12 @@
                     var padding = options.GetKey<bool>("Padding");
                     if (ImGui.MenuItem("Padding", null, ref padding))
                         options.SetKey("Padding", padding);
+                    var vsync = options.GetKey<bool>("VSync");
+                    if (ImGui.MenuItem("VSync", null, ref vsync))
+                    {
+                        this.VSync = vsync;
+                        options.SetKey("VSync", vsync);
+                    }
                     ImGui.Separator();
 
                     // Display a menu item to close this example.
