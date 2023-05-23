@@ -50,7 +50,7 @@
         /// <param name="measurementNoise">
         /// This parameter controls how much weight the filter gives to the measured data versus the predicted state.
         /// </param>
-        public KalmanFilter(float processNoise = 0.1f, float measurementNoise = 1f)
+        public KalmanFilter(float processNoise = 1f, float measurementNoise = 1f)
         {
             Q = processNoise;
             R = measurementNoise;

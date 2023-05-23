@@ -26,7 +26,6 @@ namespace Triggered.modules.demo
     /// </summary>
     public static class DemoCV
     {
-        static string _resultOCR = "";
         /// <summary>
         /// Shows a blue screen with Hello, World
         /// </summary>
@@ -1085,8 +1084,9 @@ namespace Triggered.modules.demo
             ImGui.End();
         }
 
-        private static wrapper.KalmanFilter currFilter = new(0.01f,1f);
-        private static wrapper.KalmanFilter maxFilter = new(0.01f,1f);
+        static string _resultOCR = "";
+        private static wrapper.KalmanFilter currFilter = new();
+        private static wrapper.KalmanFilter maxFilter = new();
         public static void DemoOCR()
         {
             string win1 = "OCR Matching";
@@ -1125,9 +1125,8 @@ namespace Triggered.modules.demo
                 CvInvoke.BitwiseNot(hsvMask, invertMask);
                 OCR.SetImage(invertMask);
                 string result = OCR.GetUTF8Text().Trim();
-                if (result != "" && _resultOCR != result)
+                if (result != "")
                 {
-                    _resultOCR = result;
                     // brute force a few scenarios to conform to shape
                     result = Regex.Replace(result, "  ", " ");
                     result = Regex.Replace(result, "[,.]", "");
@@ -1157,9 +1156,10 @@ namespace Triggered.modules.demo
                                     float kCurrent = currFilter.Filter(current);
                                     float kMaximum = maxFilter.Filter(maximum);
                                     // We have our non-error condition
-                                    float kPercentage = kCurrent / kMaximum;
+                                    double kPercentage = Math.Ceiling( (double)kCurrent / kMaximum * 100);
                                     float percentage = current / maximum;
-                                    App.Log($"{name} : {parts[0]} / {parts[1]} = {(int)(percentage * 100)}% => Kalman {kCurrent} / {kMaximum} = {(int)(kPercentage * 100)}% ",0);
+
+                                    App.Log($"{name} : {(int)current} / {(int)maximum} = {(int)(percentage * 100)}%\n=> Kalman {(int)kCurrent} / {(int)kMaximum} = {(int)kPercentage}% ",0);
                                 }
                             }
                         }
