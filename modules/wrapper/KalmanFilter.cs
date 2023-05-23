@@ -48,9 +48,14 @@
         /// A higher value for processNoise means that the filter trusts the dynamic model more.
         /// A higher value for measurementNoise means that the filter trusts the measured data more.
         /// </summary>
-        /// <param name="processNoise">This parameter controls how much weight the filter gives to the predicted state versus the measured data.</param>
-        /// <param name="measurementNoise">This parameter controls how much weight the filter gives to the measured data versus the predicted state.</param>
-        public KalmanFilter(float processNoise, float measurementNoise)
+        /// 
+        /// <param name="processNoise">
+        /// This parameter controls how much weight the filter gives to the predicted state versus the measured data.
+        /// </param>
+        /// <param name="measurementNoise">
+        /// This parameter controls how much weight the filter gives to the measured data versus the predicted state.
+        /// </param>
+        public KalmanFilter(float processNoise = 0.1f, float measurementNoise = 1f)
         {
             Q = processNoise;
             R = measurementNoise;
