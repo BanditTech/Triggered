@@ -1085,8 +1085,8 @@ namespace Triggered.modules.demo
             ImGui.End();
         }
 
-        private static wrapper.KalmanFilter currFilter = new();
-        private static wrapper.KalmanFilter maxFilter = new();
+        private static wrapper.KalmanFilter currFilter = new(0.01f,1f);
+        private static wrapper.KalmanFilter maxFilter = new(0.01f,1f);
         public static void DemoOCR()
         {
             string win1 = "OCR Matching";
@@ -1145,7 +1145,7 @@ namespace Triggered.modules.demo
                         else
                         {
                             if (!parts[0].All(char.IsDigit) || !parts[1].All(char.IsDigit)) 
-                                App.Log($"not all digits: {result}", 4);
+                                App.Log($"Not all digits: {result}", 4);
                             else
                             {
                                 float current = float.Parse(parts[0]);
@@ -1159,7 +1159,7 @@ namespace Triggered.modules.demo
                                     // We have our non-error condition
                                     float kPercentage = kCurrent / kMaximum;
                                     float percentage = current / maximum;
-                                    App.Log($"{name} : {parts[0]} / {parts[1]} = {(int)(percentage * 100)}% => Kalman {kCurrent} / {kMaximum} = {(int)(kPercentage * 100)}% ",1);
+                                    App.Log($"{name} : {parts[0]} / {parts[1]} = {(int)(percentage * 100)}% => Kalman {kCurrent} / {kMaximum} = {(int)(kPercentage * 100)}% ",0);
                                 }
                             }
                         }

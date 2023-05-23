@@ -12,22 +12,17 @@
         /// Process noise variance.
         /// Represents the uncertainty in the system's dynamic model.
         /// </summary>
-        private float Q;
+        private readonly float Q;
         /// <summary>
         /// Measurement noise variance.
         /// Represents the uncertainty in the measured data.
         /// </summary>
-        private float R;
+        private readonly float R;
         /// <summary>
         /// Estimate error covariance.
         /// Represents the uncertainty in the state estimate.
         /// </summary>
         private float P;
-        /// <summary>
-        /// Kalman gain.
-        /// Determines the weight given to the measured data versus the predicted state estimate.
-        /// </summary>
-        private float K;
         /// <summary>
         /// State estimate.
         ///  The current estimate of the system state.
@@ -60,7 +55,6 @@
             Q = processNoise;
             R = measurementNoise;
             P = 1.0f;
-            K = 0.0f;
             X = 0.0f;
             prevX = 0.0f;
             initialized = false;
@@ -85,9 +79,9 @@
                 X = prevX;
                 // Add to error covariance
                 P += Q;
-
                 // Calculate Kalman Gain
-                K = P / (P + R);
+                // Determines the weight given to the measured data versus the predicted state estimate.
+                float K = P / (P + R);
                 // Update Estimate value
                 X += K * (measurement - X);
                 // Update error covariance
