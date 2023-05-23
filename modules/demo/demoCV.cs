@@ -13,6 +13,8 @@ using static Triggered.modules.wrapper.OpenCV;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Triggered.modules.demo
 {
@@ -1083,13 +1085,15 @@ namespace Triggered.modules.demo
             ImGui.End();
         }
 
+        private static wrapper.KalmanFilter currFilter = new();
+        private static wrapper.KalmanFilter maxFilter = new();
         public static void DemoOCR()
         {
             string win1 = "OCR Matching";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             var options = App.Options.DemoCV;
             Tesseract OCR = new();
-            OCR.Init(Path.Join(AppContext.BaseDirectory,"tessdata"),"eng",OcrEngineMode.TesseractOnly);
+            OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"),"fast",OcrEngineMode.LstmOnly);
             // We create our named window
             CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
             // Exit the loop when you press the Escape Key
@@ -1116,15 +1120,54 @@ namespace Triggered.modules.demo
                 hsvMat.Dispose();
                 // Produce the target mask Mat
                 Mat hsvMask = GetBlackWhiteMaskMat(filteredMat);
-                OCR.SetImage(hsvMask);
+                // Invert the mask to improve Tesseract matching
+                Mat invertMask = new();
+                CvInvoke.BitwiseNot(hsvMask, invertMask);
+                OCR.SetImage(invertMask);
                 string result = OCR.GetUTF8Text().Trim();
-                if (_resultOCR != result)
+                if (result != "" && _resultOCR != result)
                 {
-                    App.Log($"Text detection resulted in {result}",0);
                     _resultOCR = result;
+                    // brute force a few scenarios to conform to shape
+                    result = Regex.Replace(result, "  ", " ");
+                    result = Regex.Replace(result, "[,.]", "");
+                    result = Regex.Replace(result, "{", "/");
+                    result = Regex.Replace(result, "//", "/");
+                    string[] split = result.Split(" ");
+                    if (split.Length != 2)
+                        App.Log($"Not exactly one space: {result}",4);
+                    else
+                    {
+                        string name = split[0];
+                        string[] parts = split[1].Split("/",StringSplitOptions.TrimEntries);
+                        if (parts.Length != 2)
+                            App.Log($"No divisor: {result}", 4);
+                        else
+                        {
+                            if (!parts[0].All(char.IsDigit) || !parts[1].All(char.IsDigit)) 
+                                App.Log($"not all digits: {result}", 4);
+                            else
+                            {
+                                float current = float.Parse(parts[0]);
+                                float maximum = float.Parse(parts[1]);
+                                if (current > maximum)
+                                    App.Log($"Min above max: {current} / {maximum}",4);
+                                else
+                                {
+                                    float kCurrent = currFilter.Filter(current);
+                                    float kMaximum = maxFilter.Filter(maximum);
+                                    // We have our non-error condition
+                                    float kPercentage = kCurrent / kMaximum;
+                                    float percentage = current / maximum;
+                                    App.Log($"{name} : {parts[0]} / {parts[1]} = {(int)(percentage * 100)}% => Kalman {kCurrent} / {kMaximum} = {(int)(kPercentage * 100)}% ",1);
+                                }
+                            }
+                        }
+                    }
                 }
                 // Release Memory
                 filteredMat.Dispose();
+                invertMask.Dispose();
                 // Create a Mat for the result
                 Mat copied = new();
                 // Copy the image from within the masked area
@@ -1145,7 +1188,7 @@ namespace Triggered.modules.demo
 
         public static void RenderOCR()
         {
-            ImGui.Begin("DemoCVOCR");
+            ImGui.Begin("Demo OCR");
 
             // This sets up an options for the DemoCV methods.
             var options = App.Options.DemoCV;
@@ -1157,7 +1200,6 @@ namespace Triggered.modules.demo
             var y = options.GetKey<int>("OCR.Y");
             var w = options.GetKey<int>("OCR.W");
             var h = options.GetKey<int>("OCR.H");
-            var percentage = options.GetKey<float>("OCR.Percentage");
 
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Min", ref min, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
@@ -1195,8 +1237,6 @@ namespace Triggered.modules.demo
             {
                 options.SetKey("OCR.H", h);
             }
-
-            ImGui.LabelText("% ", $"{percentage}");
 
             ImGui.End();
         }
