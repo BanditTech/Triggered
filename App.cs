@@ -6,7 +6,9 @@ using Triggered.modules.options;
 using Triggered.modules.panels;
 using Triggered.modules.struct_game;
 using Triggered.modules.struct_filter;
-using Emgu.CV.OCR;
+using ImGuiNET;
+using System;
+using System.Linq;
 
 namespace Triggered
 {
@@ -52,6 +54,13 @@ namespace Triggered
         public static Player Player = new();
 
         /// <summary>
+        /// Pointer to AlmaMono font
+        /// </summary>
+        public static ImFontPtr fontAM;
+
+        public static string[] fonts;
+
+        /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
         /// </summary>
         static App()
@@ -66,6 +75,17 @@ namespace Triggered
             // NLog requires some setup to begin logging to file
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logger = LogManager.GetCurrentClassLogger();
+
+            // Gather a list of ttf files in our fonts directory
+            string[] fontFiles = Directory.GetFiles("fonts","*.ttf");
+            // Create a list to store the font names
+            List<string> fontNames = new List<string>();
+            foreach (string fontFile in fontFiles)
+            {
+                string fontName = Path.GetFileNameWithoutExtension(fontFile);
+                fontNames.Add(fontName);
+            }
+            fonts = fontNames.ToArray();
         }
 
         #region Log(string log, LogLevel level)
