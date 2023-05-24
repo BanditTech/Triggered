@@ -40,19 +40,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="fonts\AlmaMono-Regular.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="fonts\NotoSans-Regular.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="lib\Tesseract\tessdata\fast.traineddata">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="lib\Tesseract\tessdata\eng.traineddata">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="tessdata\eng.traineddata">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="NLog.config">
@@ -64,6 +58,10 @@
     <Reference Include="ClickableTransparentOverlay">
       <HintPath>lib\ClickableTransparentOverlay.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="fonts\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties example_1json__JsonSchema="https://json.schemastore.org/jsconfig.json" /></VisualStudio></ProjectExtensions>
