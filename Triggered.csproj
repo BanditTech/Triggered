@@ -102,6 +102,6 @@
     </Reference>
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties example_1json__JsonSchema="https://json.schemastore.org/jsconfig.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>
