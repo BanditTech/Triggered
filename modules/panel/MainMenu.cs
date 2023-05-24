@@ -1,5 +1,7 @@
 ﻿namespace Triggered.modules.panels
 {
+    using System.IO;
+    using System;
     using System.Numerics;
     using System.Threading;
     using System.Threading.Tasks;
@@ -9,6 +11,8 @@
     using ImGuiNET;
     using Triggered.modules.demo;
     using Triggered.modules.wrapper;
+    using System.Drawing;
+    using Emgu.CV.CvEnum;
 
     /// <summary>
     /// The main brains of the App Behavior
@@ -113,6 +117,12 @@
         /// <returns></returns>
         protected override Task PostInitialized()
         {
+            var options = App.Options.MainMenu;
+            int fontSize = options.GetKey<int>("Font.Size");
+            var fontRange = options.GetKey<int>("Font.Range");
+            string fontName = App.fonts[options.GetKey<int>("Font.Index")];
+            string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", $"{fontName}.ttf");
+            ReplaceFont(fontPath, fontSize, (FontGlyphRangeType)fontRange);
             this.VSync = App.Options.MainMenu.GetKey<bool>("VSync");
             return Task.CompletedTask;
         }
@@ -192,6 +202,34 @@
                 return;
             }
             // Menu definition area
+            var fontIndex = options.GetKey<int>("Font.Index");
+            var fontSize = options.GetKey<int>("Font.Size");
+            var fontRange = options.GetKey<int>("Font.Range");
+            bool _adjusted = false;
+            if (ImGui.Combo("Font",ref fontIndex, App.fonts, App.fonts.Length))
+            {
+                options.SetKey("Font.Index",fontIndex);
+                _adjusted = true;
+            }
+            ImGui.SameLine();
+            if (ImGui.InputInt("Size", ref fontSize))
+            {
+                options.SetKey("Font.Size", fontSize);
+                _adjusted = true;
+            }
+            if (ImGui.Combo("Glyph Range", ref fontRange, App.glyphs, App.glyphs.Length))
+            {
+                options.SetKey("Font.Range", fontRange);
+                _adjusted = true;
+            }
+            if (_adjusted)
+            {
+                string fontName = App.fonts[fontIndex];
+                string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", $"{fontName}.ttf");
+                ReplaceFont(fontPath, fontSize, (FontGlyphRangeType)fontRange);
+            }
+
+            ImGui.Separator();
             int delay = options.GetKey<int>("LogicTickDelayInMilliseconds");
             if (ImGui.SliderInt("Logic MS", ref delay, 10, 1000))
                 options.SetKey("LogicTickDelayInMilliseconds", delay);

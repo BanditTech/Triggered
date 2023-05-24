@@ -9,6 +9,7 @@ using Triggered.modules.struct_filter;
 using ImGuiNET;
 using System;
 using System.Linq;
+using ClickableTransparentOverlay;
 
 namespace Triggered
 {
@@ -58,7 +59,15 @@ namespace Triggered
         /// </summary>
         public static ImFontPtr fontAM;
 
+        /// <summary>
+        /// Font files available
+        /// </summary>
         public static string[] fonts;
+
+        /// <summary>
+        /// what range
+        /// </summary>
+        public static string[] glyphs;
 
         /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
@@ -86,6 +95,8 @@ namespace Triggered
                 fontNames.Add(fontName);
             }
             fonts = fontNames.ToArray();
+
+            glyphs = Enum.GetNames(typeof(FontGlyphRangeType));
         }
 
         #region Log(string log, LogLevel level)

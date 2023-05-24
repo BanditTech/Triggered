@@ -16,6 +16,10 @@
             SetKey("SelectedLogLevelIndex", 1);
             SetKey("LogAutoScroll", true);
             SetKey("LogMaxLines", 1000);
+            // Font
+            SetKey("Font.Index",0);
+            SetKey("Font.Size",18);
+            SetKey("Font.Range",0);
             // Panel Visibility
             SetKey("Display_StashSorter", true);
             SetKey("Display_Main", true);
