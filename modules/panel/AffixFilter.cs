@@ -5,11 +5,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Text.RegularExpressions;
 
-namespace Triggered
+namespace Triggered.modules.panel
 {
-    public class DropdownBoxUtility
+    public class AffixFilter
     {
         private static List<string> filteredItems = new List<string>();
         private static string[] listNames = {
@@ -29,7 +28,7 @@ namespace Triggered
         private static int selectedListIndex = 0;
         private static JObject jsonData; // JObject to store the parsed JSON data
 
-        public static bool DrawDropdownBox(ref string input)
+        public static bool DrawTextBox(ref string input)
         {
             bool isInputTextEnterPressed = ImGui.InputText("##input", ref input, 32, ImGuiInputTextFlags.EnterReturnsTrue);
             var min = ImGui.GetItemRectMin();
@@ -65,7 +64,7 @@ namespace Triggered
                         bool allPartsMatch = true;
                         foreach (string part in parts)
                         {
-                            if (!str.Contains(part,StringComparison.OrdinalIgnoreCase))
+                            if (!str.Contains(part, StringComparison.OrdinalIgnoreCase))
                             {
                                 allPartsMatch = false;
                                 break;
@@ -149,8 +148,10 @@ namespace Triggered
 
         private static void LoadJsonData()
         {
+            // Build our string to locate the file
+            string path = Path.Combine(AppContext.BaseDirectory, "data", "PathofExile", "stats.json");
             // Load the JSON file into a string
-            string jsonString = File.ReadAllText("stats.json");
+            string jsonString = File.ReadAllText(path);
 
             // Parse the JSON data into a JObject
             jsonData = JObject.Parse(jsonString);

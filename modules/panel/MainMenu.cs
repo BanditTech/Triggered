@@ -11,8 +11,7 @@
     using ImGuiNET;
     using Triggered.modules.demo;
     using Triggered.modules.wrapper;
-    using System.Drawing;
-    using Emgu.CV.CvEnum;
+    using Triggered.modules.panel;
 
     /// <summary>
     /// The main brains of the App Behavior
@@ -360,7 +359,8 @@
                 });
             }
 
-            if (DropdownBoxUtility.DrawDropdownBox(ref input))
+            // if we have a change in the Dropdown input, we save it
+            if (AffixFilter.DrawTextBox(ref input))
             {
                 options.SetKey("TestText", input);
             }
