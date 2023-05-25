@@ -43762,7 +43762,7 @@
         },
         {
           "id": "enchant.delirium_reward_currency",
-          "text": "Delirium Reward Type: Currency (×#)",
+          "text": "Delirium Reward Type: Currency (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -43777,17 +43777,17 @@
         },
         {
           "id": "enchant.delirium_reward_trinkets",
-          "text": "Delirium Reward Type: Jewellery (×#)",
+          "text": "Delirium Reward Type: Jewellery (ï¿½#)",
           "type": "enchant"
         },
         {
           "id": "enchant.delirium_reward_armour",
-          "text": "Delirium Reward Type: Armour (×#)",
+          "text": "Delirium Reward Type: Armour (ï¿½#)",
           "type": "enchant"
         },
         {
           "id": "enchant.delirium_reward_weapon",
-          "text": "Delirium Reward Type: Weapons (×#)",
+          "text": "Delirium Reward Type: Weapons (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -43908,7 +43908,7 @@
         },
         {
           "id": "enchant.delirium_reward_labyrinth",
-          "text": "Delirium Reward Type: Labyrinth Items (×#)",
+          "text": "Delirium Reward Type: Labyrinth Items (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44002,7 +44002,7 @@
         },
         {
           "id": "enchant.delirium_reward_divinationcards",
-          "text": "Delirium Reward Type: Divination Cards (×#)",
+          "text": "Delirium Reward Type: Divination Cards (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44088,7 +44088,7 @@
         },
         {
           "id": "enchant.delirium_reward_uniques",
-          "text": "Delirium Reward Type: Unique Items (×#)",
+          "text": "Delirium Reward Type: Unique Items (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44098,7 +44098,7 @@
         },
         {
           "id": "enchant.delirium_reward_harbinger",
-          "text": "Delirium Reward Type: Harbinger Items (×#)",
+          "text": "Delirium Reward Type: Harbinger Items (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44118,7 +44118,7 @@
         },
         {
           "id": "enchant.delirium_reward_fossils",
-          "text": "Delirium Reward Type: Fossils (×#)",
+          "text": "Delirium Reward Type: Fossils (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44128,22 +44128,22 @@
         },
         {
           "id": "enchant.delirium_reward_maps",
-          "text": "Delirium Reward Type: Map Items (×#)",
+          "text": "Delirium Reward Type: Map Items (ï¿½#)",
           "type": "enchant"
         },
         {
           "id": "enchant.delirium_reward_blight",
-          "text": "Delirium Reward Type: Blight Items (×#)",
+          "text": "Delirium Reward Type: Blight Items (ï¿½#)",
           "type": "enchant"
         },
         {
           "id": "enchant.delirium_reward_fragments",
-          "text": "Delirium Reward Type: Fragments (×#)",
+          "text": "Delirium Reward Type: Fragments (ï¿½#)",
           "type": "enchant"
         },
         {
           "id": "enchant.delirium_reward_metamorphosis",
-          "text": "Delirium Reward Type: Catalysts (×#)",
+          "text": "Delirium Reward Type: Catalysts (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44163,7 +44163,7 @@
         },
         {
           "id": "enchant.delirium_reward_gems",
-          "text": "Delirium Reward Type: Gems (×#)",
+          "text": "Delirium Reward Type: Gems (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44173,7 +44173,7 @@
         },
         {
           "id": "enchant.delirium_reward_essences",
-          "text": "Delirium Reward Type: Essences (×#)",
+          "text": "Delirium Reward Type: Essences (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44188,7 +44188,7 @@
         },
         {
           "id": "enchant.delirium_reward_breach",
-          "text": "Delirium Reward Type: Breach Items (×#)",
+          "text": "Delirium Reward Type: Breach Items (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44228,7 +44228,7 @@
         },
         {
           "id": "enchant.delirium_reward_scarabs",
-          "text": "Delirium Reward Type: Scarabs (×#)",
+          "text": "Delirium Reward Type: Scarabs (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44263,7 +44263,7 @@
         },
         {
           "id": "enchant.delirium_reward_abyss",
-          "text": "Delirium Reward Type: Abyss Items (×#)",
+          "text": "Delirium Reward Type: Abyss Items (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -44598,7 +44598,7 @@
         },
         {
           "id": "enchant.delirium_reward_incubators",
-          "text": "Delirium Reward Type: Incubators (×#)",
+          "text": "Delirium Reward Type: Incubators (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -45758,7 +45758,7 @@
         },
         {
           "id": "enchant.delirium_reward_perandus",
-          "text": "Delirium Reward Type: Expedition Items (×#)",
+          "text": "Delirium Reward Type: Expedition Items (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -47518,7 +47518,7 @@
         },
         {
           "id": "enchant.delirium_reward_talismans",
-          "text": "Delirium Reward Type: Talismans (×#)",
+          "text": "Delirium Reward Type: Talismans (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -50586,7 +50586,7 @@
         },
         {
           "id": "enchant.delirium_reward_generic",
-          "text": "Delirium Reward Type: Delirium (×#)",
+          "text": "Delirium Reward Type: Delirium (ï¿½#)",
           "type": "enchant"
         },
         {
@@ -71152,377 +71152,377 @@
       "entries": [
         {
           "id": "monster.metamorph_46310",
-          "text": "Drops additional Currency Items (×#)",
+          "text": "Drops additional Currency Items (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_17718",
-          "text": "Drops additional Rare Armour (×#)",
+          "text": "Drops additional Rare Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_24009",
-          "text": "Drops additional Rare Jewellery (×#)",
+          "text": "Drops additional Rare Jewellery (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_21643",
-          "text": "Drops additional Rare Weapons (×#)",
+          "text": "Drops additional Rare Weapons (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_49022",
-          "text": "Drops a 5-linked Rare Weapon (×#)",
+          "text": "Drops a 5-linked Rare Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_31505",
-          "text": "Drops additional Essences (×#)",
+          "text": "Drops additional Essences (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_38458",
-          "text": "Drops additional Quality Gems (×#)",
+          "text": "Drops additional Quality Gems (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_56804",
-          "text": "Drops additional Divination Cards (×#)",
+          "text": "Drops additional Divination Cards (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_53880",
-          "text": "Drops additional Map Fragments (×#)",
+          "text": "Drops additional Map Fragments (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_14784",
-          "text": "Drops additional Catalysts (×#)",
+          "text": "Drops additional Catalysts (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_30518",
-          "text": "Drops a Unique Item (×#)",
+          "text": "Drops a Unique Item (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_32278",
-          "text": "Drops additional Fossils (×#)",
+          "text": "Drops additional Fossils (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_58421",
-          "text": "Drops additional Jewels (×#)",
+          "text": "Drops additional Jewels (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_61261",
-          "text": "Drops additional Rare Talismans (×#)",
+          "text": "Drops additional Rare Talismans (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_60969",
-          "text": "Drops an Abyssal Jewel (×#)",
+          "text": "Drops an Abyssal Jewel (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_40327",
-          "text": "Drops additional Maps (×#)",
+          "text": "Drops additional Maps (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_52493",
-          "text": "Drops additional Currency Shards (×#)",
+          "text": "Drops additional Currency Shards (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_57414",
-          "text": "Drops a 5-linked Rare Armour (×#)",
+          "text": "Drops a 5-linked Rare Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_21332",
-          "text": "Drops additional Blight Oils (×#)",
+          "text": "Drops additional Blight Oils (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_45212",
-          "text": "Drops an Enchanted Helmet (×#)",
+          "text": "Drops an Enchanted Helmet (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_26727",
-          "text": "Drops additional Unique Items (×#)",
+          "text": "Drops additional Unique Items (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_50716",
-          "text": "Drops a 6-linked Rare Armour (×#)",
+          "text": "Drops a 6-linked Rare Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_28349",
-          "text": "Drops a 6-linked Rare Weapon (×#)",
+          "text": "Drops a 6-linked Rare Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_65389",
-          "text": "Drops additional Incursion Jewellery (×#)",
+          "text": "Drops additional Incursion Jewellery (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_9856",
-          "text": "Drops additional Expedition Items (×#)",
+          "text": "Drops additional Expedition Items (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_24945",
-          "text": "Drops an Incursion Weapon (×#)",
+          "text": "Drops an Incursion Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_27277",
-          "text": "Drops additional Incursion Armour (×#)",
+          "text": "Drops additional Incursion Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_3937",
-          "text": "Drops a Veiled Weapon (×#)",
+          "text": "Drops a Veiled Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_26083",
-          "text": "Drops additional Veiled Armour (×#)",
+          "text": "Drops additional Veiled Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_11599",
-          "text": "Drops a Fractured Weapon (×#)",
+          "text": "Drops a Fractured Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_34745",
-          "text": "Drops additional Breach Splinters (×#)",
+          "text": "Drops additional Breach Splinters (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_24441",
-          "text": "Drops a Fractured Armour (×#)",
+          "text": "Drops a Fractured Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_5427",
-          "text": "Drops a Rare Weapon with 30% Quality (×#)",
+          "text": "Drops a Rare Weapon with 30% Quality (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_15157",
-          "text": "Drops additional valuable Currency Shards (×#)",
+          "text": "Drops additional valuable Currency Shards (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_25751",
-          "text": "Drops additional Veiled Jewellery (×#)",
+          "text": "Drops additional Veiled Jewellery (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_3230",
-          "text": "Drops a Rare Armour with 30% Quality (×#)",
+          "text": "Drops a Rare Armour with 30% Quality (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_12589",
-          "text": "Drops additional Rusted Scarabs (×#)",
+          "text": "Drops additional Rusted Scarabs (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_6531",
-          "text": "Drops an Offering to the Goddess (×#)",
+          "text": "Drops an Offering to the Goddess (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_3359",
-          "text": "Drops additional Legion Incubators (×#)",
+          "text": "Drops additional Legion Incubators (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_33173",
-          "text": "Drops additional Abyssal Jewels (×#)",
+          "text": "Drops additional Abyssal Jewels (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_11032",
-          "text": "Drops a Map Item (×#)",
+          "text": "Drops a Map Item (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_52398",
-          "text": "Drops a Synthesised Weapon (×#)",
+          "text": "Drops a Synthesised Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_20164",
-          "text": "Drops a valuable Gem (×#)",
+          "text": "Drops a valuable Gem (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_19644",
-          "text": "Drops additional Harbinger Currency (×#)",
+          "text": "Drops additional Harbinger Currency (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_56168",
-          "text": "Drops a Synthesised Armour (×#)",
+          "text": "Drops a Synthesised Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_41014",
-          "text": "Drops additional Atlas Jewellery (×#)",
+          "text": "Drops additional Atlas Jewellery (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_40212",
-          "text": "Drops additional Shaper or Elder Jewellery (×#)",
+          "text": "Drops additional Shaper or Elder Jewellery (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_39486",
-          "text": "Drops Enchanted Boots (×#)",
+          "text": "Drops Enchanted Boots (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_38125",
-          "text": "Drops additional Unique Jewellery (×#)",
+          "text": "Drops additional Unique Jewellery (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_11653",
-          "text": "Drops additional Polished Scarabs (×#)",
+          "text": "Drops additional Polished Scarabs (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_15116",
-          "text": "Drops additional Legion Splinters (×#)",
+          "text": "Drops additional Legion Splinters (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_33220",
-          "text": "Drops Enchanted Gloves (×#)",
+          "text": "Drops Enchanted Gloves (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_25160",
-          "text": "Drops a Stygian Vise (×#)",
+          "text": "Drops a Stygian Vise (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_23869",
-          "text": "Drops a Map with a Blight Encounter (×#)",
+          "text": "Drops a Map with a Blight Encounter (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_5439",
-          "text": "Drops a Blighted Map (×#)",
+          "text": "Drops a Blighted Map (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_32428",
-          "text": "Drops an Intrinsic Catalyst (×#)",
+          "text": "Drops an Intrinsic Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_11361",
-          "text": "Drops additional Gilded Scarabs (×#)",
+          "text": "Drops additional Gilded Scarabs (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_14029",
-          "text": "Drops a Breachstone (×#)",
+          "text": "Drops a Breachstone (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_53246",
-          "text": "Drops a Noxious Catalyst (×#)",
+          "text": "Drops a Noxious Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_46106",
-          "text": "Drops an Imbued Catalyst (×#)",
+          "text": "Drops an Imbued Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_14476",
-          "text": "Drops a 30% Quality Weapon (×#)",
+          "text": "Drops a 30% Quality Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_3026",
-          "text": "Drops an Abrasive Catalyst (×#)",
+          "text": "Drops an Abrasive Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_38920",
-          "text": "Drops a Turbulent Catalyst (×#)",
+          "text": "Drops a Turbulent Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_50437",
-          "text": "Drops a 6-linked Weapon (×#)",
+          "text": "Drops a 6-linked Weapon (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_36842",
-          "text": "Drops a 6-linked Unique Body Armour (×#)",
+          "text": "Drops a 6-linked Unique Body Armour (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_59711",
-          "text": "Drops a Resonator (×#)",
+          "text": "Drops a Resonator (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_37095",
-          "text": "Drops a Beachhead Unique Map (×#)",
+          "text": "Drops a Beachhead Unique Map (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_23061",
-          "text": "Drops a Breach Blessing (×#)",
+          "text": "Drops a Breach Blessing (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_28849",
-          "text": "Drops a Talisman Unique Item (×#)",
+          "text": "Drops a Talisman Unique Item (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_51849",
-          "text": "Drops a Tempering Catalyst (×#)",
+          "text": "Drops a Tempering Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_40095",
-          "text": "Drops a Prismatic Catalyst (×#)",
+          "text": "Drops a Prismatic Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_32976",
-          "text": "Drops a Fertile Catalyst (×#)",
+          "text": "Drops a Fertile Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_46515",
-          "text": "Drops an Unstable Catalyst (×#)",
+          "text": "Drops an Unstable Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_10952",
-          "text": "Drops an Accelerating Catalyst (×#)",
+          "text": "Drops an Accelerating Catalyst (ï¿½#)",
           "type": "monster"
         },
         {
           "id": "monster.metamorph_27614",
-          "text": "Drops an Abyss Unique Item (×#)",
+          "text": "Drops an Abyss Unique Item (ï¿½#)",
           "type": "monster"
         }
       ]

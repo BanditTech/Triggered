@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Triggered
 {
@@ -99,14 +100,49 @@ namespace Triggered
 
         private static string[] GetSelectedListItems(int index)
         {
-            // Load JSON data if not already loaded
             if (jsonData == null)
                 LoadJsonData();
 
-            return jsonData["result"][index]["entries"]
-                .Select(entry => entry["text"]?.ToString())
-                .ToArray();
+            List<string> mergedItems = new List<string>();
+
+            jsonData["result"][index]["entries"]
+                .Select(entry =>
+                {
+                    string text = entry["text"].ToString();
+
+                    if (entry["option"] != null)
+                    {
+                        JArray options = (JArray)entry["option"]["options"];
+                        if (options != null && options.Count > 0)
+                        {
+                            if (text.Contains("#"))
+                            {
+                                return options
+                                    .Select(option => text.Replace("#", option["text"].ToString()))
+                                    .ToList();
+                            }
+                            else if (text.StartsWith("Grants Summon Harbinger Skill"))
+                            {
+                                return options
+                                    .Select(option => $"Grants Summon {option["text"]} Skill")
+                                    .ToList();
+                            }
+                            else
+                            {
+                                return new List<string> { text }
+                                    .Concat(options.Select(option => option["text"].ToString()))
+                                    .ToList();
+                            }
+                        }
+                    }
+                    return new List<string> { text };
+                })
+                .ToList()
+                .ForEach(items => mergedItems.AddRange(items));
+
+            return mergedItems.ToArray();
         }
+
 
         private static void LoadJsonData()
         {
