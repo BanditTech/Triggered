@@ -359,6 +359,8 @@
                 });
             }
 
+            DropdownBoxUtility.DrawDropdownBox();
+
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
             // you should remove the below if-statement as well.
