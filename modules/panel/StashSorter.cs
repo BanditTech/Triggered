@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Triggered.modules.wrapper;
 using Triggered.modules.struct_filter;
+using Triggered.modules.panel;
 
 namespace Triggered.modules.panels
 {
@@ -843,7 +844,7 @@ namespace Triggered.modules.panels
                         App.Log(json,0);
                     }
                     EditElement(parentType);
-                    // 
+                    // remove the color adjustments
                     ImGui.PopStyleColor(3);
                 }
                 #endregion
@@ -1287,7 +1288,7 @@ namespace Triggered.modules.panels
                 ImGui.Text("Key:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(availableSpace);
-                ImGui.InputText("##Key", ref _rightClickedElement.Key, 256);
+                AffixFilter.DrawTextBox(ref _rightClickedElement.Key);
 
                 // string Eval
                 ImGui.Text("Eval:");
