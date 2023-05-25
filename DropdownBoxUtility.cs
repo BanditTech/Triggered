@@ -1,6 +1,9 @@
 ﻿using ImGuiNET;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Numerics;
 
 namespace Triggered
@@ -9,8 +12,22 @@ namespace Triggered
     {
         private static string input = string.Empty;
         private static List<string> filteredItems = new List<string>();
-        private static string[] listNames = { "List 1", "List 2", "List 3" };
+        private static string[] listNames = {
+            "Pseudo",
+            "Explicit",
+            "Implicit",
+            "Fractured",
+            "Enchant",
+            "Scourge",
+            "Crafted",
+            "Crucible",
+            "Veiled",
+            "Monster",
+            "Delve",
+            "Ultimatum",
+        };
         private static int selectedListIndex = 0;
+        private static JObject jsonData; // JObject to store the parsed JSON data
 
         public static void DrawDropdownBox()
         {
@@ -21,7 +38,7 @@ namespace Triggered
 
             if (isInputTextActivated)
             {
-                ImGui.SetNextWindowPos(new Vector2(min.X,min.Y));
+                ImGui.SetNextWindowPos(new Vector2(min.X, min.Y));
                 ImGui.OpenPopup("##popup");
             }
 
@@ -41,13 +58,13 @@ namespace Triggered
                         filteredItems.Add(item);
                 else
                 {
-                    var parts = input.Split(" ",StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    var parts = input.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                     foreach (string str in selectedItems)
                     {
                         bool allPartsMatch = true;
                         foreach (string part in parts)
                         {
-                            if (!str.Contains(part))
+                            if (!str.Contains(part,StringComparison.OrdinalIgnoreCase))
                             {
                                 allPartsMatch = false;
                                 break;
@@ -79,20 +96,25 @@ namespace Triggered
                 ImGui.EndPopup();
             }
         }
+
         private static string[] GetSelectedListItems(int index)
         {
-            // Add logic to retrieve items based on the selected list index
-            switch (index)
-            {
-                case 0:
-                    return new string[] { "cats", "dogs", "rabbits", "turtles" };
-                case 1:
-                    return new string[] { "apples", "oranges", "bananas", "grapes" };
-                case 2:
-                    return new string[] { "carrots", "broccoli", "peas", "corn" };
-                default:
-                    return new string[0];
-            }
+            // Load JSON data if not already loaded
+            if (jsonData == null)
+                LoadJsonData();
+
+            return jsonData["result"][index]["entries"]
+                .Select(entry => entry["text"]?.ToString())
+                .ToArray();
+        }
+
+        private static void LoadJsonData()
+        {
+            // Load the JSON file into a string
+            string jsonString = File.ReadAllText("stats.json");
+
+            // Parse the JSON data into a JObject
+            jsonData = JObject.Parse(jsonString);
         }
     }
 }
