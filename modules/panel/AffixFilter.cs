@@ -30,15 +30,18 @@ namespace Triggered.modules.panel
 
         public static bool DrawTextBox(ref string input)
         {
-            bool isInputTextEnterPressed = ImGui.InputText("##input", ref input, 32, ImGuiInputTextFlags.EnterReturnsTrue);
+            float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
+            bool isInputTextEnterPressed = ImGui.InputText("##input", ref input, 256, ImGuiInputTextFlags.EnterReturnsTrue);
             var min = ImGui.GetItemRectMin();
             var size = ImGui.GetItemRectSize();
+            if (size.X > availableSpace)
+                size.X = availableSpace;
             bool isInputTextActivated = ImGui.IsItemActivated();
             bool popupCompleted = false;
 
             if (isInputTextActivated)
             {
-                ImGui.SetNextWindowPos(new Vector2(min.X, min.Y));
+                ImGui.SetNextWindowPos(new Vector2(min.X - 8, min.Y - 8));
                 ImGui.OpenPopup("##popup");
             }
 
@@ -46,8 +49,10 @@ namespace Triggered.modules.panel
             {
                 if (isInputTextActivated)
                     ImGui.SetKeyboardFocusHere(0);
-                ImGui.InputText("##input_popup", ref input, 32);
+                ImGui.SetNextItemWidth(size.X - 100);
+                ImGui.InputText("##input_popup", ref input, 256);
                 ImGui.SameLine();
+                ImGui.SetNextItemWidth(100);
                 ImGui.Combo("##listCombo", ref selectedListIndex, listNames, listNames.Length);
                 filteredItems.Clear();
                 // Select items based on the selected list index
@@ -74,7 +79,7 @@ namespace Triggered.modules.panel
                             filteredItems.Add(str);
                     }
                 }
-                ImGui.BeginChild("scrolling_region", new Vector2(size.X * 2, size.Y * 10), false, ImGuiWindowFlags.HorizontalScrollbar);
+                ImGui.BeginChild("scrolling_region", new Vector2(size.X, size.Y * 10), false, ImGuiWindowFlags.HorizontalScrollbar);
                 foreach (string item in filteredItems)
                 {
                     if (ImGui.Selectable(item))
