@@ -11,7 +11,6 @@ namespace Triggered
 {
     public class DropdownBoxUtility
     {
-        private static string input = string.Empty;
         private static List<string> filteredItems = new List<string>();
         private static string[] listNames = {
             "Pseudo",
@@ -30,12 +29,13 @@ namespace Triggered
         private static int selectedListIndex = 0;
         private static JObject jsonData; // JObject to store the parsed JSON data
 
-        public static void DrawDropdownBox()
+        public static bool DrawDropdownBox(ref string input)
         {
             bool isInputTextEnterPressed = ImGui.InputText("##input", ref input, 32, ImGuiInputTextFlags.EnterReturnsTrue);
             var min = ImGui.GetItemRectMin();
             var size = ImGui.GetItemRectSize();
             bool isInputTextActivated = ImGui.IsItemActivated();
+            bool popupCompleted = false;
 
             if (isInputTextActivated)
             {
@@ -83,6 +83,7 @@ namespace Triggered
                         App.Log("Selected popup");
                         input = item;
                         ImGui.CloseCurrentPopup();
+                        popupCompleted = true;
                         break;
                     }
                 }
@@ -92,10 +93,12 @@ namespace Triggered
                 {
                     App.Log("Closing popup");
                     ImGui.CloseCurrentPopup();
+                    popupCompleted = true;
                 }
 
                 ImGui.EndPopup();
             }
+            return popupCompleted;
         }
 
         private static string[] GetSelectedListItems(int index)

@@ -30,6 +30,8 @@
             SetKey("VSync", true);
             // Logic
             SetKey("LogicTickDelayInMilliseconds", 100);
+            // Test filtered text
+            SetKey("TestText", "");
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

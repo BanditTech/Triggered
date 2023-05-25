@@ -184,6 +184,7 @@
             App.logimgui.Draw("Log Window");
         }
 
+        private static string input = App.Options.MainMenu.GetKey<string>("TestText");
         private void RenderMainMenu()
         {
             var options = App.Options.MainMenu;
@@ -359,7 +360,10 @@
                 });
             }
 
-            DropdownBoxUtility.DrawDropdownBox();
+            if (DropdownBoxUtility.DrawDropdownBox(ref input))
+            {
+                options.SetKey("TestText", input);
+            }
 
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
