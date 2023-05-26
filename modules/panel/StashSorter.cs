@@ -374,7 +374,7 @@ namespace Triggered.modules.panels
                         ImGui.Text("Key:");
                         ImGui.SameLine();
                         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                        ImGui.InputText("##Key", ref _element.Key, 256);
+                        AffixFilter.DrawTextBox(ref _element.Key);
                         ImGui.PopID();
 
                         // We only want to display the Weight field if the parent requires it

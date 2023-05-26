@@ -3,7 +3,6 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using Triggered.modules.panels;
-    using ImNodesNET;
 
     class Program
     {
