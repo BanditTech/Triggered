@@ -18,6 +18,8 @@ namespace Triggered.modules
         private string selectedProfile;
         private bool removeConfirmationPopup;
         private Dictionary<string, JObject> savedObjects;
+        // Dictionary to store the checkbox state for each Options object
+        private Dictionary<string, bool> selectedOptions = new Dictionary<string, bool>();
 
         public void Initialize()
         {
@@ -109,6 +111,11 @@ namespace Triggered.modules
             return returnState;
         }
 
+        internal bool LoadProfile(Dictionary<string,bool> selected)
+        {
+            throw new NotImplementedException();
+        }
+
         private void SaveProfile()
         {
             if (string.IsNullOrEmpty(selectedProfile))
@@ -152,7 +159,53 @@ namespace Triggered.modules
 
         internal bool RenderLoad()
         {
-            throw new NotImplementedException();
+            bool returnState = false;
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
+            ImGui.Begin("Load Profile");
+
+            // Dropdown box to select a profile
+            if (ImGui.BeginCombo("Profile", selectedProfile))
+            {
+                foreach (string profile in profileFiles)
+                {
+                    bool isSelected = (selectedProfile == profile);
+                    if (ImGui.Selectable(profile, isSelected))
+                    {
+                        selectedProfile = profile;
+                    }
+
+                    if (isSelected)
+                        ImGui.SetItemDefaultFocus();
+                }
+                if (profileFiles.Length == 0)
+                    ImGui.Selectable(selectedProfile);
+                ImGui.EndCombo();
+            }
+
+            // Iterate through all loaded Options objects
+            foreach (Options options in App.Options.Itterate())
+            {
+                bool isSelected = selectedOptions.Keys.Contains(options.Name) ? selectedOptions[options.Name] : true;
+                // Display the checkbox for the current Options object
+                if (ImGui.Checkbox(options.Name, ref isSelected))
+                    selectedOptions[options.Name] = isSelected;
+            }
+
+            // Load button
+            if (ImGui.Button("Load"))
+            {
+                // Load the selected profile with the chosen Options
+                LoadProfile(selectedOptions);
+
+                ImGui.CloseCurrentPopup();
+                returnState = true;
+            }
+
+            ImGui.End();
+
+            if (Utils.IsKeyPressedAndNotTimeout(VK.ESCAPE)) // Escape.
+                returnState = true;
+            return returnState;
         }
     }
 }
