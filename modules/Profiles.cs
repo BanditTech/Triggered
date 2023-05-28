@@ -20,7 +20,7 @@ namespace Triggered.modules
         private bool removeConfirmationPopup;
         private Dictionary<string, JObject> savedObjects;
         private Dictionary<string, bool> selectedOptions = App.Options.Itterate()
-            .ToDictionary(options => options.Name, options => true);
+            .ToDictionary( options => options.Name, options => true );
 
         internal void Initialize()
         {
@@ -39,7 +39,7 @@ namespace Triggered.modules
 
         internal void LoadProfile()
         {
-            string path = Path.Combine(AppContext.BaseDirectory, "profiles", selectedProfile);
+            string path = Path.Combine(AppContext.BaseDirectory, "profile", selectedProfile);
             if (!File.Exists(path))
                 return;
             JObject fileObj = (JObject)wrapper.JSON.Obj(File.ReadAllText(path));
@@ -77,7 +77,7 @@ namespace Triggered.modules
             
             // Save the profile object to a file with the selected profile name
             string profileFileName = selectedProfile + ".json";
-            string profileFilePath = Path.Combine(AppContext.BaseDirectory, "profiles", profileFileName);
+            string profileFilePath = Path.Combine(AppContext.BaseDirectory, "profile", profileFileName);
             bool refreshNames = false;
             if (!File.Exists(profileFilePath))
                 refreshNames = true;
@@ -91,21 +91,35 @@ namespace Triggered.modules
         {
             // Remove the selected profile file from the profiles folder
             string profileFileName = selectedProfile + ".json";
-            string profileFilePath = Path.Combine("profiles", profileFileName);
+            string profileFilePath = Path.Combine(AppContext.BaseDirectory, "profile", profileFileName);
             File.Delete(profileFilePath);
 
             // Refresh the profile files list
             Initialize();
         }
 
+        private string newName = string.Empty;
         internal bool RenderSave()
         {
             bool returnState = false;
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("Save Profile");
 
+            ImGui.Text("Add a new Profile:");
+            ImGui.InputText("##newName", ref newName, 256);
+            ImGui.SameLine();
+            if (ImGui.Button("Add") && !string.IsNullOrEmpty(newName))
+            {
+                selectedProfile = newName;
+                newName = string.Empty;
+                SaveProfile();
+                ImGui.CloseCurrentPopup();
+                returnState = true;
+            }
+            ImGui.Separator();
+            ImGui.Text("Select an existing Profile:");
             // Dropdown box to select a profile
-            if (ImGui.BeginCombo("Profile", selectedProfile))
+            if (ImGui.BeginCombo("##selectedProfile", selectedProfile))
             {
                 foreach (string profile in profileFiles)
                 {
@@ -123,7 +137,7 @@ namespace Triggered.modules
                     ImGui.Selectable(selectedProfile);
                 ImGui.EndCombo();
             }
-
+            ImGui.SameLine();
             // Save button
             if (ImGui.Button("Save"))
             {
