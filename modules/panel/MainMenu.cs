@@ -127,7 +127,7 @@
         }
 
         /// <summary>
-        /// RenderBW thread is run every frame
+        /// Render thread is run every frame
         /// We can piggy back on the render thread for simple keybinds
         /// </summary>
 
@@ -184,6 +184,8 @@
         }
 
         private static string input = App.Options.MainMenu.GetKey<string>("TestText");
+        private bool saveProfile = false;
+        private bool loadProfile = false;
         private void RenderMainMenu()
         {
             var options = App.Options.MainMenu;
@@ -393,8 +395,20 @@
                         App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
                     ImGui.EndMenu();
                 }
+                if (ImGui.BeginMenu("Profile"))
+                {
+                    if (ImGui.MenuItem("Save"))
+                        saveProfile = true;
+                    if (ImGui.MenuItem("Load"))
+                        loadProfile = true;
+                    ImGui.EndMenu();
+                }
                 ImGui.EndMenuBar();
             }
+            if (saveProfile && App.Profiles.RenderSave())
+                saveProfile = false;
+            if (loadProfile && App.Profiles.RenderLoad())
+                loadProfile = false;
             // Menu definition complete
             ImGui.End();
         }

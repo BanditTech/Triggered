@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using ClickableTransparentOverlay.Win32;
+using ImGuiNET;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Triggered.modules
     /// <summary>
     /// Produce and receive Profile Dictionary.
     /// </summary>
-    public class Profile
+    public class Profiles
     {
         private string[] profileFiles;
         private string selectedProfile;
@@ -21,7 +22,7 @@ namespace Triggered.modules
         public void Initialize()
         {
             // Load profile files from the profiles folder
-            profileFiles = Directory.GetFiles("profiles", "*.json");
+            profileFiles = Directory.GetFiles("profile", "*.json");
             for (int i = 0; i < profileFiles.Length; i++)
             {
                 // Remove the file extension and path to make it more readable
@@ -33,10 +34,11 @@ namespace Triggered.modules
             savedObjects = new Dictionary<string, JObject>();
         }
 
-        public void Render()
+        public bool RenderSave()
         {
+            bool returnState = false;
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
-            ImGui.Begin("Profile Editor");
+            ImGui.Begin("Save Profile");
 
             // Dropdown box to select a profile
             if (ImGui.BeginCombo("Profile", selectedProfile))
@@ -53,6 +55,8 @@ namespace Triggered.modules
                     if (isSelected)
                         ImGui.SetItemDefaultFocus();
                 }
+                if (profileFiles.Length == 0)
+                    ImGui.Selectable(selectedProfile);
                 ImGui.EndCombo();
             }
 
@@ -61,6 +65,7 @@ namespace Triggered.modules
             {
                 SaveProfile();
                 ImGui.CloseCurrentPopup();
+                returnState = true;
             }
 
             // Remove button
@@ -71,7 +76,8 @@ namespace Triggered.modules
             // Confirmation popup for remove button
             if (removeConfirmationPopup)
                 ImGui.OpenPopup("Confirm Remove");
-            if (ImGui.BeginPopupModal("Confirm Remove", ref removeConfirmationPopup, ImGuiWindowFlags.AlwaysAutoResize))
+            var modalOpen = true;
+            if (ImGui.BeginPopupModal("Confirm Remove", ref modalOpen, ImGuiWindowFlags.AlwaysAutoResize))
             {
                 ImGui.Text("Are you sure you want to remove this profile?");
                 ImGui.Separator();
@@ -81,6 +87,7 @@ namespace Triggered.modules
                     RemoveProfile();
                     ImGui.CloseCurrentPopup();
                     removeConfirmationPopup = false;
+                    returnState = true;
                 }
 
                 ImGui.SameLine();
@@ -89,20 +96,29 @@ namespace Triggered.modules
                 {
                     ImGui.CloseCurrentPopup();
                     removeConfirmationPopup = false;
+                    returnState = true;
                 }
 
                 ImGui.EndPopup();
             }
 
             ImGui.End();
+
+            if (Utils.IsKeyPressedAndNotTimeout(VK.ESCAPE)) //Escape.
+                returnState = true;
+            return returnState;
         }
 
         private void SaveProfile()
         {
+            if (string.IsNullOrEmpty(selectedProfile))
+                return;
             // Create a new JObject to hold the saved options
             JObject profileObject = new JObject();
 
+
             // Iterate through all loaded Options objects
+            savedObjects.Clear();
             foreach (Options options in App.Options.Itterate())
             {
                 // Prepare the save object for each Options object
@@ -110,11 +126,17 @@ namespace Triggered.modules
                 // Use the Options object name as the key for the saved object
                 savedObjects[options.Name] = saveObject;
             }
-
+            
             // Save the profile object to a file with the selected profile name
             string profileFileName = selectedProfile + ".json";
             string profileFilePath = Path.Combine(AppContext.BaseDirectory, "profiles", profileFileName);
-            File.WriteAllText(profileFilePath, profileObject.ToString());
+            bool refreshNames = false;
+            if (!File.Exists(profileFilePath))
+                refreshNames = true;
+            // We write the profile in human readable format
+            File.WriteAllText(profileFilePath, wrapper.JSON.Str(profileObject));
+            if (refreshNames)
+                Initialize();
         }
 
         private void RemoveProfile()
@@ -126,6 +148,11 @@ namespace Triggered.modules
 
             // Refresh the profile files list
             Initialize();
+        }
+
+        internal bool RenderLoad()
+        {
+            throw new NotImplementedException();
         }
     }
 }

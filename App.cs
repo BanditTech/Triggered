@@ -10,6 +10,7 @@ using ImGuiNET;
 using System;
 using System.Linq;
 using ClickableTransparentOverlay;
+using Triggered.modules;
 
 namespace Triggered
 {
@@ -54,6 +55,8 @@ namespace Triggered
         /// </summary>
         public static Player Player = new();
 
+        public static Profiles Profiles = new();
+
         /// <summary>
         /// Font files available
         /// </summary>
@@ -92,6 +95,8 @@ namespace Triggered
             fonts = fontNames.ToArray();
 
             glyphs = Enum.GetNames(typeof(FontGlyphRangeType));
+
+            Profiles.Initialize();
         }
 
         #region Log(string log, LogLevel level)
