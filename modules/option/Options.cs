@@ -329,6 +329,7 @@ namespace Triggered.modules.options
                 string json = File.ReadAllText($"save\\{Name}.json");
                 var obj = (JToken)JSON.Obj(json);
                 Merge(obj);
+                _changed = false;
             }
         }
 
