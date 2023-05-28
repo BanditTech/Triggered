@@ -108,7 +108,7 @@ namespace Triggered.modules
             ImGui.Text("Add a new Profile:");
             ImGui.InputText("##newName", ref newName, 256);
             ImGui.SameLine();
-            if (ImGui.Button("Create") && !string.IsNullOrEmpty(newName))
+            if (ImGui.Button("Create") && IsValidFilename(newName))
             {
                 selectedProfile = newName;
                 newName = string.Empty;
@@ -236,6 +236,16 @@ namespace Triggered.modules
             if (Utils.IsKeyPressedAndNotTimeout(VK.ESCAPE)) // Escape.
                 returnState = true;
             return returnState;
+        }
+
+        private readonly char[] invalidChars = Path.GetInvalidFileNameChars();
+        internal bool IsValidFilename(string fileName)
+        {
+            if (string.IsNullOrEmpty(newName))
+                return false;
+            if (fileName.IndexOfAny(invalidChars) >= 0)
+                return false;
+            return true;
         }
     }
 }
