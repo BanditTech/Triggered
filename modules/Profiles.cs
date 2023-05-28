@@ -1,5 +1,6 @@
 ﻿using ClickableTransparentOverlay.Win32;
 using ImGuiNET;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,10 @@ namespace Triggered.modules
         private string selectedProfile;
         private bool removeConfirmationPopup;
         private Dictionary<string, JObject> savedObjects;
-        // Dictionary to store the checkbox state for each Options object
-        private Dictionary<string, bool> selectedOptions = new Dictionary<string, bool>();
+        private Dictionary<string, bool> selectedOptions = App.Options.Itterate()
+            .ToDictionary(options => options.Name, options => true);
 
-        public void Initialize()
+        internal void Initialize()
         {
             // Load profile files from the profiles folder
             profileFiles = Directory.GetFiles("profile", "*.json");
@@ -36,7 +37,68 @@ namespace Triggered.modules
             savedObjects = new Dictionary<string, JObject>();
         }
 
-        public bool RenderSave()
+        internal void LoadProfile()
+        {
+            string path = Path.Combine(AppContext.BaseDirectory, "profiles", selectedProfile);
+            if (!File.Exists(path))
+                return;
+            JObject fileObj = (JObject)wrapper.JSON.Obj(File.ReadAllText(path));
+            Dictionary<string, JToken> profile = fileObj.Properties()
+                .ToDictionary(
+                prop => prop.Name,
+                prop => prop.Value
+                );
+            Dictionary<string,JToken> matchingOptions = selectedOptions
+                .Where(option => option.Value && profile.ContainsKey(option.Key))
+                .ToDictionary(option => option.Key, option => profile[option.Key]);
+            App.Options.Itterate()
+                .Where(option => matchingOptions.ContainsKey(option.Name))
+                .ToList()
+                .ForEach(option => option.Merge(matchingOptions[option.Name]));
+        }
+
+        private void SaveProfile()
+        {
+            if (string.IsNullOrEmpty(selectedProfile))
+                return;
+            // Create a new JObject to hold the saved options
+            JObject profileObject = new JObject();
+
+
+            // Iterate through all loaded Options objects
+            savedObjects.Clear();
+            foreach (Options options in App.Options.Itterate())
+            {
+                // Prepare the save object for each Options object
+                JObject saveObject = options.PrepareSaveObject();
+                // Use the Options object name as the key for the saved object
+                savedObjects[options.Name] = saveObject;
+            }
+            
+            // Save the profile object to a file with the selected profile name
+            string profileFileName = selectedProfile + ".json";
+            string profileFilePath = Path.Combine(AppContext.BaseDirectory, "profiles", profileFileName);
+            bool refreshNames = false;
+            if (!File.Exists(profileFilePath))
+                refreshNames = true;
+            // We write the profile in human readable format
+            File.WriteAllText(profileFilePath, wrapper.JSON.Str(profileObject));
+            if (refreshNames)
+                Initialize();
+        }
+
+        private void RemoveProfile()
+        {
+            // Remove the selected profile file from the profiles folder
+            string profileFileName = selectedProfile + ".json";
+            string profileFilePath = Path.Combine("profiles", profileFileName);
+            File.Delete(profileFilePath);
+
+            // Refresh the profile files list
+            Initialize();
+        }
+
+        internal bool RenderSave()
         {
             bool returnState = false;
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
@@ -111,52 +173,6 @@ namespace Triggered.modules
             return returnState;
         }
 
-        internal bool LoadProfile(Dictionary<string,bool> selected)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SaveProfile()
-        {
-            if (string.IsNullOrEmpty(selectedProfile))
-                return;
-            // Create a new JObject to hold the saved options
-            JObject profileObject = new JObject();
-
-
-            // Iterate through all loaded Options objects
-            savedObjects.Clear();
-            foreach (Options options in App.Options.Itterate())
-            {
-                // Prepare the save object for each Options object
-                JObject saveObject = options.PrepareSaveObject();
-                // Use the Options object name as the key for the saved object
-                savedObjects[options.Name] = saveObject;
-            }
-            
-            // Save the profile object to a file with the selected profile name
-            string profileFileName = selectedProfile + ".json";
-            string profileFilePath = Path.Combine(AppContext.BaseDirectory, "profiles", profileFileName);
-            bool refreshNames = false;
-            if (!File.Exists(profileFilePath))
-                refreshNames = true;
-            // We write the profile in human readable format
-            File.WriteAllText(profileFilePath, wrapper.JSON.Str(profileObject));
-            if (refreshNames)
-                Initialize();
-        }
-
-        private void RemoveProfile()
-        {
-            // Remove the selected profile file from the profiles folder
-            string profileFileName = selectedProfile + ".json";
-            string profileFilePath = Path.Combine("profiles", profileFileName);
-            File.Delete(profileFilePath);
-
-            // Refresh the profile files list
-            Initialize();
-        }
-
         internal bool RenderLoad()
         {
             bool returnState = false;
@@ -185,7 +201,7 @@ namespace Triggered.modules
             // Iterate through all loaded Options objects
             foreach (Options options in App.Options.Itterate())
             {
-                bool isSelected = selectedOptions.Keys.Contains(options.Name) ? selectedOptions[options.Name] : true;
+                bool isSelected = selectedOptions[options.Name];
                 // Display the checkbox for the current Options object
                 if (ImGui.Checkbox(options.Name, ref isSelected))
                     selectedOptions[options.Name] = isSelected;
@@ -195,7 +211,7 @@ namespace Triggered.modules
             if (ImGui.Button("Load"))
             {
                 // Load the selected profile with the chosen Options
-                LoadProfile(selectedOptions);
+                LoadProfile();
 
                 ImGui.CloseCurrentPopup();
                 returnState = true;
