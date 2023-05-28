@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using Triggered.modules.panels;
 
-    class Program
+    static class Program
     {
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
         static async Task Main()

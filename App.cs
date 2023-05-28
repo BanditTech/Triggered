@@ -55,19 +55,14 @@ namespace Triggered
         public static Player Player = new();
 
         /// <summary>
-        /// Pointer to AlmaMono font
-        /// </summary>
-        public static ImFontPtr fontAM;
-
-        /// <summary>
         /// Font files available
         /// </summary>
-        public static string[] fonts;
+        public static readonly string[] fonts;
 
         /// <summary>
         /// what range
         /// </summary>
-        public static string[] glyphs;
+        public static readonly string[] glyphs;
 
         /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
