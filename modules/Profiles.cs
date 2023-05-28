@@ -108,7 +108,7 @@ namespace Triggered.modules
             ImGui.Text("Add a new Profile:");
             ImGui.InputText("##newName", ref newName, 256);
             ImGui.SameLine();
-            if (ImGui.Button("Add") && !string.IsNullOrEmpty(newName))
+            if (ImGui.Button("Create") && !string.IsNullOrEmpty(newName))
             {
                 selectedProfile = newName;
                 newName = string.Empty;
