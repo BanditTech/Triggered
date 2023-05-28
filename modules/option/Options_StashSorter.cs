@@ -12,6 +12,10 @@
         {
             // Assign the name we will use to save the file
             Name = "StashSorter";
+            Default();
+        }
+        internal override void Default()
+        {
             // Determines which group is being edited inside the Stash Sorter list
             SetKey("SelectedGroup", 0);
             // Reset the changed flag to avoid saving again

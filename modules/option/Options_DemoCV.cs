@@ -14,6 +14,10 @@ namespace Triggered.modules.options
         {
             // Assign the name we will use to save the file
             Name = "DemoCV";
+            Default();
+        }
+        internal override void Default()
+        {
             // Black/White values
             SetKey("minFilterBlackWhite", 67);
             SetKey("maxFilterBlackWhite", 187);
@@ -50,12 +54,12 @@ namespace Triggered.modules.options
             SetKey("filterSubsetH", 100);
             SetKey("filterSubsetPercentage", 1f);
             // Shape Detection
-            SetKey("rectangleArea",250);
+            SetKey("rectangleArea", 250);
             SetKey("cannyThreshold", 180.0f);
             SetKey("cannyThresholdLinking", 120.0f);
             // visibility
-            SetKey("Display_AdjustBW",false);
-            SetKey("Display_AdjustColor",false);
+            SetKey("Display_AdjustBW", false);
+            SetKey("Display_AdjustColor", false);
             SetKey("Display_AdjustIndColor", false);
             SetKey("Display_AdjustHSVColor", false);
             SetKey("Display_AdjustHSVColorDual", false);

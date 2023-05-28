@@ -60,12 +60,12 @@ namespace Triggered
         /// <summary>
         /// Font files available
         /// </summary>
-        public static readonly string[] fonts;
+        internal static readonly string[] fonts;
 
         /// <summary>
         /// what range
         /// </summary>
-        public static readonly string[] glyphs;
+        internal static readonly string[] glyphs;
 
         /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
