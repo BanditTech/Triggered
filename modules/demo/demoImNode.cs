@@ -27,6 +27,7 @@ namespace Triggered.modules.demo
         }
         public static void Render()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("node editor");
 
             if (imguiContext != 0 && imnodesContext != 0 && editorContext != 0)

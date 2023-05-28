@@ -194,6 +194,7 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderBW()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVBlackWhite");
             // This sets up an options for the DemoCV methods.
             var options = App.Options.DemoCV;
@@ -299,6 +300,7 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderColor()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVColor");
 
             // This sets up an options for the DemoCV methods.
@@ -414,6 +416,7 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderIndColor()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVIndColor");
 
             // This sets up an options for the DemoCV methods.
@@ -538,6 +541,7 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderHSVColor()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVHSVColor");
 
             // This sets up an options for the DemoCV methods.
@@ -613,6 +617,7 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderHSVColorDual()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVHSVColorDual");
 
             // This sets up an options for the DemoCV methods.
@@ -1028,6 +1033,7 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderHSVSubset()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVHSVSubset");
 
             // This sets up an options for the DemoCV methods.
@@ -1188,6 +1194,7 @@ namespace Triggered.modules.demo
 
         public static void RenderOCR()
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("Demo OCR");
 
             // This sets up an options for the DemoCV methods.

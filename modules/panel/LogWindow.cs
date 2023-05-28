@@ -75,6 +75,7 @@ namespace Triggered.modules.panels
         /// <param name="title"></param>
         public void Draw(string title)
         {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             if (!ImGui.Begin(title))
             {
                 ImGui.End();
