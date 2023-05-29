@@ -171,6 +171,52 @@ namespace Triggered.modules.wrapper
         }
 
         /// <summary>
+        /// Capture a specific window
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
+        public static Mat GetWindowMat(IntPtr hwnd)
+        {
+            // Get the window bounds
+            if (!User32.GetWindowRect(hwnd, out User32.RECT windowRect))
+                return null;
+            Rectangle screenBounds = new Rectangle(windowRect.Left, windowRect.Top, windowRect.Right - windowRect.Left, windowRect.Bottom - windowRect.Top);
+
+            // Produce bounds to capture the specified window
+            Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height);
+
+            // Prepare our graphics context
+            using (Graphics graphicAdjust = Graphics.FromImage(screenBitmap))
+            {
+                // Copy the image from the location into the top left corner of screenBitmap
+                IntPtr hdcSrc = User32.GetWindowDC(hwnd);
+                IntPtr hdcDest = graphicAdjust.GetHdc();
+                GDI32.BitBlt(hdcDest, 0, 0, screenBounds.Width, screenBounds.Height, hdcSrc, 0, 0, GDI32.SRCCOPY);
+                graphicAdjust.ReleaseHdc(hdcDest);
+                User32.ReleaseDC(hwnd, hdcSrc);
+            }
+
+            // Convert into a Matrix
+            Mat screenMat = new Mat();
+            screenBitmap.ToMat(screenMat);
+            screenBitmap.Dispose();
+            return screenMat;
+        }
+
+        /// <summary>
+        /// Capture a named window
+        /// </summary>
+        /// <param name="windowName"></param>
+        /// <returns></returns>
+        public static Mat GetWindowMat(string windowName)
+        {
+            IntPtr hWnd = User32.GetWindowHandle(windowName);
+            if (hWnd != IntPtr.Zero)
+                return GetWindowMat(hWnd);
+            return null;
+        }
+
+        /// <summary>
         /// Determine how many rows before a non-zero pixel.
         /// </summary>
         /// <returns>Number of Empty Rows</returns>

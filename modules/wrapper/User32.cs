@@ -39,6 +39,24 @@ namespace Triggered.modules.wrapper
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
+        internal static IntPtr GetWindowHandle(string windowName)
+        {
+            IntPtr hwnd = IntPtr.Zero;
+            User32.EnumWindows((IntPtr wnd, IntPtr param) =>
+            {
+                StringBuilder stringBuilder = new StringBuilder(256);
+                User32.GetWindowText(wnd, stringBuilder, stringBuilder.Capacity);
+                if (stringBuilder.ToString() == windowName)
+                {
+                    hwnd = wnd;
+                    return false; // Stop enumerating windows
+                }
+                return true; // Continue enumerating windows
+            }, IntPtr.Zero);
+
+            return hwnd;
+        }
+
         /// <summary>
         /// Defines the callback function for EnumWindows.
         /// </summary>
