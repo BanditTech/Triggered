@@ -1090,7 +1090,6 @@ namespace Triggered.modules.demo
             ImGui.End();
         }
 
-        static string _resultOCR = "";
         private static wrapper.KalmanFilter currFilter = new();
         private static wrapper.KalmanFilter maxFilter = new();
         public static void DemoOCR()
