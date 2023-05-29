@@ -162,7 +162,7 @@ namespace Triggered.modules.wrapper
             graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size); // ==> screenBitmap
             // Release Memory
             graphicAdjust.Dispose();
-            // Convert the graphics context into a bitmap
+            // Convert into a Matrix
             Mat screenMat = new();
             screenBitmap.ToMat(screenMat); // ==> screenMat
             // Release Memory
