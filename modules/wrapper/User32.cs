@@ -39,6 +39,11 @@ namespace Triggered.modules.wrapper
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
+        /// <summary>
+        /// Utilize EnumWindows to match the title bar.
+        /// </summary>
+        /// <param name="windowName"></param>
+        /// <returns></returns>
         internal static IntPtr GetWindowHandle(string windowName)
         {
             IntPtr hwnd = IntPtr.Zero;
