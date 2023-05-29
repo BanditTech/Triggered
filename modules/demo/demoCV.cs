@@ -1246,5 +1246,44 @@ namespace Triggered.modules.demo
 
             ImGui.End();
         }
+
+        public static void DemoHWND()
+        {
+            string win1 = "Capture Window";
+            var options = App.Options.DemoCV;
+            // We create our named window
+            CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
+            // Exit the loop when you press the Escape Key
+            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
+            {
+                string name = options.GetKey<string>("HWND.Name");
+                // Capture the Window
+                Mat screenMat = GetWindowMat(name);
+                if (screenMat == null)
+                    continue;
+                // Display the Masked image
+                DisplayImage(win1, screenMat);
+                // Release Memory
+                screenMat.Dispose();
+            }
+            CvInvoke.DestroyWindow(win1);
+            options.SetKey("Display_AdjustHWND", false);
+        }
+
+        public static void RenderHWND()
+        {
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
+            ImGui.Begin("Demo HWND");
+
+            // This sets up an options for the DemoCV methods.
+            var options = App.Options.DemoCV;
+            // Get the current values from options
+            string name = options.GetKey<string>("HWND.Name");
+            if (ImGui.InputText("Window",ref name, 256))
+                options.SetKey("HWND.Name", name);
+
+            ImGui.End();
+        }
+
     }
 }

@@ -45,6 +45,8 @@ namespace Triggered.modules.options
             SetKey("OCR.Y", 100);
             SetKey("OCR.W", 100);
             SetKey("OCR.H", 100);
+            // HWND Values
+            SetKey("HWND.Name","Path of Exile");
             // HSV Subset Values
             SetKey("filterSubsetHSVMin", new Vector3(0.4f, 0f, 0f));
             SetKey("filterSubsetHSVMax", new Vector3(0.5f, 1f, 1f));
@@ -67,6 +69,7 @@ namespace Triggered.modules.options
             SetKey("Display_AdjustShape", false);
             SetKey("Display_AdjustRectangle", false);
             SetKey("Display_AdjustOCR", false);
+            SetKey("Display_AdjustHWND", false);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

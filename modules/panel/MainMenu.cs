@@ -100,6 +100,13 @@
                     DemoCV.DemoOCR();
                 });
             }
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHWND"))
+            {
+                Task.Run(() =>
+                {
+                    DemoCV.DemoHWND();
+                });
+            }
         }
 
         /// <summary>
@@ -174,6 +181,8 @@
                 DemoCV.RenderHSVSubset();
             if (App.Options.DemoCV.GetKey<bool>("Display_AdjustOCR"))
                 DemoCV.RenderOCR();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHWND"))
+                DemoCV.RenderHWND();
 
             // demoImNode.Render();
         }
@@ -346,6 +355,14 @@
                 Task.Run(() =>
                 {
                     DemoCV.DemoOCR();
+                });
+            }
+            if (ImGui.Button("HWND demo"))
+            {
+                App.Options.DemoCV.SetKey("Display_AdjustHWND", true);
+                Task.Run(() =>
+                {
+                    DemoCV.DemoHWND();
                 });
             }
             ImGui.Separator();
