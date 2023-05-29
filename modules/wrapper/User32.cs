@@ -42,10 +42,10 @@ namespace Triggered.modules.wrapper
         internal static IntPtr GetWindowHandle(string windowName)
         {
             IntPtr hwnd = IntPtr.Zero;
-            User32.EnumWindows((IntPtr wnd, IntPtr param) =>
+            EnumWindows((IntPtr wnd, IntPtr param) =>
             {
                 StringBuilder stringBuilder = new StringBuilder(256);
-                User32.GetWindowText(wnd, stringBuilder, stringBuilder.Capacity);
+                GetWindowText(wnd, stringBuilder, stringBuilder.Capacity);
                 if (stringBuilder.ToString() == windowName)
                 {
                     hwnd = wnd;
