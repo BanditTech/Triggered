@@ -99,6 +99,7 @@ namespace Triggered.modules.options
         {
             string[] keyArray = keys.Split('.');
             JToken value = keyList;
+            // Begin with key navigation
             foreach (var key in keyArray)
             {
                 if (value == null)
@@ -107,6 +108,7 @@ namespace Triggered.modules.options
                 {
                     if (int.TryParse(key, out int index)) // try to parse current key as an int
                     {
+                        // Recurse into each index
                         value = value[index];
                         continue;
                     }
@@ -116,24 +118,30 @@ namespace Triggered.modules.options
                         throw new ArgumentException($"Invalid key '{key}' for array type.");
                     }
                 }
+                // Recurse into each property
                 value = value[key];
             }
-
+            // validate the object exists
             if (value == null)
                 return default;
 
-            if (value.Type == JTokenType.String
-            || value.Type == JTokenType.Integer
-            || value.Type == JTokenType.Float
-            || value.Type == JTokenType.Boolean)
-                return value.Value<T>();
-            else if (value.Type == JTokenType.Object 
-            || value.Type == JTokenType.Array)
-                return value.ToObject<T>();
-            else if (value.Type == JTokenType.Null)
-                return default;
-
-            throw new InvalidOperationException($"Unsupported JTokenType {value.Type}");
+            // Prepare outcome based on jtoken type
+            var jtokenType = value.Type;
+            switch (jtokenType)
+            {
+                case JTokenType.String:
+                case JTokenType.Integer:
+                case JTokenType.Float:
+                case JTokenType.Boolean:
+                    return value.Value<T>();
+                case JTokenType.Object:
+                case JTokenType.Array:
+                    return value.ToObject<T>();
+                case JTokenType.Null:
+                    return default;
+                default:
+                    throw new ArgumentException("Unsupported JTokenType");
+            }
         }
 
         /// <summary>
