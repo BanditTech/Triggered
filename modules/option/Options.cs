@@ -122,28 +122,6 @@ namespace Triggered.modules.options
             if (value == null)
                 return default;
 
-            if (typeof(T) == typeof(Vector4) && value is JObject obj4)
-            {
-                var x = obj4.GetValue("X").Value<float>();
-                var y = obj4.GetValue("Y").Value<float>();
-                var z = obj4.GetValue("Z").Value<float>();
-                var w = obj4.GetValue("W").Value<float>();
-                return (T)(object)new Vector4(x, y, z, w);
-            }
-            else if (typeof(T) == typeof(Vector3) && value is JObject obj3)
-            {
-                var x = obj3.GetValue("X").Value<float>();
-                var y = obj3.GetValue("Y").Value<float>();
-                var z = obj3.GetValue("Z").Value<float>();
-                return (T)(object)new Vector3(x, y, z);
-            }
-            else if (typeof(T) == typeof(Vector3) && value is JObject obj2)
-            {
-                var x = obj2.GetValue("X").Value<float>();
-                var y = obj2.GetValue("Y").Value<float>();
-                return (T)(object)new Vector2(x, y);
-            }
-
             if (value.Type == JTokenType.String
             || value.Type == JTokenType.Integer
             || value.Type == JTokenType.Float
