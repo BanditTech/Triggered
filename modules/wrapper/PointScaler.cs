@@ -49,6 +49,17 @@ namespace Triggered.modules.wrapper
             }
         }
 
+        public struct ScaledRectangle
+        {
+            public Coordinate Start { get; set; }
+            public Coordinate End { get; set; }
+            public ScaledRectangle(Coordinate start, Coordinate end)
+            {
+                Start = start;
+                End = end;
+            }
+        }
+
         /// <summary>
         /// Determine the starting location for X, Y
         /// </summary>
