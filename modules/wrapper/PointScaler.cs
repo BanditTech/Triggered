@@ -18,14 +18,17 @@ namespace Triggered.modules.wrapper
             /// Defines the origin Height to use for scaling the position.
             /// </summary>
             public int Height { get; set; }
+
             /// <summary>
             /// Designates the X and Y position to use in relation to the anchor.
             /// </summary>
             public Point Point { get; set; }
+
             /// <summary>
             /// Determine which position to set as (x 0, y 0).
             /// </summary>
             public AnchorPosition Anchor { get; set; }
+
             /// <summary>
             /// Constructs the Coordinate.
             /// </summary>
