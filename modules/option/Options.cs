@@ -144,22 +144,13 @@ namespace Triggered.modules.options
                 return (T)(object)new Vector2(x, y);
             }
 
-            if (value.Type == JTokenType.String)
-                return (T)Convert.ChangeType(value.Value<string>(), typeof(T));
-            else if (value.Type == JTokenType.Integer)
-                return (T)Convert.ChangeType(value.Value<int>(), typeof(T));
-            else if (value.Type == JTokenType.Float)
-            {
-                if (typeof(T) == typeof(float))
-                    return (T)Convert.ChangeType(value.Value<float>(), typeof(T));
-                else if (typeof(T) == typeof(double))
-                    return (T)Convert.ChangeType(value.Value<double>(), typeof(T));
-            }
-            else if (value.Type == JTokenType.Boolean)
-                return (T)Convert.ChangeType(value.Value<bool>(), typeof(T));
-            else if (value.Type == JTokenType.Object)
-                return (T)(object)value;
-            else if (value.Type == JTokenType.Array)
+            if (value.Type == JTokenType.String
+            || value.Type == JTokenType.Integer
+            || value.Type == JTokenType.Float
+            || value.Type == JTokenType.Boolean)
+                return value.Value<T>();
+            else if (value.Type == JTokenType.Object 
+            || value.Type == JTokenType.Array)
                 return value.ToObject<T>();
             else if (value.Type == JTokenType.Null)
                 return default;
