@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,6 +45,17 @@ namespace Triggered.modules.wrapper
         {
             object obj = JsonConvert.DeserializeObject(json);
             return obj;
+        }
+        /// <summary>
+        /// Convert from JSON string into specific .NET type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public static T GetObject<T>(string json)
+        {
+            var token = JToken.Parse(json);
+            return token.ToObject<T>();
         }
         /// <summary>
         /// Validates a JSON string for use in importing.
