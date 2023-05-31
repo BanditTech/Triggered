@@ -23,8 +23,8 @@ namespace Triggered.modules.wrapper
             {
                 this.lib = lib;
                 this.order = order;
-                this.scanCodePage1 = scanCodePage1;
-                this.scanCodePage7 = scanCodePage7;
+                this.scanCodePage1 = scanCodePage1; // win32 scancode https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+                this.scanCodePage7 = scanCodePage7; // HID (SDL,...) https://gist.github.com/MightyPork/6da26e382a7ad91b5496ee55fdc73db2
                 this.offset = offset;
                 this.width = width;
             }
