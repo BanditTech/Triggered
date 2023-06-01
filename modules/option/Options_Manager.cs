@@ -13,19 +13,19 @@ namespace Triggered.modules.options
         /// <summary>
         /// MainMenu Options object
         /// </summary>
-        public Options_MainMenu MainMenu { get; set; } = new Options_MainMenu();
+        public Options_MainMenu MainMenu = new Options_MainMenu();
         /// <summary>
         /// StashSorter Options object
         /// </summary>
-        public Options_StashSorter StashSorter { get; set; } = new Options_StashSorter();
+        public Options_StashSorter StashSorter = new Options_StashSorter();
         /// <summary>
         /// StashSorter Options object
         /// </summary>
-        public Options_DemoCV DemoCV { get; set; } = new Options_DemoCV();
+        public Options_DemoCV DemoCV = new Options_DemoCV();
         /// <summary>
         /// Locations Options object
         /// </summary>
-        public Options_Locations Locations { get; set; } = new Options_Locations();
+        public Options_Locations Locations = new Options_Locations();
         /// <summary>
         /// Allows to itterate this list of Options.
         /// </summary>
