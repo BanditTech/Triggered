@@ -29,16 +29,6 @@ namespace Triggered.modules.options
         internal bool _changed = false;
 
         /// <summary>
-        /// Class finalizer. 
-        /// </summary>
-        ~Options()
-        {
-            // When constructing JArray without list size, we set to 20
-            // We trim the keyList to remove extra JArray Null objects 
-            TrimNullValues(keyList);
-        }
-
-        /// <summary>
         /// Set the object located at keys to the content of value.
         /// This uses dot notation to navigate the object structure.
         /// </summary>

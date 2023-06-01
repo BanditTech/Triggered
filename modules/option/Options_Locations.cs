@@ -20,7 +20,6 @@ namespace Triggered.modules.options
         internal override void Default()
         {
             // Configure Default values
-
             SetKey("Resource.Left", new ScaledRectangle(
                 new Coordinate(
                     new Point(40, 250),
@@ -45,6 +44,24 @@ namespace Triggered.modules.options
                     AnchorPosition.Right
                 )
             ));
+            SetKey("Panel.Main", new Coordinate(
+                new Point(250, 250),
+                1080,
+                AnchorPosition.BottomLeft
+            ));
+            SetKey("Panel.Inventory", new Coordinate(
+                new Point(250, 250),
+                1080,
+                AnchorPosition.Right
+            ));
+            SetKey("Panel.Stash", new Coordinate(
+                new Point(250, 250),
+                1080,
+                AnchorPosition.Left
+            ));
+            SetKey("Measure.SlotSize", new Measurement(20, 1080));
+
+            TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

@@ -70,6 +70,8 @@ namespace Triggered.modules.options
             SetKey("Display_AdjustRectangle", false);
             SetKey("Display_AdjustOCR", false);
             SetKey("Display_AdjustHWND", false);
+
+            TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }

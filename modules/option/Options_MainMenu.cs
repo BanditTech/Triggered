@@ -37,6 +37,8 @@
             SetKey("LogicTickDelayInMilliseconds", 100);
             // Test filtered text
             SetKey("TestText", "");
+
+            TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again
             _changed = false;
         }
