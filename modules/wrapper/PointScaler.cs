@@ -10,6 +10,33 @@ namespace Triggered.modules.wrapper
     public static class PointScaler
     {
         /// <summary>
+        /// Represents a measurement value with associated height.
+        /// </summary>
+        public struct Measurement
+        {
+            /// <summary>
+            /// Gets or sets the value of the measurement.
+            /// </summary>
+            public int Value { get; set; }
+
+            /// <summary>
+            /// Gets or sets the height associated with the measurement.
+            /// </summary>
+            public int Height { get; set; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Measurement"/> struct.
+            /// </summary>
+            /// <param name="value">The value of the measurement.</param>
+            /// <param name="height">The height associated with the measurement.</param>
+            public Measurement(int value, int height)
+            {
+                Value = value;
+                Height = height;
+            }
+        }
+
+        /// <summary>
         /// Defines a sampled location to be used in other resolutions.
         /// </summary>
         public struct Coordinate
