@@ -49,16 +49,33 @@ namespace Triggered.modules.wrapper
             }
         }
 
+        /// <summary>
+        /// Represents a rectangle with scaled coordinates.
+        /// </summary>
         public struct ScaledRectangle
         {
+            /// <summary>
+            /// The starting coordinate of the rectangle.
+            /// </summary>
             public Coordinate Start { get; set; }
+
+            /// <summary>
+            /// The ending coordinate of the rectangle.
+            /// </summary>
             public Coordinate End { get; set; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ScaledRectangle"/> struct.
+            /// </summary>
+            /// <param name="start">The starting coordinate of the rectangle.</param>
+            /// <param name="end">The ending coordinate of the rectangle.</param>
             public ScaledRectangle(Coordinate start, Coordinate end)
             {
                 Start = start;
                 End = end;
             }
         }
+
 
         /// <summary>
         /// Determine the starting location for X, Y
@@ -110,12 +127,12 @@ namespace Triggered.modules.wrapper
         /// <param name="rectangle"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static Point GetAnchorPoint(Coordinate origin, Rectangle rectangle)
+        public static Point CalculatePoint(Coordinate origin, Rectangle rectangle)
         {
             Point anchorPoint = new();
             int centerX;
             int centerY;
-            var position = ScaledPoint(origin, rectangle);
+            var position = ScaledPoint(origin, rectangle.Height);
 
             // Determine which edge to use as initial X, Y
             switch (origin.Anchor)
@@ -172,14 +189,35 @@ namespace Triggered.modules.wrapper
         }
 
         /// <summary>
-        /// Scales the origin point into a position relative to target height.
+        /// Calculates a new rectangle based on a scaled origin rectangle and a reference rectangle.
+        /// </summary>
+        /// <param name="origin">The scaled origin rectangle.</param>
+        /// <param name="rectangle">The reference rectangle.</param>
+        /// <returns>A new calculated rectangle.</returns>
+        public static Rectangle CalculateRectangle(ScaledRectangle origin, Rectangle rectangle)
+        {
+            // Begin with validated points
+            var start = CalculatePoint(origin.Start,rectangle);
+            var end = CalculatePoint(origin.End,rectangle);
+            Rectangle output = new();
+            // Ensure that we begin from the top left corner
+            output.X = start.X < end.X ? start.X : end.X;
+            output.Y = start.Y < end.Y ? start.Y : end.Y;
+            // Ensure we always calculate the correct value
+            output.Width = Math.Abs(end.X - start.X) + 1;
+            output.Height = Math.Abs(end.Y - start.Y) + 1;
+            return output;
+        }
+
+        /// <summary>
+        /// Scales the origin position relative to target height.
         /// </summary>
         /// <param name="origin"></param>
-        /// <param name="rectangle"></param>
+        /// <param name="height"></param>
         /// <returns></returns>
-        public static Point ScaledPoint(Coordinate origin, Rectangle rectangle)
+        public static Point ScaledPoint(Coordinate origin, int height)
         {
-            float scale = rectangle.Height / (float)origin.Height;
+            float scale = height / (float)origin.Height;
             int scaledX = ScaledValue(origin.Point.X, scale);
             int scaledY = ScaledValue(origin.Point.Y, scale);
             return new Point(scaledX, scaledY);
