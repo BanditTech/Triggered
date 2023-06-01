@@ -215,6 +215,12 @@ namespace Triggered.modules.wrapper
             return anchorPoint;
         }
 
+        public static int CalculateMeasurement(Measurement measurement, Rectangle rectangle)
+        {
+            var scale = rectangle.Height / measurement.Height;
+            return ScaledValue(measurement.Value,scale);
+        }
+
         /// <summary>
         /// Calculates a new rectangle based on a scaled origin rectangle and a reference rectangle.
         /// </summary>
