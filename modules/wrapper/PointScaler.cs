@@ -103,7 +103,6 @@ namespace Triggered.modules.wrapper
             }
         }
 
-
         /// <summary>
         /// Determine the starting location for X, Y
         /// </summary>

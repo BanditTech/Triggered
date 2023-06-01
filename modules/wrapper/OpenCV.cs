@@ -1,8 +1,11 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.OCR;
 using Emgu.CV.Util;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Numerics;
 
 namespace Triggered.modules.wrapper
@@ -271,6 +274,74 @@ namespace Triggered.modules.wrapper
                 }
                 return matchRows;
             }
+        }
+
+        public static Dictionary<string, Rectangle> FindTextPositions(Tesseract.Character[] characters, List<string> targetStrings)
+        {
+            Dictionary<string, Rectangle> textPositions = new();
+
+            foreach (string targetString in targetStrings)
+            {
+                var result = FindTextBounds(characters, targetString);
+                if (!result.IsEmpty)
+                {
+                    textPositions.Add(targetString, result);
+                }
+            }
+
+            return textPositions;
+        }
+
+        public static Rectangle FindTextBounds(Tesseract.Character[] characters, string target)
+        {
+            List<Rectangle> boundingBoxes = new();
+            string putty = string.Empty;
+            for (int i = 0; i < characters.Length; i++)
+            {
+                var nullPutty = string.IsNullOrEmpty(putty);
+                var containPutty = nullPutty || (!nullPutty && target.Contains(putty));
+                if (target.Contains(characters[i].Text) && containPutty)
+                {
+                    putty = putty == string.Empty ? characters[i].Text : putty + characters[i].Text;
+                    boundingBoxes.Add(characters[i].Region);
+                    if (putty == target)
+                    {
+                        Rectangle bounds = boundingBoxes[0];
+                        foreach (Rectangle box in boundingBoxes)
+                        {
+                            bounds = Rectangle.Union(box, bounds);
+                        }
+                        return bounds;
+                    }
+                }
+                else
+                {
+                    // reset the comparison
+                    putty = string.Empty;
+                    boundingBoxes.Clear();
+                }
+            }
+            return default;
+        }
+
+
+        private static bool ValidateProximity(List<Tesseract.Character> characters, int maxVerticalDistance = 10, int maxHorizontalDistance = 50)
+        {
+            if (characters.Count < 2)
+                return true;
+
+            // Iterate over the characters to check the distance between consecutive characters
+            for (int i = 1; i < characters.Count; i++)
+            {
+                int verticalDistance = Math.Abs(characters[i].Region.Y - characters[i - 1].Region.Y);
+                int horizontalDistance = Math.Abs(characters[i].Region.X - characters[i - 1].Region.X);
+                if (verticalDistance > maxVerticalDistance)
+                    return false;
+                if (horizontalDistance > maxHorizontalDistance)
+                    return false;
+            }
+
+            return true;
         }
 
         /// <summary>

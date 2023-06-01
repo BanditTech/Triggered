@@ -1132,6 +1132,10 @@ namespace Triggered.modules.demo
                 string result = OCR.GetUTF8Text().Trim();
                 if (result != "")
                 {
+                    var chars = OCR.GetCharacters();
+                    var bound = FindTextBounds(chars,"Life");
+                    if (!bound.IsEmpty)
+                        App.Log($"We have a match for Life @{bound.X},{bound.Y} - W{bound.Width} H{bound.Height}");
                     // brute force a few scenarios to conform to shape
                     result = Regex.Replace(result, "  ", " ");
                     result = Regex.Replace(result, "[,.]", "");
