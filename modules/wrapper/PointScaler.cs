@@ -215,6 +215,12 @@ namespace Triggered.modules.wrapper
             return anchorPoint;
         }
 
+        /// <summary>
+        /// Calculates a scaled measurement value based on a given measurement and reference rectangle.
+        /// </summary>
+        /// <param name="measurement">The measurement value and associated height.</param>
+        /// <param name="rectangle">The reference rectangle.</param>
+        /// <returns>The calculated scaled measurement value.</returns>
         public static int CalculateMeasurement(Measurement measurement, Rectangle rectangle)
         {
             var scale = rectangle.Height / measurement.Height;
