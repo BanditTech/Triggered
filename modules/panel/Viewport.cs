@@ -134,16 +134,10 @@ namespace Triggered.modules.panel
         private static void CheckHotkeys()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
-            {
-                var value = mmOpts.GetKey<bool>("Display_Main");
-                mmOpts.SetKey("Display_Main", !value);
-            }
+                mmOpts.SetKey("Display_Main", !mmOpts.GetKey<bool>("Display_Main"));
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
-            {
-                var value = mmOpts.GetKey<bool>("Display_StashSorter");
-                mmOpts.SetKey("Display_StashSorter", !value);
-            }
+                mmOpts.SetKey("Display_StashSorter", !mmOpts.GetKey<bool>("Display_StashSorter"));
         }
 
         private static void RenderViewPort()
