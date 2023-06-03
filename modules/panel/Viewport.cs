@@ -7,7 +7,7 @@ using ClickableTransparentOverlay;
 using ClickableTransparentOverlay.Win32;
 using ImGuiNET;
 using Triggered.modules.demo;
-
+using Triggered.modules.options;
 
 namespace Triggered.modules.panel
 {
@@ -17,6 +17,8 @@ namespace Triggered.modules.panel
     /// </summary>
     public class Viewport : Overlay
     {
+        private static Options mmOpts => App.Options.MainMenu;
+        private static Options cvOpts => App.Options.DemoCV;
         /// <summary>
         /// Save any changed options each second.
         /// </summary>
@@ -134,26 +136,22 @@ namespace Triggered.modules.panel
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
             {
-                var mainMenu = App.Options.MainMenu;
-                var value = mainMenu.GetKey<bool>("Display_Main");
-                mainMenu.SetKey("Display_Main", !value);
+                var value = mmOpts.GetKey<bool>("Display_Main");
+                mmOpts.SetKey("Display_Main", !value);
             }
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
             {
-                var mainMenu = App.Options.MainMenu;
-                var value = mainMenu.GetKey<bool>("Display_StashSorter");
-                mainMenu.SetKey("Display_StashSorter", !value);
+                var value = mmOpts.GetKey<bool>("Display_StashSorter");
+                mmOpts.SetKey("Display_StashSorter", !value);
             }
         }
 
         private static void RenderViewPort()
         {
-            // Load our options for the main menu
-            var options = App.Options.MainMenu;
             // Prepare the local variables
-            var fullscreen = options.GetKey<bool>("Fullscreen");
-            var padding = options.GetKey<bool>("Padding");
+            var fullscreen = mmOpts.GetKey<bool>("Fullscreen");
+            var padding = mmOpts.GetKey<bool>("Padding");
 
             // Variables to configure the Dockspace example.
             // Includes App.fullscreen, App.padding
@@ -246,31 +244,31 @@ namespace Triggered.modules.panel
 
         private static void RenderChildren()
         {
-            if (App.Options.MainMenu.GetKey<bool>("Display_Main"))
+            if (mmOpts.GetKey<bool>("Display_Main"))
                 MainMenu.Render();
-            if (App.Options.MainMenu.GetKey<bool>("Display_StashSorter"))
+            if (mmOpts.GetKey<bool>("Display_StashSorter"))
                 StashSorter.Render();
-            if (App.Options.MainMenu.GetKey<bool>("Display_Log"))
+            if (mmOpts.GetKey<bool>("Display_Log"))
                 App.logimgui.Draw("Log Window");
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
+            if (cvOpts.GetKey<bool>("Display_AdjustBW"))
                 DemoCV.RenderBW();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
+            if (cvOpts.GetKey<bool>("Display_AdjustColor"))
                 DemoCV.RenderColor();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
+            if (cvOpts.GetKey<bool>("Display_AdjustIndColor"))
                 DemoCV.RenderIndColor();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHSVColor"))
                 DemoCV.RenderHSVColor();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHSVColorDual"))
                 DemoCV.RenderHSVColorDual();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustShape"))
+            if (cvOpts.GetKey<bool>("Display_AdjustShape"))
                 DemoCV.RenderShapeDetection();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
+            if (cvOpts.GetKey<bool>("Display_AdjustRectangle"))
                 DemoCV.RenderShapeRectangle();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVSubset"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHSVSubset"))
                 DemoCV.RenderHSVSubset();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustOCR"))
+            if (cvOpts.GetKey<bool>("Display_AdjustOCR"))
                 DemoCV.RenderOCR();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHWND"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHWND"))
                 DemoCV.RenderHWND();
         }
     }
