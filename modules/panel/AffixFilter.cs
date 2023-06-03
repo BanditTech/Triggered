@@ -8,6 +8,9 @@ using System.Numerics;
 
 namespace Triggered.modules.panel
 {
+    /// <summary>
+    /// Draw a textbox which allows for a popup menu when clicked
+    /// </summary>
     public class AffixFilter
     {
         private static List<string> filteredItems = new List<string>();
@@ -28,6 +31,12 @@ namespace Triggered.modules.panel
         private static int selectedListIndex = 0;
         private static JObject jsonData; // JObject to store the parsed JSON data
 
+        /// <summary>
+        /// Primary function of the class, draws the textbox which can be clicked on.
+        /// When clicked, the popup list allows for selection of the filtered options.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static bool DrawTextBox(ref string input)
         {
             float availableSpace = ImGui.GetContentRegionAvail().X - ImGui.GetTreeNodeToLabelSpacing();
@@ -149,7 +158,6 @@ namespace Triggered.modules.panel
 
             return mergedItems.ToArray();
         }
-
 
         private static void LoadJsonData()
         {
