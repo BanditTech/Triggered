@@ -18,9 +18,9 @@
         internal override void Default()
         {
             // Logging
-            SetKey("SelectedLogLevelIndex", 1);
-            SetKey("LogAutoScroll", true);
-            SetKey("LogMaxLines", 1000);
+            SetKey("Log.SelectedIndex", 1);
+            SetKey("Log.AutoScroll", true);
+            SetKey("Log.MaxLines", 1000);
             // Font
             SetKey("Font.Index", 13);
             SetKey("Font.Size", 18);
@@ -33,8 +33,6 @@
             SetKey("Fullscreen", true);
             SetKey("Padding", false);
             SetKey("VSync", true);
-            // Logic
-            SetKey("LogicTickDelayInMilliseconds", 100);
             // Test filtered text
             SetKey("TestText", "");
 

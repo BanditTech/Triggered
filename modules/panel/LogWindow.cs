@@ -17,9 +17,9 @@ namespace Triggered.modules.panel
         private readonly object locker = new object();
         private static readonly string[] logLevelNames = { "Trace", "Debug", "Info", "Warn", "Error", "Fatal" };
         private static Options_MainMenu Opts => App.Options.MainMenu;
-        private static bool _autoscroll = Opts.GetKey<bool>("LogAutoScroll");
-        private static int _maxlines = Opts.GetKey<int>("LogMaxLines");
-        private static int _minLevel = Opts.GetKey<int>("SelectedLogLevelIndex");
+        private static bool _autoscroll = Opts.GetKey<bool>("Log.AutoScroll");
+        private static int _maxlines = Opts.GetKey<int>("Log.MaxLines");
+        private static int _minLevel = Opts.GetKey<int>("Log.SelectedIndex");
         private readonly Dictionary<string, string> colorMap = new Dictionary<string, string>
         {
             // LogLevel Color Assignments
@@ -86,13 +86,13 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             // Autoscroll option
             if (ImGui.Checkbox("Auto-scroll", ref _autoscroll))
-                Opts.SetKey("LogAutoScroll", _autoscroll);
+                Opts.SetKey("Log.AutoScroll", _autoscroll);
             ImGui.SameLine();
             // Minimum log level
             ImGui.SetNextItemWidth(100);
             if (ImGui.Combo(">= Level", ref _minLevel, logLevelNames, logLevelNames.Length))
             {
-                Opts.SetKey("SelectedLogLevelIndex", _minLevel);
+                Opts.SetKey("Log.SelectedIndex", _minLevel);
                 App.Log($"Changing minimum log level to {logLevelNames[_minLevel]}", 5);
             }
             ImGui.Separator();

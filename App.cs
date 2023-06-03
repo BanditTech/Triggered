@@ -114,7 +114,7 @@ namespace Triggered
         /// <param name="level">NLog LogLevel</param>
         public static void Log(string log, LogLevel level)
         {
-            var selectedLogLevelIndex = App.Options.MainMenu.GetKey<int>("SelectedLogLevelIndex");
+            var selectedLogLevelIndex = App.Options.MainMenu.GetKey<int>("Log.SelectedIndex");
             // Only send message to the log window above Debug level
             if (level.Ordinal >= selectedLogLevelIndex)
             {

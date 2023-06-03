@@ -34,7 +34,8 @@ namespace Triggered.modules.panel
                 }
                 return;
             }
-            // Menu definition area
+
+            #region Font Configuration
             var fontIndex = mmOpts.GetKey<int>("Font.Index");
             var fontSize = mmOpts.GetKey<int>("Font.Size");
             var fontRange = mmOpts.GetKey<int>("Font.Range");
@@ -61,11 +62,9 @@ namespace Triggered.modules.panel
                 string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", $"{fontName}.ttf");
                 Program.viewport.ReplaceFont(fontPath, fontSize, (FontGlyphRangeType)fontRange);
             }
-
             ImGui.Separator();
-            int delay = mmOpts.GetKey<int>("LogicTickDelayInMilliseconds");
-            if (ImGui.SliderInt("Logic MS", ref delay, 10, 1000))
-                mmOpts.SetKey("LogicTickDelayInMilliseconds", delay);
+            #endregion
+
             var displayLog = mmOpts.GetKey<bool>("Display_Log");
             if (ImGui.Checkbox("Show/Hide the Log", ref displayLog))
                 mmOpts.SetKey("Display_Log", displayLog);
@@ -76,6 +75,8 @@ namespace Triggered.modules.panel
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Stash Sorter.");
             ImGui.Separator();
+
+            #region Demonstration Buttons
             if (ImGui.Button("Launch AHK Demo"))
             {
                 Thread thread = new Thread(() =>
@@ -205,6 +206,7 @@ namespace Triggered.modules.panel
             {
                 mmOpts.SetKey("TestText", input);
             }
+            #endregion
 
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
