@@ -8,6 +8,7 @@ using ClickableTransparentOverlay.Win32;
 using ImGuiNET;
 using Triggered.modules.demo;
 using Triggered.modules.options;
+using System.Linq;
 
 namespace Triggered.modules.panel
 {
@@ -107,17 +108,36 @@ namespace Triggered.modules.panel
         }
 
         /// <summary>
-        /// Enable VSync and configure 
+        /// Enable VSync then validate the font
         /// </summary>
         /// <returns></returns>
         protected override Task PostInitialized()
         {
+            // VSync
+            this.VSync = Opts.GetKey<bool>("VSync");
+            // Font
             int fontSize = Font.GetKey<int>("Size");
-            var fontRange = Font.GetKey<int>("Range");
-            string fontName = App.fonts[Font.GetKey<int>("Selection")];
+            int fontRange = Font.GetKey<int>("Range");
+            string fontName = Font.GetKey<string>("Name");
+            if (!App.fonts.Contains(fontName) )
+            {
+                int fontSelection = Font.GetKey<int>("Selection");
+                if (App.fonts[fontSelection] != null)
+                    fontName = App.fonts[fontSelection];
+                else
+                    fontName = App.fonts.FirstOrDefault();
+
+                if (string.IsNullOrEmpty(fontName))
+                {
+                    App.Log("Critical error attempting to fix font selection",5);
+                    throw new NullReferenceException("Critical error attempting to fix font selection");
+                }
+
+                Font.SetKey("Name", fontName);
+                Font.SetKey("Selection", Array.IndexOf(App.fonts,fontName));
+            }
             string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", $"{fontName}.ttf");
             ReplaceFont(fontPath, fontSize, (FontGlyphRangeType)fontRange);
-            this.VSync = Opts.GetKey<bool>("VSync");
             return Task.CompletedTask;
         }
 

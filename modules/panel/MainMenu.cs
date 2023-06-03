@@ -44,6 +44,8 @@ namespace Triggered.modules.panel
             if (ImGui.Combo("Font", ref fontIndex, App.fonts, App.fonts.Length))
             {
                 Font.SetKey("Selection", fontIndex);
+                string fontName = App.fonts[fontIndex];
+                Font.SetKey("Name", fontName);
                 _adjusted = true;
             }
             ImGui.SameLine();

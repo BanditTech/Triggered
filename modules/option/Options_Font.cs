@@ -18,6 +18,7 @@
         internal override void Default()
         {
             SetKey("Selection", 13);
+            SetKey("Name", "Ubuntu");
             SetKey("Size", 18);
             SetKey("Range", 0);
 
