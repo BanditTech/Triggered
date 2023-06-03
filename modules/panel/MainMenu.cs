@@ -14,14 +14,13 @@ namespace Triggered.modules.panel
     internal static  class MainMenu
     {
         private static Options_MainMenu mmOpts => App.Options.MainMenu;
-        private static Options_DemoCV cvOpts => App.Options.DemoCV;
         private static Options_Panel Panel => App.Options.Panel;
         private static string input = mmOpts.GetKey<string>("TestText");
         private static bool saveProfile = false;
         private static bool loadProfile = false;
         internal static void Render()
         {
-            if (!mmOpts.GetKey<bool>("MainMenu"))
+            if (!Panel.GetKey<bool>("MainMenu"))
                 return;
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
