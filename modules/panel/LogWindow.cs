@@ -16,6 +16,7 @@ namespace Triggered.modules.panel
         private readonly List<(string text, Vector4 color)> items = new List<(string text, Vector4 color)>();
         private readonly object locker = new object();
         private static readonly string[] logLevelNames = { "Trace", "Debug", "Info", "Warn", "Error", "Fatal" };
+        private static Options_Panel Panel => App.Options.Panel;
         private static Options_MainMenu Opts => App.Options.MainMenu;
         private static bool _autoscroll = Opts.GetKey<bool>("Log.AutoScroll");
         private static int _maxlines = Opts.GetKey<int>("Log.MaxLines");
@@ -70,7 +71,7 @@ namespace Triggered.modules.panel
         /// <param name="title"></param>
         public void Draw(string title)
         {
-            if (!Opts.GetKey<bool>("Display_Log"))
+            if (!Panel.GetKey<bool>("Log"))
                 return;
 
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);

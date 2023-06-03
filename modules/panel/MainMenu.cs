@@ -15,12 +15,13 @@ namespace Triggered.modules.panel
     {
         private static Options_MainMenu mmOpts => App.Options.MainMenu;
         private static Options_DemoCV cvOpts => App.Options.DemoCV;
+        private static Options_Panel Panel => App.Options.Panel;
         private static string input = mmOpts.GetKey<string>("TestText");
         private static bool saveProfile = false;
         private static bool loadProfile = false;
         internal static void Render()
         {
-            if (!mmOpts.GetKey<bool>("Display_Main"))
+            if (!mmOpts.GetKey<bool>("MainMenu"))
                 return;
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
@@ -66,12 +67,12 @@ namespace Triggered.modules.panel
             ImGui.Separator();
             #endregion
 
-            var displayLog = mmOpts.GetKey<bool>("Display_Log");
+            var displayLog = Panel.GetKey<bool>("Log");
             if (ImGui.Checkbox("Show/Hide the Log", ref displayLog))
-                mmOpts.SetKey("Display_Log", displayLog);
-            var displayStashSorter = mmOpts.GetKey<bool>("Display_StashSorter");
+                Panel.SetKey("Log", displayLog);
+            var displayStashSorter = Panel.GetKey<bool>("StashSorter");
             if (ImGui.Checkbox("Show/Hide the Stash Sorter", ref displayStashSorter))
-                mmOpts.SetKey("Display_StashSorter", displayStashSorter);
+                Panel.SetKey("StashSorter", displayStashSorter);
             ImGui.Separator();
 
             ImGui.Text("F12 button: show/hide this Menu.");
@@ -106,7 +107,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("B/W demo"))
             {
-                cvOpts.SetKey("Display_AdjustBW", true);
+                Panel.SetKey("CV.BlackWhite", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoBlackWhite();
@@ -115,7 +116,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("Color demo"))
             {
-                cvOpts.SetKey("Display_AdjustColor", true);
+                Panel.SetKey("CV.Color", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoColor();
@@ -124,7 +125,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("Ind RGB demo"))
             {
-                cvOpts.SetKey("Display_AdjustIndColor", true);
+                Panel.SetKey("CV.IndividualColor", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoIndColor();
@@ -132,7 +133,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("HSV demo"))
             {
-                cvOpts.SetKey("Display_AdjustHSVColor", true);
+                Panel.SetKey("CV.HSV", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColor();
@@ -141,7 +142,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("HSV Dual demo"))
             {
-                cvOpts.SetKey("Display_AdjustHSVColorDual", true);
+                Panel.SetKey("CV.DualHSV", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColorDual();
@@ -150,7 +151,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("HSV Subset demo"))
             {
-                cvOpts.SetKey("Display_AdjustHSVSubset", true);
+                Panel.SetKey("CV.SubsetHSV", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVSubset();
@@ -158,7 +159,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("Shape demo"))
             {
-                cvOpts.SetKey("Display_AdjustShape", true);
+                Panel.SetKey("CV.Shape", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeDetection();
@@ -167,7 +168,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("Rectangle demo"))
             {
-                cvOpts.SetKey("Display_AdjustRectangle", true);
+                Panel.SetKey("CV.Rectangle", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeRectangle();
@@ -176,7 +177,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("OCR demo"))
             {
-                cvOpts.SetKey("Display_AdjustOCR", true);
+                Panel.SetKey("CV.OCR", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoOCR();
@@ -184,7 +185,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("HWND demo"))
             {
-                cvOpts.SetKey("Display_AdjustHWND", true);
+                Panel.SetKey("CV.WindowHandle", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHWND();

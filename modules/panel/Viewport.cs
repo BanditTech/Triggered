@@ -18,7 +18,7 @@ namespace Triggered.modules.panel
     public class Viewport : Overlay
     {
         private static Options_MainMenu mmOpts => App.Options.MainMenu;
-        private static Options_DemoCV cvOpts => App.Options.DemoCV;
+        private static Options_Panel Panel => App.Options.Panel;
         /// <summary>
         /// Save any changed options each second.
         /// </summary>
@@ -40,63 +40,63 @@ namespace Triggered.modules.panel
         private static void LaunchWindows()
         {
             // if we have set these options to true, open the window when we start the menu
-            if (cvOpts.GetKey<bool>("Display_AdjustBW"))
+            if (Panel.GetKey<bool>("CV.BlackWhite"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoBlackWhite();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustColor"))
+            if (Panel.GetKey<bool>("CV.Color"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoColor();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustIndColor"))
+            if (Panel.GetKey<bool>("CV.IndividualColor"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoIndColor();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustHSVColor"))
+            if (Panel.GetKey<bool>("CV.HSV"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColor();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustHSVColorDual"))
+            if (Panel.GetKey<bool>("CV.DualHSV"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColorDual();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustRectangle"))
+            if (Panel.GetKey<bool>("CV.Rectangle"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeRectangle();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustHSVSubset"))
+            if (Panel.GetKey<bool>("CV.SubsetHSV"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVSubset();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustOCR"))
+            if (Panel.GetKey<bool>("CV.OCR"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoOCR();
                 });
             }
-            if (cvOpts.GetKey<bool>("Display_AdjustHWND"))
+            if (Panel.GetKey<bool>("CV.WindowHandle"))
             {
                 Task.Run(() =>
                 {
@@ -134,10 +134,10 @@ namespace Triggered.modules.panel
         private static void CheckHotkeys()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
-                mmOpts.SetKey("Display_Main", !mmOpts.GetKey<bool>("Display_Main"));
+                Panel.SetKey("MainMenu", !Panel.GetKey<bool>("MainMenu"));
 
             if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
-                mmOpts.SetKey("Display_StashSorter", !mmOpts.GetKey<bool>("Display_StashSorter"));
+                Panel.SetKey("StashSorter", !Panel.GetKey<bool>("StashSorter"));
         }
 
         private static void RenderViewPort()

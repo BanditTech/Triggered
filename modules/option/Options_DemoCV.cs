@@ -59,17 +59,6 @@ namespace Triggered.modules.options
             SetKey("rectangleArea", 250);
             SetKey("cannyThreshold", 180.0f);
             SetKey("cannyThresholdLinking", 120.0f);
-            // visibility
-            SetKey("Display_AdjustBW", false);
-            SetKey("Display_AdjustColor", false);
-            SetKey("Display_AdjustIndColor", false);
-            SetKey("Display_AdjustHSVColor", false);
-            SetKey("Display_AdjustHSVColorDual", false);
-            SetKey("Display_AdjustHSVSubset", false);
-            SetKey("Display_AdjustShape", false);
-            SetKey("Display_AdjustRectangle", false);
-            SetKey("Display_AdjustOCR", false);
-            SetKey("Display_AdjustHWND", false);
 
             TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again

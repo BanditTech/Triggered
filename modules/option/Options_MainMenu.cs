@@ -25,10 +25,6 @@
             SetKey("Font.Index", 13);
             SetKey("Font.Size", 18);
             SetKey("Font.Range", 0);
-            // Panel Visibility
-            SetKey("Display_StashSorter", true);
-            SetKey("Display_Main", true);
-            SetKey("Display_Log", true);
             // Viewport options
             SetKey("Fullscreen", true);
             SetKey("Padding", false);

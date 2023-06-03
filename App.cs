@@ -6,9 +6,7 @@ using Triggered.modules.options;
 using Triggered.modules.panel;
 using Triggered.modules.struct_game;
 using Triggered.modules.struct_filter;
-using ImGuiNET;
 using System;
-using System.Linq;
 using ClickableTransparentOverlay;
 using Triggered.modules.option;
 

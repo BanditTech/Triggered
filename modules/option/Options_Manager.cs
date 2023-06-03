@@ -11,6 +11,10 @@ namespace Triggered.modules.options
     public class Options_Manager
     {
         /// <summary>
+        /// Panel Options object
+        /// </summary>
+        public Options_Panel Panel = new Options_Panel();
+        /// <summary>
         /// MainMenu Options object
         /// </summary>
         public Options_MainMenu MainMenu = new Options_MainMenu();

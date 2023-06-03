@@ -49,6 +49,8 @@ namespace Triggered.modules.panel
         public static readonly string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=", "~=", ">0<", ">0<=", "!=" };
         public static readonly string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
         private static Options_StashSorter Opts => App.Options.StashSorter;
+        private static Options_Panel Panel => App.Options.Panel;
+
         #endregion
 
         #region Setup Functions
@@ -118,7 +120,7 @@ namespace Triggered.modules.panel
         /// </summary>
         public static void Render()
         {
-            if (!App.Options.MainMenu.GetKey<bool>("Display_StashSorter"))
+            if (!Panel.GetKey<bool>("StashSorter"))
                 return;
             // Create the main window
             ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.FirstUseEver);
@@ -867,11 +869,7 @@ namespace Triggered.modules.panel
             if (ImGui.BeginMenuBar())
             {
                 if (ImGui.MenuItem("Hide"))
-                {
-                    var mainMenu = App.Options.MainMenu;
-                    var value = mainMenu.GetKey<bool>("Display_StashSorter");
-                    mainMenu.SetKey("Display_StashSorter", !value);
-                }
+                    Panel.SetKey("StashSorter", !Panel.GetKey<bool>("StashSorter"));
                 if (ImGui.BeginMenu("File"))
                 {
                     if (ImGui.MenuItem("Load"))

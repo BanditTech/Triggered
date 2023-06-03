@@ -27,28 +27,29 @@ namespace Triggered.modules.demo
     /// </summary>
     public static class DemoCV
     {
+        private static Options_Panel Panel => App.Options.Panel;
         private static Options_DemoCV Opts => App.Options.DemoCV;
         public static void Render()
         {
-            if (Opts.GetKey<bool>("Display_AdjustBW"))
+            if (Panel.GetKey<bool>("CV.BlackWhite"))
                 RenderBW();
-            if (Opts.GetKey<bool>("Display_AdjustColor"))
+            if (Panel.GetKey<bool>("CV.Color"))
                 RenderColor();
-            if (Opts.GetKey<bool>("Display_AdjustIndColor"))
+            if (Panel.GetKey<bool>("CV.IndividualColor"))
                 RenderIndColor();
-            if (Opts.GetKey<bool>("Display_AdjustHSVColor"))
+            if (Panel.GetKey<bool>("CV.HSV"))
                 RenderHSVColor();
-            if (Opts.GetKey<bool>("Display_AdjustHSVColorDual"))
+            if (Panel.GetKey<bool>("CV.DualHSV"))
                 RenderHSVColorDual();
-            if (Opts.GetKey<bool>("Display_AdjustShape"))
+            if (Panel.GetKey<bool>("CV.Shape"))
                 RenderShapeDetection();
-            if (Opts.GetKey<bool>("Display_AdjustRectangle"))
+            if (Panel.GetKey<bool>("CV.Rectangle"))
                 RenderShapeRectangle();
-            if (Opts.GetKey<bool>("Display_AdjustHSVSubset"))
+            if (Panel.GetKey<bool>("CV.SubsetHSV"))
                 RenderHSVSubset();
-            if (Opts.GetKey<bool>("Display_AdjustOCR"))
+            if (Panel.GetKey<bool>("CV.OCR"))
                 RenderOCR();
-            if (Opts.GetKey<bool>("Display_AdjustHWND"))
+            if (Panel.GetKey<bool>("CV.WindowHandle"))
                 RenderHWND();
         }
         /// <summary>
@@ -177,7 +178,6 @@ namespace Triggered.modules.demo
             using Bitmap screenBitmap = new Bitmap(screenBounds.Width, screenBounds.Height);
             using Mat frame = new Mat(screenBounds.Height / 4, screenBounds.Width / 4, DepthType.Cv8U, 3);
             using Mat screenMat = new Mat();
-            var options = App.Options.DemoCV;
 
             // We create our named window
             CvInvoke.NamedWindow(win1);
@@ -185,8 +185,8 @@ namespace Triggered.modules.demo
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                var minSlide = options.GetKey<int>("minFilterBlackWhite");
-                var maxSlide = options.GetKey<int>("maxFilterBlackWhite");
+                var minSlide = Opts.GetKey<int>("minFilterBlackWhite");
+                var maxSlide = Opts.GetKey<int>("maxFilterBlackWhite");
                 using (Graphics graphicAdjust = Graphics.FromImage(screenBitmap))
                 {
                     graphicAdjust.CopyFromScreen(screenBounds.Location, Point.Empty, screenBounds.Size);
@@ -211,7 +211,7 @@ namespace Triggered.modules.demo
                 CvInvoke.Imshow(win1, frame);
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustBW", false);
+            Panel.SetKey("CV.BlackWhite", false);
         }
 
         /// <summary>
@@ -221,15 +221,13 @@ namespace Triggered.modules.demo
         {
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVBlackWhite");
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
-            var min = options.GetKey<int>("minFilterBlackWhite");
-            var max = options.GetKey<int>("maxFilterBlackWhite");
+            var min = Opts.GetKey<int>("minFilterBlackWhite");
+            var max = Opts.GetKey<int>("maxFilterBlackWhite");
 
             if (ImGui.SliderInt("Min", ref min, 0, 255))
             {
                 if (min < max)
-                    options.SetKey("minFilterBlackWhite", min);
+                    Opts.SetKey("minFilterBlackWhite", min);
                 else
                     min = max - 1;
             }
@@ -237,7 +235,7 @@ namespace Triggered.modules.demo
             if (ImGui.SliderInt("Max", ref max, 0, 255))
             {
                 if (max > min)
-                    options.SetKey("maxFilterBlackWhite", max);
+                    Opts.SetKey("maxFilterBlackWhite", max);
                 else
                     max = min + 1;
             }
@@ -254,7 +252,6 @@ namespace Triggered.modules.demo
             // Construct our variables with `using` when possible
             string win1 = "Primary Screen Capture Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            var options = App.Options.DemoCV;
 
             // We create our named window
             CvInvoke.NamedWindow(win1);
@@ -262,9 +259,9 @@ namespace Triggered.modules.demo
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                float up = options.GetKey<float>("filterup");
-                float down = options.GetKey<float>("filterdown");
-                Vector3 filterColor = options.GetKey<Vector3>("filterColorRGB");
+                float up = Opts.GetKey<float>("filterup");
+                float down = Opts.GetKey<float>("filterdown");
+                Vector3 filterColor = Opts.GetKey<Vector3>("filterColorRGB");
 
                 using (Mat screenMat = new Mat())
                 {
@@ -317,7 +314,7 @@ namespace Triggered.modules.demo
                 }
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustColor", false);
+            Panel.SetKey("CV.Color", false);
         }
 
         /// <summary>
@@ -328,21 +325,19 @@ namespace Triggered.modules.demo
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVColor");
 
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             // Get the current values from options
-            var up = options.GetKey<float>("filterup");
-            var down = options.GetKey<float>("filterdown");
-            var color = options.GetKey<Vector3>("filterColorRGB");
+            var up = Opts.GetKey<float>("filterup");
+            var down = Opts.GetKey<float>("filterdown");
+            var color = Opts.GetKey<Vector3>("filterColorRGB");
 
             // Adjustable range sliders from the base color
             if (ImGui.SliderFloat("Included Below", ref down, 0f, 1f))
-                options.SetKey("filterdown", down);
+                Opts.SetKey("filterdown", down);
             if (ImGui.SliderFloat("Included Above", ref up, 0f, 1f))
-                options.SetKey("filterup", up);
+                Opts.SetKey("filterup", up);
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Color", ref color))
-                options.SetKey("filterColorRGB", color);
+                Opts.SetKey("filterColorRGB", color);
 
             ImGui.End();
         }
@@ -354,7 +349,6 @@ namespace Triggered.modules.demo
         {
             string win1 = "Primary Screen Capture Individual Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            var options = App.Options.DemoCV;
 
             // We create our named window
             CvInvoke.NamedWindow(win1);
@@ -362,10 +356,10 @@ namespace Triggered.modules.demo
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
                 // Set up our local variables
-                float r = options.GetKey<float>("filterR");
-                float g = options.GetKey<float>("filterG");
-                float b = options.GetKey<float>("filterB");
-                Vector3 filterColor = options.GetKey<Vector3>("filterColorIndRGB");
+                float r = Opts.GetKey<float>("filterR");
+                float g = Opts.GetKey<float>("filterG");
+                float b = Opts.GetKey<float>("filterB");
+                Vector3 filterColor = Opts.GetKey<Vector3>("filterColorIndRGB");
                 ScalarArray rMin, rMax, gMin, gMax, bMin, bMax;
 
                 // Take color points and produce ranges from them
@@ -433,7 +427,7 @@ namespace Triggered.modules.demo
                 }
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustIndColor", false);
+            Panel.SetKey("CV.IndividualColor", false);
         }
 
         /// <summary>
@@ -444,24 +438,22 @@ namespace Triggered.modules.demo
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVIndColor");
 
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             // Get the current values from options
-            var r = options.GetKey<float>("filterR");
-            var g = options.GetKey<float>("filterG");
-            var b = options.GetKey<float>("filterB");
-            var color = options.GetKey<Vector3>("filterColorIndRGB");
+            var r = Opts.GetKey<float>("filterR");
+            var g = Opts.GetKey<float>("filterG");
+            var b = Opts.GetKey<float>("filterB");
+            var color = Opts.GetKey<Vector3>("filterColorIndRGB");
 
             // Adjustable range sliders from the base color
             if (ImGui.SliderFloat("Range for R", ref r, 0f, 1f))
-                options.SetKey("filterR", r);
+                Opts.SetKey("filterR", r);
             if (ImGui.SliderFloat("Range for G", ref g, 0f, 1f))
-                options.SetKey("filterG", g);
+                Opts.SetKey("filterG", g);
             if (ImGui.SliderFloat("Range for B", ref b, 0f, 1f))
-                options.SetKey("filterB", b);
+                Opts.SetKey("filterB", b);
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Color", ref color))
-                options.SetKey("filterColorIndRGB", color);
+                Opts.SetKey("filterColorIndRGB", color);
 
             ImGui.End();
         }
@@ -473,7 +465,6 @@ namespace Triggered.modules.demo
         {
             string win1 = "Primary Screen Capture HSV Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            var options = App.Options.DemoCV;
 
             // We create our named window
             CvInvoke.NamedWindow(win1);
@@ -481,10 +472,10 @@ namespace Triggered.modules.demo
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
                 // Set up our local variables
-                float h = options.GetKey<float>("filterH");
-                float s = options.GetKey<float>("filterS");
-                float v = options.GetKey<float>("filterV");
-                Vector3 filterColor = options.GetKey<Vector3>("filterColorHSV");
+                float h = Opts.GetKey<float>("filterH");
+                float s = Opts.GetKey<float>("filterS");
+                float v = Opts.GetKey<float>("filterV");
+                Vector3 filterColor = Opts.GetKey<Vector3>("filterColorHSV");
                 ScalarArray hMin, hMax, sMin, sMax, vMin, vMax;
 
                 // Take color points and produce ranges from them
@@ -558,7 +549,7 @@ namespace Triggered.modules.demo
                 }
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustHSVColor", false);
+            Panel.SetKey("CV.HSV", false);
         }
 
         /// <summary>
@@ -569,24 +560,22 @@ namespace Triggered.modules.demo
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVHSVColor");
 
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             // Get the current values from options
-            var h = options.GetKey<float>("filterH");
-            var s = options.GetKey<float>("filterS");
-            var v = options.GetKey<float>("filterV");
-            var color = options.GetKey<Vector3>("filterColorHSV");
+            var h = Opts.GetKey<float>("filterH");
+            var s = Opts.GetKey<float>("filterS");
+            var v = Opts.GetKey<float>("filterV");
+            var color = Opts.GetKey<Vector3>("filterColorHSV");
 
             // Adjustable range sliders from the base color
             if (ImGui.SliderFloat("Hue", ref h, 0f, 1f))
-                options.SetKey("filterH", h);
+                Opts.SetKey("filterH", h);
             if (ImGui.SliderFloat("Saturation", ref s, 0f, 1f))
-                options.SetKey("filterS", s);
+                Opts.SetKey("filterS", s);
             if (ImGui.SliderFloat("Vibrance", ref v, 0f, 1f))
-                options.SetKey("filterV", v);
+                Opts.SetKey("filterV", v);
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Color", ref color, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
-                options.SetKey("filterColorHSV", color);
+                Opts.SetKey("filterColorHSV", color);
 
             ImGui.End();
         }
@@ -598,7 +587,6 @@ namespace Triggered.modules.demo
         {
             string win1 = "Primary Screen Capture HSV Dual Color";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            var options = App.Options.DemoCV;
 
             // We create our named window
             CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
@@ -606,8 +594,8 @@ namespace Triggered.modules.demo
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
                 // Set up our local variables
-                Vector3 min = options.GetKey<Vector3>("filterColorHSVMin");
-                Vector3 max = options.GetKey<Vector3>("filterColorHSVMax");
+                Vector3 min = Opts.GetKey<Vector3>("filterColorHSVMin");
+                Vector3 max = Opts.GetKey<Vector3>("filterColorHSVMax");
                 // Capture the screen
                 Mat screenMat = GetScreenMat(screenBounds);
                 // Convert into HSV color space
@@ -634,7 +622,7 @@ namespace Triggered.modules.demo
                 copied.Dispose();
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustHSVColorDual", false);
+            Panel.SetKey("CV.DualHSV", false);
         }
 
         /// <summary>
@@ -645,18 +633,16 @@ namespace Triggered.modules.demo
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("DemoCVHSVColorDual");
 
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             // Get the current values from options
-            var min = options.GetKey<Vector3>("filterColorHSVMin");
-            var max = options.GetKey<Vector3>("filterColorHSVMax");
+            var min = Opts.GetKey<Vector3>("filterColorHSVMin");
+            var max = Opts.GetKey<Vector3>("filterColorHSVMax");
 
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Min", ref min, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
-                options.SetKey("filterColorHSVMin", min);
+                Opts.SetKey("filterColorHSVMin", min);
 
             if (ImGui.ColorPicker3("Filter Max", ref max, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
-                options.SetKey("filterColorHSVMax", max);
+                Opts.SetKey("filterColorHSVMax", max);
 
             ImGui.End();
         }
@@ -668,8 +654,6 @@ namespace Triggered.modules.demo
         {
             string win1 = "Shape Detection";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            var options = App.Options.DemoCV;
-
 
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
@@ -686,7 +670,7 @@ namespace Triggered.modules.demo
             }
 
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustShape", false);
+            Panel.SetKey("CV.Shape", false);
         }
 
         /// <summary>
@@ -845,7 +829,6 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void DemoShapeRectangle()
         {
-            var options = App.Options.DemoCV;
             string win1 = "Rectangle Detection";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
 
@@ -865,7 +848,7 @@ namespace Triggered.modules.demo
             }
 
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustRectangle", false);
+            Panel.SetKey("CV.Rectangle", false);
         }
 
         /// <summary>
@@ -875,11 +858,10 @@ namespace Triggered.modules.demo
         /// <returns></returns>
         public static Mat ProcessRectangles(Mat img)
         {
-            var options = App.Options.DemoCV;
             // Get the current values from options
-            var area = options.GetKey<int>("rectangleArea");
-            double cannyThreshold = options.GetKey<float>("cannyThreshold");
-            double cannyThresholdLinking = options.GetKey<float>("cannyThresholdLinking");
+            var area = Opts.GetKey<int>("rectangleArea");
+            double cannyThreshold = Opts.GetKey<float>("cannyThreshold");
+            double cannyThresholdLinking = Opts.GetKey<float>("cannyThresholdLinking");
             Stopwatch watch = Stopwatch.StartNew();
 
             using (UMat gray = new UMat())
@@ -973,19 +955,17 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void RenderShapeRectangle()
         {
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             // Get the current values from options
-            var area = options.GetKey<int>("rectangleArea");
-            var cannyThreshold = options.GetKey<float>("cannyThreshold");
-            var cannyThresholdLinking = options.GetKey<float>("cannyThresholdLinking");
+            var area = Opts.GetKey<int>("rectangleArea");
+            var cannyThreshold = Opts.GetKey<float>("cannyThreshold");
+            var cannyThresholdLinking = Opts.GetKey<float>("cannyThresholdLinking");
 
             if (ImGui.SliderInt("Area", ref area, 10, 1000))
-                options.SetKey("rectangleArea", area);
+                Opts.SetKey("rectangleArea", area);
             if (ImGui.SliderFloat("cannyThreshold", ref cannyThreshold, 0f, 1000f))
-                options.SetKey("cannyThreshold", cannyThreshold);
+                Opts.SetKey("cannyThreshold", cannyThreshold);
             if (ImGui.SliderFloat("cannyThresholdLinking", ref cannyThresholdLinking, 0f, 1000f))
-                options.SetKey("cannyThresholdLinking", cannyThresholdLinking);
+                Opts.SetKey("cannyThresholdLinking", cannyThresholdLinking);
         }
 
         private static float _percentage = 1f;
@@ -996,8 +976,6 @@ namespace Triggered.modules.demo
         {
             string win1 = "HSV Subset Matching";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            var options = App.Options.DemoCV;
-
 
             // We create our named window
             CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
@@ -1005,12 +983,12 @@ namespace Triggered.modules.demo
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
                 // Set up our local variables
-                Vector3 min = options.GetKey<Vector3>("filterSubsetHSVMin");
-                Vector3 max = options.GetKey<Vector3>("filterSubsetHSVMax");
-                int x = options.GetKey<int>("filterSubsetX");
-                int y = options.GetKey<int>("filterSubsetY");
-                int w = options.GetKey<int>("filterSubsetW");
-                int h = options.GetKey<int>("filterSubsetH");
+                Vector3 min = Opts.GetKey<Vector3>("filterSubsetHSVMin");
+                Vector3 max = Opts.GetKey<Vector3>("filterSubsetHSVMax");
+                int x = Opts.GetKey<int>("filterSubsetX");
+                int y = Opts.GetKey<int>("filterSubsetY");
+                int w = Opts.GetKey<int>("filterSubsetW");
+                int h = Opts.GetKey<int>("filterSubsetH");
 
                 Rectangle subset = new Rectangle(x, y, w, h);
                 // Capture the screen
@@ -1032,7 +1010,7 @@ namespace Triggered.modules.demo
                 if (_percentage != percentage)
                 {
                     _percentage = percentage;
-                    options.SetKey("filterSubsetPercentage", percentage);
+                    Opts.SetKey("filterSubsetPercentage", percentage);
                 }
                 // Release Memory
                 filteredMat.Dispose();
@@ -1050,7 +1028,7 @@ namespace Triggered.modules.demo
                 copied.Dispose();
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustHSVSubset", false);
+            Panel.SetKey("CV.SubsetHSV", false);
         }
 
         /// <summary>
@@ -1062,32 +1040,31 @@ namespace Triggered.modules.demo
             ImGui.Begin("DemoCVHSVSubset");
 
             // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             var screen = Screen.PrimaryScreen.Bounds;
             // Get the current values from options
-            var min = options.GetKey<Vector3>("filterSubsetHSVMin");
-            var max = options.GetKey<Vector3>("filterSubsetHSVMax");
-            var x = options.GetKey<int>("filterSubsetX");
-            var y = options.GetKey<int>("filterSubsetY");
-            var w = options.GetKey<int>("filterSubsetW");
-            var h = options.GetKey<int>("filterSubsetH");
-            var percentage = options.GetKey<float>("filterSubsetPercentage");
+            var min = Opts.GetKey<Vector3>("filterSubsetHSVMin");
+            var max = Opts.GetKey<Vector3>("filterSubsetHSVMax");
+            var x = Opts.GetKey<int>("filterSubsetX");
+            var y = Opts.GetKey<int>("filterSubsetY");
+            var w = Opts.GetKey<int>("filterSubsetW");
+            var h = Opts.GetKey<int>("filterSubsetH");
+            var percentage = Opts.GetKey<float>("filterSubsetPercentage");
 
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Min", ref min, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
-                options.SetKey("filterSubsetHSVMin", min);
+                Opts.SetKey("filterSubsetHSVMin", min);
 
             if (ImGui.ColorPicker3("Filter Max", ref max, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
-                options.SetKey("filterSubsetHSVMax", max);
+                Opts.SetKey("filterSubsetHSVMax", max);
 
             if (ImGui.SliderInt("X", ref x, 0, screen.Width - 1))
             {
                 if (x + w > screen.Width)
                 {
                     w = screen.Width - x;
-                    options.SetKey("filterSubsetW", w);
+                    Opts.SetKey("filterSubsetW", w);
                 }
-                options.SetKey("filterSubsetX", x);
+                Opts.SetKey("filterSubsetX", x);
             }
 
             if (ImGui.SliderInt("Y", ref y, 0, screen.Height - 1))
@@ -1095,19 +1072,19 @@ namespace Triggered.modules.demo
                 if (y + h > screen.Height)
                 {
                     h = screen.Height - y;
-                    options.SetKey("filterSubsetH", h);
+                    Opts.SetKey("filterSubsetH", h);
                 }
-                options.SetKey("filterSubsetY", y);
+                Opts.SetKey("filterSubsetY", y);
             }
 
             if (ImGui.SliderInt("W", ref w, 1, screen.Width - x))
             {
-                options.SetKey("filterSubsetW", w);
+                Opts.SetKey("filterSubsetW", w);
             }
 
             if (ImGui.SliderInt("H", ref h, 1, screen.Height - y))
             {
-                options.SetKey("filterSubsetH", h);
+                Opts.SetKey("filterSubsetH", h);
             }
 
             ImGui.LabelText("% ",$"{percentage}");
@@ -1121,7 +1098,6 @@ namespace Triggered.modules.demo
         {
             string win1 = "OCR Matching";
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
-            var options = App.Options.DemoCV;
             Tesseract OCR = new();
             OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"),"fast",OcrEngineMode.LstmOnly);
             // We create our named window
@@ -1130,12 +1106,12 @@ namespace Triggered.modules.demo
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
                 // Set up our local variables
-                Vector3 min = options.GetKey<Vector3>("OCR.Min");
-                Vector3 max = options.GetKey<Vector3>("OCR.Max");
-                int x = options.GetKey<int>("OCR.X");
-                int y = options.GetKey<int>("OCR.Y");
-                int w = options.GetKey<int>("OCR.W");
-                int h = options.GetKey<int>("OCR.H");
+                Vector3 min = Opts.GetKey<Vector3>("OCR.Min");
+                Vector3 max = Opts.GetKey<Vector3>("OCR.Max");
+                int x = Opts.GetKey<int>("OCR.X");
+                int y = Opts.GetKey<int>("OCR.Y");
+                int w = Opts.GetKey<int>("OCR.W");
+                int h = Opts.GetKey<int>("OCR.H");
 
                 Rectangle subset = new Rectangle(x, y, w, h);
                 // Capture the screen
@@ -1216,7 +1192,7 @@ namespace Triggered.modules.demo
                 copied.Dispose();
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustOCR", false);
+            Panel.SetKey("CV.OCR", false);
             OCR.Dispose();
         }
 
@@ -1225,32 +1201,30 @@ namespace Triggered.modules.demo
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("Demo OCR");
 
-            // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             var screen = Screen.PrimaryScreen.Bounds;
             // Get the current values from options
-            var min = options.GetKey<Vector3>("OCR.Min");
-            var max = options.GetKey<Vector3>("OCR.Max");
-            var x = options.GetKey<int>("OCR.X");
-            var y = options.GetKey<int>("OCR.Y");
-            var w = options.GetKey<int>("OCR.W");
-            var h = options.GetKey<int>("OCR.H");
+            var min = Opts.GetKey<Vector3>("OCR.Min");
+            var max = Opts.GetKey<Vector3>("OCR.Max");
+            var x = Opts.GetKey<int>("OCR.X");
+            var y = Opts.GetKey<int>("OCR.Y");
+            var w = Opts.GetKey<int>("OCR.W");
+            var h = Opts.GetKey<int>("OCR.H");
 
             // Render colorpicker widget
             if (ImGui.ColorPicker3("Filter Min", ref min, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
-                options.SetKey("OCR.Min", min);
+                Opts.SetKey("OCR.Min", min);
 
             if (ImGui.ColorPicker3("Filter Max", ref max, ImGuiColorEditFlags.InputHSV | ImGuiColorEditFlags.DisplayHSV | ImGuiColorEditFlags.PickerHueWheel))
-                options.SetKey("OCR.Max", max);
+                Opts.SetKey("OCR.Max", max);
 
             if (ImGui.SliderInt("X", ref x, 0, screen.Width - 1))
             {
                 if (x + w > screen.Width)
                 {
                     w = screen.Width - x;
-                    options.SetKey("OCR.W", w);
+                    Opts.SetKey("OCR.W", w);
                 }
-                options.SetKey("OCR.X", x);
+                Opts.SetKey("OCR.X", x);
             }
 
             if (ImGui.SliderInt("Y", ref y, 0, screen.Height - 1))
@@ -1258,19 +1232,19 @@ namespace Triggered.modules.demo
                 if (y + h > screen.Height)
                 {
                     h = screen.Height - y;
-                    options.SetKey("OCR.H", h);
+                    Opts.SetKey("OCR.H", h);
                 }
-                options.SetKey("OCR.Y", y);
+                Opts.SetKey("OCR.Y", y);
             }
 
             if (ImGui.SliderInt("W", ref w, 1, screen.Width - x))
             {
-                options.SetKey("OCR.W", w);
+                Opts.SetKey("OCR.W", w);
             }
 
             if (ImGui.SliderInt("H", ref h, 1, screen.Height - y))
             {
-                options.SetKey("OCR.H", h);
+                Opts.SetKey("OCR.H", h);
             }
 
             ImGui.End();
@@ -1279,13 +1253,12 @@ namespace Triggered.modules.demo
         public static void DemoHWND()
         {
             string win1 = "Capture Window";
-            var options = App.Options.DemoCV;
             // We create our named window
             CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
             // Exit the loop when you press the Escape Key
             while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
             {
-                string name = options.GetKey<string>("HWND.Name");
+                string name = Opts.GetKey<string>("HWND.Name");
                 // Capture the Window
                 Mat screenMat = GetWindowMat(name);
                 if (screenMat == null)
@@ -1296,7 +1269,7 @@ namespace Triggered.modules.demo
                 screenMat.Dispose();
             }
             CvInvoke.DestroyWindow(win1);
-            options.SetKey("Display_AdjustHWND", false);
+            Panel.SetKey("CV.WindowHandle", false);
         }
 
         public static void RenderHWND()
@@ -1305,11 +1278,10 @@ namespace Triggered.modules.demo
             ImGui.Begin("Demo HWND");
 
             // This sets up an options for the DemoCV methods.
-            var options = App.Options.DemoCV;
             // Get the current values from options
-            string name = options.GetKey<string>("HWND.Name");
+            string name = Opts.GetKey<string>("HWND.Name");
             if (ImGui.InputText("Window",ref name, 256))
-                options.SetKey("HWND.Name", name);
+                Opts.SetKey("HWND.Name", name);
 
             ImGui.End();
         }
