@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Triggered.modules.wrapper;
 using Triggered.modules.struct_filter;
+using Triggered.modules.options;
 
 namespace Triggered.modules.panel
 {
@@ -35,7 +36,6 @@ namespace Triggered.modules.panel
         static bool _showOptions = true;
         static Element _hoveredLeaf = null;
         static Group _hoveredGroup = null;
-        static float _lineHeight = ImGui.GetFontSize() + ImGui.GetStyle().FramePadding.Y * 2f;
         static DateTime _lastHover = DateTime.MinValue;
         static Type _addingType = typeof(Element);
         static Type _oldType = typeof(Element);
@@ -48,6 +48,7 @@ namespace Triggered.modules.panel
         public static readonly string[] objectTypes = new string[] { "Group", "Element" };
         public static readonly string[] EvalOptions = new string[] { ">=", ">", "=", "<", "<=", "~=", ">0<", ">0<=", "!=" };
         public static readonly string[] GroupTypes = new string[] { "AND", "NOT", "COUNT", "WEIGHT" };
+        private static Options_StashSorter Opts => App.Options.StashSorter;
         #endregion
 
         #region Setup Functions
@@ -117,7 +118,6 @@ namespace Triggered.modules.panel
         /// </summary>
         public static void Render()
         {
-            var options = App.Options.StashSorter;
             // Create the main window
             ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(500, 200), new Vector2(float.MaxValue, float.MaxValue));
@@ -127,9 +127,9 @@ namespace Triggered.modules.panel
             ImGui.Text("Selected Filter:");
             ImGui.SameLine();
             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-            int selectedGroup = options.GetKey<int>("SelectedGroup");
+            int selectedGroup = Opts.GetKey<int>("SelectedGroup");
             if (ImGui.Combo("##Selected Filter", ref selectedGroup, App.TopGroups, App.TopGroups.Length))
-                options.SetKey("SelectedGroup", selectedGroup);
+                Opts.SetKey("SelectedGroup", selectedGroup);
             ImGui.Spacing();
 
             // Add adjustments for TopGroup values
@@ -971,8 +971,7 @@ namespace Triggered.modules.panel
                         Task.Run(() =>
                         {
                             // Prepare local variables
-                            var options = App.Options.StashSorter;
-                            var key = options.GetKey<int>("SelectedGroup");
+                            var key = Opts.GetKey<int>("SelectedGroup");
                             var import = ImGui.GetClipboardText();
                             if (JSON.Validate(import))
                             {
@@ -1104,7 +1103,7 @@ namespace Triggered.modules.panel
 
             string[] indices = indexer.Split('_');
             int length = indices.Length;
-            object target = App.StashSorterList[App.Options.StashSorter.GetKey<int>("SelectedGroup")];
+            object target = App.StashSorterList[Opts.GetKey<int>("SelectedGroup")];
             object parent;
 
             // Iterate over the index keys, skipping the first one (which is always 0)
@@ -1153,7 +1152,7 @@ namespace Triggered.modules.panel
         }
         static void InsertObjectByIndexer(string indexer, Type targetType, Type sourceType, object obj)
         {
-            int selectedGroup = App.Options.StashSorter.GetKey<int>("SelectedGroup");
+            int selectedGroup = Opts.GetKey<int>("SelectedGroup");
             if (indexer == "0")
             {
                 if (sourceType == typeof(Group))

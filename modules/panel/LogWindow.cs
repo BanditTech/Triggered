@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using NLog;
+using Triggered.modules.options;
 
 namespace Triggered.modules.panel
 {
@@ -15,9 +16,10 @@ namespace Triggered.modules.panel
         private readonly List<(string text, Vector4 color)> items = new List<(string text, Vector4 color)>();
         private readonly object locker = new object();
         private static readonly string[] logLevelNames = { "Trace", "Debug", "Info", "Warn", "Error", "Fatal" };
-        private static bool _autoscroll;
-        private static int _maxlines;
-        private static int _minLevel;
+        private static Options_MainMenu Opts => App.Options.MainMenu;
+        private static bool _autoscroll = Opts.GetKey<bool>("LogAutoScroll");
+        private static int _maxlines = Opts.GetKey<int>("LogMaxLines");
+        private static int _minLevel = Opts.GetKey<int>("SelectedLogLevelIndex");
         private readonly Dictionary<string, string> colorMap = new Dictionary<string, string>
         {
             // LogLevel Color Assignments
@@ -28,16 +30,7 @@ namespace Triggered.modules.panel
             {"error", "#FF0000"},
             {"fatal", "#8B0000"},
         };
-        /// <summary>
-        /// Instantiate the values of our local reference.
-        /// </summary>
-        public LogWindow()
-        {
-            var options = App.Options.MainMenu;
-            _autoscroll = options.GetKey<bool>("LogAutoScroll");
-            _maxlines = options.GetKey<int>("LogMaxLines");
-            _minLevel = options.GetKey<int>("SelectedLogLevelIndex");
-        }
+
         /// <summary>
         /// Wipes the item list to display a fresh window.
         /// </summary>
@@ -48,6 +41,7 @@ namespace Triggered.modules.panel
                 items.Clear();
             }
         }
+
         /// <summary>
         /// Adds an entry to the list of log events which are displayed.
         /// It adds the tuple of text/color to the item list.
@@ -69,6 +63,7 @@ namespace Triggered.modules.panel
                 items.RemoveRange(0, items.Count - _maxlines);
             }
         }
+
         /// <summary>
         /// Create the log window with the specified title name.
         /// </summary>
@@ -81,8 +76,6 @@ namespace Triggered.modules.panel
                 ImGui.End();
                 return;
             }
-            // reference the options
-            var options = App.Options.MainMenu;
             // Clear Text Button
             if (ImGui.Button("Clear"))
                 Clear();
@@ -93,13 +86,13 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             // Autoscroll option
             if (ImGui.Checkbox("Auto-scroll", ref _autoscroll))
-                options.SetKey("LogAutoScroll", _autoscroll);
+                Opts.SetKey("LogAutoScroll", _autoscroll);
             ImGui.SameLine();
             // Minimum log level
             ImGui.SetNextItemWidth(100);
             if (ImGui.Combo(">= Level", ref _minLevel, logLevelNames, logLevelNames.Length))
             {
-                options.SetKey("SelectedLogLevelIndex", _minLevel);
+                Opts.SetKey("SelectedLogLevelIndex", _minLevel);
                 App.Log($"Changing minimum log level to {logLevelNames[_minLevel]}", 5);
             }
             ImGui.Separator();
@@ -122,6 +115,7 @@ namespace Triggered.modules.panel
             // We end the window
             ImGui.End();
         }
+
         /// <summary>
         /// Simple helper function which parses the text name and returns a color.
         /// A better implimentation might have allowed for custom fields.

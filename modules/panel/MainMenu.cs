@@ -7,17 +7,19 @@ using Emgu.CV;
 using ImGuiNET;
 using Triggered.modules.demo;
 using Triggered.modules.wrapper;
+using Triggered.modules.options;
 
 namespace Triggered.modules.panel
 {
     internal static  class MainMenu
     {
-        private static string input = App.Options.MainMenu.GetKey<string>("TestText");
+        private static Options_MainMenu mmOpts => App.Options.MainMenu;
+        private static Options_DemoCV cvOpts => App.Options.DemoCV;
+        private static string input = mmOpts.GetKey<string>("TestText");
         private static bool saveProfile = false;
         private static bool loadProfile = false;
         internal static void Render()
         {
-            var options = App.Options.MainMenu;
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
                 ref App.IsRunning,
@@ -33,24 +35,24 @@ namespace Triggered.modules.panel
                 return;
             }
             // Menu definition area
-            var fontIndex = options.GetKey<int>("Font.Index");
-            var fontSize = options.GetKey<int>("Font.Size");
-            var fontRange = options.GetKey<int>("Font.Range");
+            var fontIndex = mmOpts.GetKey<int>("Font.Index");
+            var fontSize = mmOpts.GetKey<int>("Font.Size");
+            var fontRange = mmOpts.GetKey<int>("Font.Range");
             bool _adjusted = false;
             if (ImGui.Combo("Font", ref fontIndex, App.fonts, App.fonts.Length))
             {
-                options.SetKey("Font.Index", fontIndex);
+                mmOpts.SetKey("Font.Index", fontIndex);
                 _adjusted = true;
             }
             ImGui.SameLine();
             if (ImGui.InputInt("Size", ref fontSize))
             {
-                options.SetKey("Font.Size", fontSize);
+                mmOpts.SetKey("Font.Size", fontSize);
                 _adjusted = true;
             }
             if (ImGui.Combo("Glyph Range", ref fontRange, App.glyphs, App.glyphs.Length))
             {
-                options.SetKey("Font.Range", fontRange);
+                mmOpts.SetKey("Font.Range", fontRange);
                 _adjusted = true;
             }
             if (_adjusted)
@@ -61,15 +63,15 @@ namespace Triggered.modules.panel
             }
 
             ImGui.Separator();
-            int delay = options.GetKey<int>("LogicTickDelayInMilliseconds");
+            int delay = mmOpts.GetKey<int>("LogicTickDelayInMilliseconds");
             if (ImGui.SliderInt("Logic MS", ref delay, 10, 1000))
-                options.SetKey("LogicTickDelayInMilliseconds", delay);
-            var displayLog = options.GetKey<bool>("Display_Log");
+                mmOpts.SetKey("LogicTickDelayInMilliseconds", delay);
+            var displayLog = mmOpts.GetKey<bool>("Display_Log");
             if (ImGui.Checkbox("Show/Hide the Log", ref displayLog))
-                options.SetKey("Display_Log", displayLog);
-            var displayStashSorter = options.GetKey<bool>("Display_StashSorter");
+                mmOpts.SetKey("Display_Log", displayLog);
+            var displayStashSorter = mmOpts.GetKey<bool>("Display_StashSorter");
             if (ImGui.Checkbox("Show/Hide the Stash Sorter", ref displayStashSorter))
-                options.SetKey("Display_StashSorter", displayStashSorter);
+                mmOpts.SetKey("Display_StashSorter", displayStashSorter);
             ImGui.Separator();
             ImGui.Text("Try pressing F12 button to show/hide this Menu.");
             ImGui.Text("Try pressing F11 button to show/hide the Stash Sorter.");
@@ -101,7 +103,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("B/W demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustBW", true);
+                cvOpts.SetKey("Display_AdjustBW", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoBlackWhite();
@@ -110,7 +112,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("Color demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustColor", true);
+                cvOpts.SetKey("Display_AdjustColor", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoColor();
@@ -119,7 +121,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("Ind RGB demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustIndColor", true);
+                cvOpts.SetKey("Display_AdjustIndColor", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoIndColor();
@@ -127,7 +129,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("HSV demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustHSVColor", true);
+                cvOpts.SetKey("Display_AdjustHSVColor", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColor();
@@ -136,7 +138,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("HSV Dual demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustHSVColorDual", true);
+                cvOpts.SetKey("Display_AdjustHSVColorDual", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColorDual();
@@ -145,7 +147,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("HSV Subset demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustHSVSubset", true);
+                cvOpts.SetKey("Display_AdjustHSVSubset", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVSubset();
@@ -153,7 +155,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("Shape demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustShape", true);
+                cvOpts.SetKey("Display_AdjustShape", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeDetection();
@@ -162,7 +164,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("Rectangle demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustRectangle", true);
+                cvOpts.SetKey("Display_AdjustRectangle", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeRectangle();
@@ -171,7 +173,7 @@ namespace Triggered.modules.panel
             ImGui.SameLine();
             if (ImGui.Button("OCR demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustOCR", true);
+                cvOpts.SetKey("Display_AdjustOCR", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoOCR();
@@ -179,7 +181,7 @@ namespace Triggered.modules.panel
             }
             if (ImGui.Button("HWND demo"))
             {
-                App.Options.DemoCV.SetKey("Display_AdjustHWND", true);
+                cvOpts.SetKey("Display_AdjustHWND", true);
                 Task.Run(() =>
                 {
                     DemoCV.DemoHWND();
@@ -201,7 +203,7 @@ namespace Triggered.modules.panel
             // if we have a change in the Dropdown input, we save it
             if (AffixFilter.DrawTextBox(ref input))
             {
-                options.SetKey("TestText", input);
+                mmOpts.SetKey("TestText", input);
             }
 
             // This is to show the menu bar that will change the config settings at runtime.
@@ -213,17 +215,17 @@ namespace Triggered.modules.panel
                 {
                     // Disabling fullscreen would allow the window to be moved to the front of other windows,
                     // which we can't undo at the moment without finer window depth/z control.
-                    var fullscreen = options.GetKey<bool>("Fullscreen");
+                    var fullscreen = mmOpts.GetKey<bool>("Fullscreen");
                     if (ImGui.MenuItem("Fullscreen", null, ref fullscreen))
-                        options.SetKey("Fullscreen", fullscreen);
-                    var padding = options.GetKey<bool>("Padding");
+                        mmOpts.SetKey("Fullscreen", fullscreen);
+                    var padding = mmOpts.GetKey<bool>("Padding");
                     if (ImGui.MenuItem("Padding", null, ref padding))
-                        options.SetKey("Padding", padding);
-                    var vsync = options.GetKey<bool>("VSync");
+                        mmOpts.SetKey("Padding", padding);
+                    var vsync = mmOpts.GetKey<bool>("VSync");
                     if (ImGui.MenuItem("VSync", null, ref vsync))
                     {
                         Program.viewport.VSync = vsync;
-                        options.SetKey("VSync", vsync);
+                        mmOpts.SetKey("VSync", vsync);
                     }
                     ImGui.Separator();
 
