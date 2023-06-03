@@ -40,63 +40,63 @@ namespace Triggered.modules.panel
         private static void LaunchWindows()
         {
             // if we have set these options to true, open the window when we start the menu
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
+            if (cvOpts.GetKey<bool>("Display_AdjustBW"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoBlackWhite();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
+            if (cvOpts.GetKey<bool>("Display_AdjustColor"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoColor();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
+            if (cvOpts.GetKey<bool>("Display_AdjustIndColor"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoIndColor();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHSVColor"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColor();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHSVColorDual"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVColorDual();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
+            if (cvOpts.GetKey<bool>("Display_AdjustRectangle"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoShapeRectangle();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVSubset"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHSVSubset"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoHSVSubset();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustOCR"))
+            if (cvOpts.GetKey<bool>("Display_AdjustOCR"))
             {
                 Task.Run(() =>
                 {
                     DemoCV.DemoOCR();
                 });
             }
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHWND"))
+            if (cvOpts.GetKey<bool>("Display_AdjustHWND"))
             {
                 Task.Run(() =>
                 {
@@ -111,13 +111,12 @@ namespace Triggered.modules.panel
         /// <returns></returns>
         protected override Task PostInitialized()
         {
-            var options = App.Options.MainMenu;
-            int fontSize = options.GetKey<int>("Font.Size");
-            var fontRange = options.GetKey<int>("Font.Range");
-            string fontName = App.fonts[options.GetKey<int>("Font.Index")];
+            int fontSize = mmOpts.GetKey<int>("Font.Size");
+            var fontRange = mmOpts.GetKey<int>("Font.Range");
+            string fontName = App.fonts[mmOpts.GetKey<int>("Font.Index")];
             string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", $"{fontName}.ttf");
             ReplaceFont(fontPath, fontSize, (FontGlyphRangeType)fontRange);
-            this.VSync = options.GetKey<bool>("VSync");
+            this.VSync = mmOpts.GetKey<bool>("VSync");
             return Task.CompletedTask;
         }
 
