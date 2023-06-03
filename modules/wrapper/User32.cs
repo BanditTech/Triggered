@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -25,7 +26,46 @@ namespace Triggered.modules.wrapper
         /// Retrieves the dimensions of the bounding rectangle of the specified window.
         /// </summary>
         [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        /// <summary>
+        /// Retrieves the position of the cursor, in screen coordinates.
+        /// </summary>
+        /// <param name="lpPoint">The position of the cursor.</param>
+        /// <returns>
+        /// Returns true if successful, or false otherwise.
+        /// </returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+
+        /// <summary>
+        /// Translates the screen coordinates of a specified point on the screen to client coordinates.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window whose client coordinates should be retrieved.</param>
+        /// <param name="lpPoint">The screen coordinates to be translated.</param>
+        /// <returns>
+        /// Returns true if successful, or false otherwise.
+        /// </returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+
+        /// <summary>
+        /// Retrieves the position of the mouse relative to the specified window.
+        /// </summary>
+        /// <param name="targetWindow">A handle to the window to which the mouse position is relative.</param>
+        /// <returns>
+        /// Returns a Point object representing the mouse position relative to the specified window.
+        /// </returns>
+        public static Point GetRelativeMousePosition(IntPtr targetWindow)
+        {
+            POINT point;
+            GetCursorPos(out point);
+            ScreenToClient(targetWindow, ref point);
+            return new Point(point.X, point.Y);
+        }
 
         /// <summary>
         /// Enumerates all top-level windows on the screen by passing the handle to each window, in turn, to an application-defined callback function.
@@ -76,6 +116,13 @@ namespace Triggered.modules.wrapper
             internal int Top;
             internal int Right;
             internal int Bottom;
+        }
+        // Define the POINT structure
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
         }
     }
 }
