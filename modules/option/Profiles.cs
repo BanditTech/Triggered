@@ -1,6 +1,5 @@
 ﻿using ClickableTransparentOverlay.Win32;
 using ImGuiNET;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.IO;
 using System.Linq;
 using Triggered.modules.options;
 
-namespace Triggered.modules
+namespace Triggered.modules.option
 {
     /// <summary>
     /// Produce and receive Profile Dictionary.
@@ -20,7 +19,7 @@ namespace Triggered.modules
         private bool removeConfirmationPopup;
         private Dictionary<string, JObject> savedObjects;
         private Dictionary<string, bool> selectedOptions = App.Options.Itterate()
-            .ToDictionary( options => options.Name, options => true );
+            .ToDictionary(options => options.Name, options => true);
 
         internal void Initialize()
         {
@@ -48,7 +47,7 @@ namespace Triggered.modules
                 prop => prop.Name,
                 prop => prop.Value
                 );
-            Dictionary<string,JToken> matchingOptions = selectedOptions
+            Dictionary<string, JToken> matchingOptions = selectedOptions
                 .Where(option => option.Value && profile.ContainsKey(option.Key))
                 .ToDictionary(option => option.Key, option => profile[option.Key]);
             App.Options.Itterate()
@@ -74,7 +73,7 @@ namespace Triggered.modules
                 // Use the Options object name as the key for the saved object
                 savedObjects[options.Name] = saveObject;
             }
-            
+
             // Save the profile object to a file with the selected profile name
             string profileFileName = selectedProfile + ".json";
             string profileFilePath = Path.Combine(AppContext.BaseDirectory, "profile", profileFileName);
@@ -123,7 +122,7 @@ namespace Triggered.modules
             {
                 foreach (string profile in profileFiles)
                 {
-                    bool isSelected = (selectedProfile == profile);
+                    bool isSelected = selectedProfile == profile;
                     if (ImGui.Selectable(profile, isSelected))
                     {
                         selectedProfile = profile;
@@ -198,7 +197,7 @@ namespace Triggered.modules
             {
                 foreach (string profile in profileFiles)
                 {
-                    bool isSelected = (selectedProfile == profile);
+                    bool isSelected = selectedProfile == profile;
                     if (ImGui.Selectable(profile, isSelected))
                     {
                         selectedProfile = profile;
