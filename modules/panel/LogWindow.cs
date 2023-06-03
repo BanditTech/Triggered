@@ -24,7 +24,7 @@ namespace Triggered.modules.panel
         {
             // LogLevel Color Assignments
             {"trace", "#808080"},
-            {"debug", "#000080"},
+            {"debug", "#1010FF"},
             {"info", "#FFFFFF"},
             {"warn", "#FFA500"},
             {"error", "#FF0000"},
@@ -80,10 +80,6 @@ namespace Triggered.modules.panel
             if (ImGui.Button("Clear"))
                 Clear();
             ImGui.SameLine();
-            // non-functional Copy button
-            if (ImGui.Button("Copy"))
-                App.Log("yep, still doesnt work");
-            ImGui.SameLine();
             // Autoscroll option
             if (ImGui.Checkbox("Auto-scroll", ref _autoscroll))
                 Opts.SetKey("Log.AutoScroll", _autoscroll);
@@ -93,7 +89,7 @@ namespace Triggered.modules.panel
             if (ImGui.Combo(">= Level", ref _minLevel, logLevelNames, logLevelNames.Length))
             {
                 Opts.SetKey("Log.SelectedIndex", _minLevel);
-                App.Log($"Changing minimum log level to {logLevelNames[_minLevel]}", 5);
+                App.Log($"Changing minimum displayed log level to {logLevelNames[_minLevel]}", _minLevel);
             }
             ImGui.Separator();
             // We start a scroll area to contain the text data
