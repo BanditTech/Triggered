@@ -6,9 +6,8 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Triggered.modules.wrapper;
 using Triggered.modules.struct_filter;
-using Triggered.modules.panel;
 
-namespace Triggered.modules.panels
+namespace Triggered.modules.panel
 {
     static class StashSorter
     {

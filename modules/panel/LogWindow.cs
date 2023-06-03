@@ -5,7 +5,7 @@ using System.Numerics;
 using ImGuiNET;
 using NLog;
 
-namespace Triggered.modules.panels
+namespace Triggered.modules.panel
 {
     /// <summary>
     /// Creates a log window in ImGui

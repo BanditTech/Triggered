@@ -3,14 +3,14 @@ using NLog.Config;
 using System.Collections.Generic;
 using System.IO;
 using Triggered.modules.options;
-using Triggered.modules.panels;
+using Triggered.modules.panel;
 using Triggered.modules.struct_game;
 using Triggered.modules.struct_filter;
 using ImGuiNET;
 using System;
 using System.Linq;
 using ClickableTransparentOverlay;
-using Triggered.modules;
+using Triggered.modules.option;
 
 namespace Triggered
 {

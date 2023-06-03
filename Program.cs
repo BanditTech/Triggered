@@ -2,7 +2,7 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
-    using Triggered.modules.panels;
+using Triggered.modules.panel;
 
     static class Program
     {
