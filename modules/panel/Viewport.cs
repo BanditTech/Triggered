@@ -237,32 +237,10 @@ namespace Triggered.modules.panel
 
         private static void RenderChildren()
         {
-            if (mmOpts.GetKey<bool>("Display_Main"))
-                MainMenu.Render();
-            if (mmOpts.GetKey<bool>("Display_StashSorter"))
-                StashSorter.Render();
-            if (mmOpts.GetKey<bool>("Display_Log"))
-                App.logimgui.Draw("Log Window");
-            if (cvOpts.GetKey<bool>("Display_AdjustBW"))
-                DemoCV.RenderBW();
-            if (cvOpts.GetKey<bool>("Display_AdjustColor"))
-                DemoCV.RenderColor();
-            if (cvOpts.GetKey<bool>("Display_AdjustIndColor"))
-                DemoCV.RenderIndColor();
-            if (cvOpts.GetKey<bool>("Display_AdjustHSVColor"))
-                DemoCV.RenderHSVColor();
-            if (cvOpts.GetKey<bool>("Display_AdjustHSVColorDual"))
-                DemoCV.RenderHSVColorDual();
-            if (cvOpts.GetKey<bool>("Display_AdjustShape"))
-                DemoCV.RenderShapeDetection();
-            if (cvOpts.GetKey<bool>("Display_AdjustRectangle"))
-                DemoCV.RenderShapeRectangle();
-            if (cvOpts.GetKey<bool>("Display_AdjustHSVSubset"))
-                DemoCV.RenderHSVSubset();
-            if (cvOpts.GetKey<bool>("Display_AdjustOCR"))
-                DemoCV.RenderOCR();
-            if (cvOpts.GetKey<bool>("Display_AdjustHWND"))
-                DemoCV.RenderHWND();
+            MainMenu.Render();
+            StashSorter.Render();
+            App.logimgui.Draw("Log Window");
+            DemoCV.Render();
         }
     }
 }

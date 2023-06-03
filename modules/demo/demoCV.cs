@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Triggered.modules.options;
 
 namespace Triggered.modules.demo
 {
@@ -26,6 +27,30 @@ namespace Triggered.modules.demo
     /// </summary>
     public static class DemoCV
     {
+        private static Options_DemoCV Opts => App.Options.DemoCV;
+        public static void Render()
+        {
+            if (Opts.GetKey<bool>("Display_AdjustBW"))
+                RenderBW();
+            if (Opts.GetKey<bool>("Display_AdjustColor"))
+                RenderColor();
+            if (Opts.GetKey<bool>("Display_AdjustIndColor"))
+                RenderIndColor();
+            if (Opts.GetKey<bool>("Display_AdjustHSVColor"))
+                RenderHSVColor();
+            if (Opts.GetKey<bool>("Display_AdjustHSVColorDual"))
+                RenderHSVColorDual();
+            if (Opts.GetKey<bool>("Display_AdjustShape"))
+                RenderShapeDetection();
+            if (Opts.GetKey<bool>("Display_AdjustRectangle"))
+                RenderShapeRectangle();
+            if (Opts.GetKey<bool>("Display_AdjustHSVSubset"))
+                RenderHSVSubset();
+            if (Opts.GetKey<bool>("Display_AdjustOCR"))
+                RenderOCR();
+            if (Opts.GetKey<bool>("Display_AdjustHWND"))
+                RenderHWND();
+        }
         /// <summary>
         /// Shows a blue screen with Hello, World
         /// </summary>

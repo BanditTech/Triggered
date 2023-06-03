@@ -20,6 +20,8 @@ namespace Triggered.modules.panel
         private static bool loadProfile = false;
         internal static void Render()
         {
+            if (!mmOpts.GetKey<bool>("Display_Main"))
+                return;
             bool isCollapsed = !ImGui.Begin(
                 "Triggered Options",
                 ref App.IsRunning,

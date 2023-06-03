@@ -70,6 +70,9 @@ namespace Triggered.modules.panel
         /// <param name="title"></param>
         public void Draw(string title)
         {
+            if (!Opts.GetKey<bool>("Display_Log"))
+                return;
+
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
             if (!ImGui.Begin(title))
             {

@@ -118,6 +118,8 @@ namespace Triggered.modules.panel
         /// </summary>
         public static void Render()
         {
+            if (!App.Options.MainMenu.GetKey<bool>("Display_StashSorter"))
+                return;
             // Create the main window
             ImGui.SetNextWindowSize(new Vector2(500, 500), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(500, 200), new Vector2(float.MaxValue, float.MaxValue));
