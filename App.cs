@@ -2,7 +2,6 @@
 using NLog.Config;
 using System.Collections.Generic;
 using System.IO;
-using Triggered.modules.options;
 using Triggered.modules.panel;
 using Triggered.modules.struct_game;
 using Triggered.modules.struct_filter;
@@ -46,7 +45,7 @@ namespace Triggered
         /// <summary>
         /// Options are loaded as a group using a Manager.
         /// </summary>
-        public static Options_Manager Options = new();
+        public static modules.options.Manager Options = new();
 
         /// <summary>
         /// The current values for Player resources and location.

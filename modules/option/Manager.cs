@@ -8,7 +8,7 @@ namespace Triggered.modules.options
     /// Manage all Options objects in one place.
     /// Instantiate to App.Options for ease of use.
     /// </summary>
-    public class Options_Manager
+    public class Manager
     {
         /// <summary>
         /// Panel Options object

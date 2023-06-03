@@ -39,6 +39,9 @@ namespace Triggered.modules.panel
             LaunchWindows();
         }
 
+        /// <summary>
+        /// Launches the windows which were open when the app exits.
+        /// </summary>
         private static void LaunchWindows()
         {
             // if we have set these options to true, open the window when we start the menu
