@@ -24,14 +24,13 @@ namespace Triggered.modules.panel
                 "Triggered Options",
                 ref App.IsRunning,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.MenuBar);
+
             // Determine if we need to draw the menu
             if (!App.IsRunning || isCollapsed)
             {
                 ImGui.End();
                 if (!App.IsRunning)
-                {
                     Program.viewport.Close();
-                }
                 return;
             }
 
@@ -72,8 +71,9 @@ namespace Triggered.modules.panel
             if (ImGui.Checkbox("Show/Hide the Stash Sorter", ref displayStashSorter))
                 mmOpts.SetKey("Display_StashSorter", displayStashSorter);
             ImGui.Separator();
-            ImGui.Text("Try pressing F12 button to show/hide this Menu.");
-            ImGui.Text("Try pressing F11 button to show/hide the Stash Sorter.");
+
+            ImGui.Text("F12 button: show/hide this Menu.");
+            ImGui.Text("F11 button: show/hide the Stash Sorter.");
             ImGui.Separator();
 
             #region Demonstration Buttons
@@ -208,6 +208,7 @@ namespace Triggered.modules.panel
             }
             #endregion
 
+            #region Menu Bar
             // This is to show the menu bar that will change the config settings at runtime.
             // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
             // you should remove the below if-statement as well.
@@ -250,6 +251,8 @@ namespace Triggered.modules.panel
                 saveProfile = false;
             if (loadProfile && App.Profiles.RenderLoad())
                 loadProfile = false;
+            #endregion
+
             // Menu definition complete
             ImGui.End();
         }
