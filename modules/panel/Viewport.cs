@@ -120,11 +120,17 @@ namespace Triggered.modules.panel
         }
 
         /// <summary>
-        /// Render thread is run every frame
-        /// We can piggy back on the render thread for simple keybinds
+        /// Render a viewport for which to render further children menu.
         /// </summary>
-
         protected override void Render()
+        {
+            CheckHotkeys();
+            Brain.Process();
+            RenderViewPort();
+            RenderChildren();
+        }
+
+        private static void CheckHotkeys()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
             {
@@ -139,42 +145,6 @@ namespace Triggered.modules.panel
                 var value = mainMenu.GetKey<bool>("Display_StashSorter");
                 mainMenu.SetKey("Display_StashSorter", !value);
             }
-            // We always render this invisible window
-            // Having no viewport will break the children docks
-            RenderViewPort();
-
-            // Render the children to the viewport
-            RenderChildren();
-        }
-
-        private static void RenderChildren()
-        {
-            if (App.Options.MainMenu.GetKey<bool>("Display_Main"))
-                MainMenu.Render();
-            if (App.Options.MainMenu.GetKey<bool>("Display_StashSorter"))
-                StashSorter.Render();
-            if (App.Options.MainMenu.GetKey<bool>("Display_Log"))
-                App.logimgui.Draw("Log Window");
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
-                DemoCV.RenderBW();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
-                DemoCV.RenderColor();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
-                DemoCV.RenderIndColor();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
-                DemoCV.RenderHSVColor();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
-                DemoCV.RenderHSVColorDual();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustShape"))
-                DemoCV.RenderShapeDetection();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
-                DemoCV.RenderShapeRectangle();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVSubset"))
-                DemoCV.RenderHSVSubset();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustOCR"))
-                DemoCV.RenderOCR();
-            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHWND"))
-                DemoCV.RenderHWND();
         }
 
         private static void RenderViewPort()
@@ -272,6 +242,36 @@ namespace Triggered.modules.panel
             }
             // End the parent window that contains the Dockspace:
             ImGui.End();
+        }
+
+        private static void RenderChildren()
+        {
+            if (App.Options.MainMenu.GetKey<bool>("Display_Main"))
+                MainMenu.Render();
+            if (App.Options.MainMenu.GetKey<bool>("Display_StashSorter"))
+                StashSorter.Render();
+            if (App.Options.MainMenu.GetKey<bool>("Display_Log"))
+                App.logimgui.Draw("Log Window");
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustBW"))
+                DemoCV.RenderBW();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustColor"))
+                DemoCV.RenderColor();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustIndColor"))
+                DemoCV.RenderIndColor();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColor"))
+                DemoCV.RenderHSVColor();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVColorDual"))
+                DemoCV.RenderHSVColorDual();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustShape"))
+                DemoCV.RenderShapeDetection();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustRectangle"))
+                DemoCV.RenderShapeRectangle();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHSVSubset"))
+                DemoCV.RenderHSVSubset();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustOCR"))
+                DemoCV.RenderOCR();
+            if (App.Options.DemoCV.GetKey<bool>("Display_AdjustHWND"))
+                DemoCV.RenderHWND();
         }
     }
 }
