@@ -1,18 +1,18 @@
-﻿namespace Triggered
-{
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Triggered.modules.panel;
 
+namespace Triggered
+{
     static class Program
     {
+        public static Viewport viewport = new Viewport();
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
         static async Task Main()
         {
-            using var overlay = new MainMenu();
             try
             {
-                await overlay.Run();
+                await viewport.Run();
             }
             finally
             {
@@ -23,6 +23,7 @@ using Triggered.modules.panel;
         {
             // Begin to release resources
             App.Log("Final execution block initiated. Releasing memory resources.");
+            viewport.Dispose();
         }
     }
 }
