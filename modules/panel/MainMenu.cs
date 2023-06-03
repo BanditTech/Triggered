@@ -13,9 +13,9 @@ namespace Triggered.modules.panel
 {
     internal static  class MainMenu
     {
-        private static Options_MainMenu mmOpts => App.Options.MainMenu;
+        private static Options_Viewport Viewport => App.Options.Viewport;
         private static Options_Panel Panel => App.Options.Panel;
-        private static string input = mmOpts.GetKey<string>("TestText");
+        private static Options_Font Font => App.Options.Font;
         private static bool saveProfile = false;
         private static bool loadProfile = false;
         internal static void Render()
@@ -37,24 +37,24 @@ namespace Triggered.modules.panel
             }
 
             #region Font Configuration
-            var fontIndex = mmOpts.GetKey<int>("Font.Index");
-            var fontSize = mmOpts.GetKey<int>("Font.Size");
-            var fontRange = mmOpts.GetKey<int>("Font.Range");
+            var fontIndex = Font.GetKey<int>("Selection");
+            var fontSize = Font.GetKey<int>("Size");
+            var fontRange = Font.GetKey<int>("Range");
             bool _adjusted = false;
             if (ImGui.Combo("Font", ref fontIndex, App.fonts, App.fonts.Length))
             {
-                mmOpts.SetKey("Font.Index", fontIndex);
+                Font.SetKey("Selection", fontIndex);
                 _adjusted = true;
             }
             ImGui.SameLine();
             if (ImGui.InputInt("Size", ref fontSize))
             {
-                mmOpts.SetKey("Font.Size", fontSize);
+                Font.SetKey("Size", fontSize);
                 _adjusted = true;
             }
             if (ImGui.Combo("Glyph Range", ref fontRange, App.glyphs, App.glyphs.Length))
             {
-                mmOpts.SetKey("Font.Range", fontRange);
+                Font.SetKey("Range", fontRange);
                 _adjusted = true;
             }
             if (_adjusted)
@@ -202,12 +202,6 @@ namespace Triggered.modules.panel
                     CvInvoke.WaitKey();
                 });
             }
-
-            // if we have a change in the Dropdown input, we save it
-            if (AffixFilter.DrawTextBox(ref input))
-            {
-                mmOpts.SetKey("TestText", input);
-            }
             #endregion
 
             #region Menu Bar
@@ -220,17 +214,17 @@ namespace Triggered.modules.panel
                 {
                     // Disabling fullscreen would allow the window to be moved to the front of other windows,
                     // which we can't undo at the moment without finer window depth/z control.
-                    var fullscreen = mmOpts.GetKey<bool>("Fullscreen");
+                    var fullscreen = Viewport.GetKey<bool>("Fullscreen");
                     if (ImGui.MenuItem("Fullscreen", null, ref fullscreen))
-                        mmOpts.SetKey("Fullscreen", fullscreen);
-                    var padding = mmOpts.GetKey<bool>("Padding");
+                        Viewport.SetKey("Fullscreen", fullscreen);
+                    var padding = Viewport.GetKey<bool>("Padding");
                     if (ImGui.MenuItem("Padding", null, ref padding))
-                        mmOpts.SetKey("Padding", padding);
-                    var vsync = mmOpts.GetKey<bool>("VSync");
+                        Viewport.SetKey("Padding", padding);
+                    var vsync = Viewport.GetKey<bool>("VSync");
                     if (ImGui.MenuItem("VSync", null, ref vsync))
                     {
                         Program.viewport.VSync = vsync;
-                        mmOpts.SetKey("VSync", vsync);
+                        Viewport.SetKey("VSync", vsync);
                     }
                     ImGui.Separator();
 

@@ -13,23 +13,31 @@ namespace Triggered.modules.options
         /// <summary>
         /// Panel Options object
         /// </summary>
-        public Options_Panel Panel = new Options_Panel();
+        public Options_Panel Panel = new();
         /// <summary>
-        /// MainMenu Options object
+        /// Log Options object
         /// </summary>
-        public Options_MainMenu MainMenu = new Options_MainMenu();
+        public Options_Log Log = new();
+        /// <summary>
+        /// Viewport Options object
+        /// </summary>
+        public Options_Viewport Viewport = new();
+        /// <summary>
+        /// Font Options object
+        /// </summary>
+        public Options_Font Font = new();
         /// <summary>
         /// StashSorter Options object
         /// </summary>
-        public Options_StashSorter StashSorter = new Options_StashSorter();
+        public Options_StashSorter StashSorter = new();
         /// <summary>
         /// StashSorter Options object
         /// </summary>
-        public Options_DemoCV DemoCV = new Options_DemoCV();
+        public Options_DemoCV DemoCV = new();
         /// <summary>
         /// Locations Options object
         /// </summary>
-        public Options_Locations Locations = new Options_Locations();
+        public Options_Locations Locations = new();
         /// <summary>
         /// Allows to itterate this list of Options.
         /// </summary>

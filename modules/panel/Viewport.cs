@@ -17,7 +17,8 @@ namespace Triggered.modules.panel
     /// </summary>
     public class Viewport : Overlay
     {
-        private static Options_MainMenu mmOpts => App.Options.MainMenu;
+        private static Options_Viewport Opts => App.Options.Viewport;
+        private static Options_Font Font => App.Options.Font;
         private static Options_Panel Panel => App.Options.Panel;
         /// <summary>
         /// Save any changed options each second.
@@ -111,12 +112,12 @@ namespace Triggered.modules.panel
         /// <returns></returns>
         protected override Task PostInitialized()
         {
-            int fontSize = mmOpts.GetKey<int>("Font.Size");
-            var fontRange = mmOpts.GetKey<int>("Font.Range");
-            string fontName = App.fonts[mmOpts.GetKey<int>("Font.Index")];
+            int fontSize = Font.GetKey<int>("Size");
+            var fontRange = Font.GetKey<int>("Range");
+            string fontName = App.fonts[Font.GetKey<int>("Selection")];
             string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", $"{fontName}.ttf");
             ReplaceFont(fontPath, fontSize, (FontGlyphRangeType)fontRange);
-            this.VSync = mmOpts.GetKey<bool>("VSync");
+            this.VSync = Opts.GetKey<bool>("VSync");
             return Task.CompletedTask;
         }
 
@@ -143,8 +144,8 @@ namespace Triggered.modules.panel
         private static void RenderViewPort()
         {
             // Prepare the local variables
-            var fullscreen = mmOpts.GetKey<bool>("Fullscreen");
-            var padding = mmOpts.GetKey<bool>("Padding");
+            var fullscreen = Opts.GetKey<bool>("Fullscreen");
+            var padding = Opts.GetKey<bool>("Padding");
 
             // Variables to configure the Dockspace example.
             // Includes App.fullscreen, App.padding
