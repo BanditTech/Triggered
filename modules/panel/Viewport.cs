@@ -17,8 +17,8 @@ namespace Triggered.modules.panel
     /// </summary>
     public class Viewport : Overlay
     {
-        private static Options mmOpts => App.Options.MainMenu;
-        private static Options cvOpts => App.Options.DemoCV;
+        private static Options_MainMenu mmOpts => App.Options.MainMenu;
+        private static Options_DemoCV cvOpts => App.Options.DemoCV;
         /// <summary>
         /// Save any changed options each second.
         /// </summary>
