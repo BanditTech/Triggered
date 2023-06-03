@@ -29,6 +29,9 @@ namespace Triggered.modules.demo
     {
         private static Options_Panel Panel => App.Options.Panel;
         private static Options_DemoCV Opts => App.Options.DemoCV;
+        /// <summary>
+        /// Renders any active OpenCV demonstration window.
+        /// </summary>
         public static void Render()
         {
             if (Panel.GetKey<bool>("CV.BlackWhite"))
