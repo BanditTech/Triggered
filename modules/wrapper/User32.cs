@@ -29,14 +29,25 @@ namespace Triggered.modules.wrapper
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
+        /// <summary>
+        /// Retrieves the rectangle that represents the position and size of a window.
+        /// </summary>
+        /// <param name="targetWindow">The handle of the target window.</param>
+        /// <returns>A Rectangle object representing the window's position and size.</returns>
         public static Rectangle GetWindowRectangle(IntPtr targetWindow)
         {
             RECT windowRect;
             GetWindowRect(targetWindow, out windowRect);
-            Rectangle rectangle = new Rectangle(windowRect.Left, windowRect.Top, windowRect.Right - windowRect.Left + 1, windowRect.Bottom - windowRect.Top + 1);
-            return rectangle;
+            return new Rectangle(
+                windowRect.Left, 
+                windowRect.Top, 
+                windowRect.Right - windowRect.Left + 1,
+                windowRect.Bottom - windowRect.Top + 1
+            );
         }
 
+        [DllImport("user32.dll")]
+        private static extern IntPtr WindowFromPoint(Point point);
 
         /// <summary>
         /// Retrieves the position of the cursor, in screen coordinates.
@@ -86,7 +97,24 @@ namespace Triggered.modules.wrapper
         /// Retrieves the text of the specified window's title bar (if it has one).
         /// </summary>
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+        internal static extern int GetWindowText(IntPtr hWnd,ref StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        internal static extern int GetWindowTextLength(IntPtr hWnd);
+
+        /// <summary>
+        /// Retrieves the title of a window given its handle.
+        /// </summary>
+        /// <param name="hWnd">The handle of the window.</param>
+        /// <returns>The title of the window as a string.</returns>
+        internal static string GetWindowTitle(IntPtr hWnd)
+        {
+            int length = GetWindowTextLength(hWnd) + 1;
+            var titleBuilder = new StringBuilder(length);
+            // Retrieve the window's title and store it in the titleBuilder.
+            GetWindowText(hWnd,ref titleBuilder, length);
+            return titleBuilder.ToString();
+        }
 
         /// <summary>
         /// Utilize EnumWindows to match the title bar.
@@ -98,8 +126,9 @@ namespace Triggered.modules.wrapper
             IntPtr hwnd = IntPtr.Zero;
             EnumWindows((IntPtr wnd, IntPtr param) =>
             {
-                StringBuilder stringBuilder = new StringBuilder(256);
-                GetWindowText(wnd, stringBuilder, stringBuilder.Capacity);
+                int length = GetWindowTextLength(wnd) + 1;
+                StringBuilder stringBuilder = new StringBuilder(length);
+                GetWindowText(wnd,ref stringBuilder, stringBuilder.Capacity);
                 if (stringBuilder.ToString() == windowName)
                 {
                     hwnd = wnd;
@@ -126,7 +155,10 @@ namespace Triggered.modules.wrapper
             internal int Right;
             internal int Bottom;
         }
-        // Define the POINT structure
+
+        /// <summary>
+        /// Represents a point in two-dimensional space.
+        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
