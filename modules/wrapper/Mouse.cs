@@ -11,6 +11,7 @@
     {
         [DllImport("user32.dll", SetLastError = true)]
         private static extern void mouse_event(uint dwFlags, uint dx, uint dy, int dwData, UIntPtr dwExtraInfo);
+
         private const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
         private const uint MOUSEEVENTF_LEFTUP = 0x0004;
         private const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
@@ -22,6 +23,7 @@
         private const uint MOUSEEVENTF_WHEEL = 0x0800;
         private const uint MOUSEEVENTF_HWHEEL = 0x1000;
         private static TextInfo textInfo = CultureInfo.GetCultureInfo("en-US").TextInfo;
+        
         /// <summary>
         /// General method for calling all other Mouse clicks:<br/>
         /// - "Left"       - <see cref="Mouse.Left"/><br/>
@@ -48,6 +50,7 @@
             else
                 throw new ArgumentException($"Invalid click method name: {methodname}");
         }
+
         /// <summary>
         /// Left click at location.
         /// </summary>
@@ -57,6 +60,7 @@
         {
             mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)x, (uint)y, 0, UIntPtr.Zero);
         }
+
         /// <summary>
         /// Right click at location.
         /// </summary>
@@ -66,6 +70,7 @@
         {
             mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, (uint)x, (uint)y, 0, UIntPtr.Zero);
         }
+
         /// <summary>
         /// Middle click at location.
         /// </summary>
@@ -75,6 +80,7 @@
         {
             mouse_event(MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP, (uint)x, (uint)y, 0, UIntPtr.Zero);
         }
+
         /// <summary>
         /// M4 Click at location.
         /// Also known as Browser_Back or XButton1.
@@ -85,6 +91,7 @@
         {
             mouse_event(MOUSEEVENTF_XDOWN | MOUSEEVENTF_XUP, (uint)x, (uint)y, 1, UIntPtr.Zero);
         }
+
         /// <summary>
         /// M5 Click at location.
         /// Also known as Browser_Forward or XButton2.
@@ -95,6 +102,7 @@
         {
             mouse_event(MOUSEEVENTF_XDOWN | MOUSEEVENTF_XUP, (uint)x, (uint)y, 2, UIntPtr.Zero);
         }
+
         /// <summary>
         /// Turn the wheel upward (away from you) at location.
         /// </summary>
@@ -104,6 +112,7 @@
         {
             mouse_event(MOUSEEVENTF_WHEEL, (uint)x, (uint)y, 120, UIntPtr.Zero);
         }
+
         /// <summary>
         /// Turn the wheel downward (toward you) at location.
         /// </summary>
@@ -113,6 +122,7 @@
         {
             mouse_event(MOUSEEVENTF_WHEEL, (uint)x, (uint)y, -120, UIntPtr.Zero);
         }
+
         /// <summary>
         /// Scroll to the left at location.
         /// </summary>
@@ -122,6 +132,7 @@
         {
             mouse_event(MOUSEEVENTF_HWHEEL, (uint)x, (uint)y, -120, UIntPtr.Zero);
         }
+
         /// <summary>
         /// Scroll to the right at location.
         /// </summary>
