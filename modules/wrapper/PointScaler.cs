@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using static Triggered.modules.wrapper.User32;
 
 namespace Triggered.modules.wrapper
 {
@@ -147,6 +148,124 @@ namespace Triggered.modules.wrapper
         }
 
         /// <summary>
+        /// Retrieves the mouse coordinate relative to the specified target window and anchor position.
+        /// </summary>
+        /// <param name="targetWindow">The handle of the target window.</param>
+        /// <param name="anchorPosition">The anchor position relative to the window.</param>
+        /// <returns>The mouse coordinate as a Coordinate object.</returns>
+        internal static Coordinate GetMouseCoordinate(IntPtr targetWindow, AnchorPosition anchorPosition)
+        {
+            POINT point;
+            GetCursorPos(out point);
+            ScreenToClient(targetWindow, ref point);
+
+            RECT windowRect;
+            GetWindowRect(targetWindow, out windowRect);
+
+            Rectangle rectangle = new Rectangle(windowRect.Left, windowRect.Top, windowRect.Right - windowRect.Left + 1, windowRect.Bottom - windowRect.Top + 1);
+
+            int x = 0;
+            int y = 0;
+            switch (anchorPosition)
+            {
+                case AnchorPosition.TopLeft:
+                    x = point.X;
+                    y = point.Y;
+                    break;
+                case AnchorPosition.Center:
+                    x = point.X - (rectangle.Width / 2);
+                    y = point.Y - (rectangle.Height / 2);
+                    break;
+                case AnchorPosition.Left:
+                    x = point.X;
+                    y = point.Y - (rectangle.Height / 2);
+                    break;
+                case AnchorPosition.Right:
+                    x = rectangle.Width - point.X;
+                    y = point.Y - (rectangle.Height / 2);
+                    break;
+                case AnchorPosition.Top:
+                    x = point.X - (rectangle.Width / 2);
+                    y = point.Y;
+                    break;
+                case AnchorPosition.Bottom:
+                    x = point.X - (rectangle.Width / 2);
+                    y = rectangle.Height - point.Y;
+                    break;
+                case AnchorPosition.BottomLeft:
+                    x = point.X;
+                    y = rectangle.Height - point.Y;
+                    break;
+                case AnchorPosition.TopRight:
+                    x = rectangle.Width - point.X;
+                    y = point.Y;
+                    break;
+                case AnchorPosition.BottomRight:
+                    x = rectangle.Width - point.X;
+                    y = rectangle.Height - point.Y;
+                    break;
+                default:
+                    break;
+            }
+
+            return new Coordinate(new Point(x, y), rectangle.Height, anchorPosition);
+        }
+
+        /// <summary>
+        /// Calculates the anchor position based on the specified rectangle and anchor position.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to calculate the anchor position from.</param>
+        /// <param name="anchorPosition">The anchor position to calculate.</param>
+        /// <returns>The anchor position as a Point.</returns>
+        public static Point GetAnchorPositionFromRectangle(Rectangle rectangle, AnchorPosition anchorPosition)
+        {
+            int x = 0;
+            int y = 0;
+
+            switch (anchorPosition)
+            {
+                case AnchorPosition.Center:
+                    x = rectangle.Left + (rectangle.Width / 2);
+                    y = rectangle.Top + (rectangle.Height / 2);
+                    break;
+                case AnchorPosition.Left:
+                    x = rectangle.Left;
+                    y = rectangle.Top + (rectangle.Height / 2);
+                    break;
+                case AnchorPosition.Right:
+                    x = rectangle.Right;
+                    y = rectangle.Top + (rectangle.Height / 2);
+                    break;
+                case AnchorPosition.Top:
+                    x = rectangle.Left + (rectangle.Width / 2);
+                    y = rectangle.Top;
+                    break;
+                case AnchorPosition.Bottom:
+                    x = rectangle.Left + (rectangle.Width / 2);
+                    y = rectangle.Bottom;
+                    break;
+                case AnchorPosition.TopLeft:
+                    x = rectangle.Left;
+                    y = rectangle.Top;
+                    break;
+                case AnchorPosition.TopRight:
+                    x = rectangle.Right;
+                    y = rectangle.Top;
+                    break;
+                case AnchorPosition.BottomLeft:
+                    x = rectangle.Left;
+                    y = rectangle.Bottom;
+                    break;
+                case AnchorPosition.BottomRight:
+                    x = rectangle.Right;
+                    y = rectangle.Bottom;
+                    break;
+            }
+
+            return new Point(x, y);
+        }
+
+        /// <summary>
         /// Produce a scaled position from an origin Coordinate and target Rectangle.
         /// </summary>
         /// <param name="origin"></param>
@@ -155,55 +274,32 @@ namespace Triggered.modules.wrapper
         /// <exception cref="ArgumentException"></exception>
         public static Point CalculatePoint(Coordinate origin, Rectangle rectangle)
         {
-            Point anchorPoint = new();
-            int centerX;
-            int centerY;
+            Point anchorPoint = GetAnchorPositionFromRectangle(rectangle,origin.Anchor);
             var position = ScaledPoint(origin, rectangle.Height);
 
             // Determine which edge to use as initial X, Y
             switch (origin.Anchor)
             {
                 case AnchorPosition.Center:
-                    centerX = rectangle.X + rectangle.Width / 2;
-                    centerY = rectangle.Y + rectangle.Height / 2;
-                    anchorPoint.X = centerX + position.X;
-                    anchorPoint.Y = centerY + position.Y;
-                    break;
                 case AnchorPosition.Left:
-                    centerY = rectangle.Y + rectangle.Height / 2;
-                    anchorPoint.X = rectangle.X + position.X;
-                    anchorPoint.Y = centerY + position.Y;
+                case AnchorPosition.Top:
+                case AnchorPosition.TopLeft:
+                    anchorPoint.X += position.X;
+                    anchorPoint.Y += position.Y;
                     break;
                 case AnchorPosition.Right:
-                    centerY = rectangle.Y + rectangle.Height / 2;
-                    anchorPoint.X = rectangle.X + rectangle.Width - position.X;
-                    anchorPoint.Y = centerY + position.Y;
-                    break;
-                case AnchorPosition.Top:
-                    centerX = rectangle.X + rectangle.Width / 2;
-                    anchorPoint.X = centerX + position.X;
-                    anchorPoint.Y = rectangle.Y + position.Y;
-                    break;
-                case AnchorPosition.TopLeft:
-                    anchorPoint.X = rectangle.X + position.X;
-                    anchorPoint.Y = rectangle.Y + position.Y;
-                    break;
                 case AnchorPosition.TopRight:
-                    anchorPoint.X = rectangle.X + rectangle.Width - position.X;
-                    anchorPoint.Y = rectangle.Y + position.Y;
+                    anchorPoint.X -= position.X;
+                    anchorPoint.Y += position.Y;
                     break;
                 case AnchorPosition.Bottom:
-                    centerX = rectangle.X + rectangle.Width / 2;
-                    anchorPoint.X = centerX + position.X;
-                    anchorPoint.Y = rectangle.Y + rectangle.Height - position.Y;
-                    break;
                 case AnchorPosition.BottomLeft:
-                    anchorPoint.X = rectangle.X + position.X;
-                    anchorPoint.Y = rectangle.Y + rectangle.Height - position.Y;
+                    anchorPoint.X += position.X;
+                    anchorPoint.Y -= position.Y;
                     break;
                 case AnchorPosition.BottomRight:
-                    anchorPoint.X = rectangle.X + rectangle.Width - position.X;
-                    anchorPoint.Y = rectangle.Y + rectangle.Height - position.Y;
+                    anchorPoint.X -= position.X;
+                    anchorPoint.Y -= position.Y;
                     break;
                 default:
                     throw new ArgumentException("Invalid anchor position");
