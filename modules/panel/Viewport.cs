@@ -14,13 +14,25 @@ namespace Triggered.modules.panel
 {
 
     /// <summary>
-    /// The main brains of the App Behavior
+    /// App elements are all nested from this Viewport.
     /// </summary>
     public class Viewport : Overlay
     {
+        /// <summary>
+        /// Gets the viewport options from the application's options.
+        /// </summary>
         private static Options_Viewport Opts => App.Options.Viewport;
+
+        /// <summary>
+        /// Gets the font options from the application's options.
+        /// </summary>
         private static Options_Font Font => App.Options.Font;
+
+        /// <summary>
+        /// Gets the panel options from the application's options.
+        /// </summary>
         private static Options_Panel Panel => App.Options.Panel;
+
         /// <summary>
         /// Save any changed options each second.
         /// </summary>
@@ -155,6 +167,9 @@ namespace Triggered.modules.panel
             RenderChildren();
         }
 
+        /// <summary>
+        /// Checks the status of hotkeys and updates the corresponding panel options accordingly.
+        /// </summary>
         private static void CheckHotkeys()
         {
             if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
@@ -164,6 +179,9 @@ namespace Triggered.modules.panel
                 Panel.SetKey("StashSorter", !Panel.GetKey<bool>("StashSorter"));
         }
 
+        /// <summary>
+        /// Renders the viewport using the specified options.
+        /// </summary>
         private static void RenderViewPort()
         {
             // Prepare the local variables
@@ -259,6 +277,9 @@ namespace Triggered.modules.panel
             ImGui.End();
         }
 
+        /// <summary>
+        /// Renders the child elements, including the main menu, stash sorter, log window, and demo CV.
+        /// </summary>
         private static void RenderChildren()
         {
             MainMenu.Render();
