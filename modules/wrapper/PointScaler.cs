@@ -155,54 +155,59 @@ namespace Triggered.modules.wrapper
         /// <returns>The mouse coordinate as a Coordinate object.</returns>
         internal static Coordinate GetMouseCoordinate(IntPtr targetWindow, AnchorPosition anchorPosition)
         {
-            POINT point;
-            GetCursorPos(out point);
-            ScreenToClient(targetWindow, ref point);
+            Point point = GetRelativeMousePosition(targetWindow);
+            Rectangle rectangle = GetWindowRectangle(targetWindow);
+            return CalculateCoordinate(point,rectangle,anchorPosition);
+        }
 
-            RECT windowRect;
-            GetWindowRect(targetWindow, out windowRect);
-
-            Rectangle rectangle = new Rectangle(windowRect.Left, windowRect.Top, windowRect.Right - windowRect.Left + 1, windowRect.Bottom - windowRect.Top + 1);
-
+        /// <summary>
+        /// Calculates the coordinate based on the relative point, rectangle, and anchor position.
+        /// </summary>
+        /// <param name="relativePoint">The relative point to calculate the coordinate from.</param>
+        /// <param name="rectangle">The rectangle to calculate the coordinate within.</param>
+        /// <param name="anchorPosition">The anchor position relative to the rectangle.</param>
+        /// <returns>The calculated coordinate as a Coordinate object.</returns>
+        public static Coordinate CalculateCoordinate(Point relativePoint, Rectangle rectangle, AnchorPosition anchorPosition)
+        {
             int x = 0;
             int y = 0;
             switch (anchorPosition)
             {
                 case AnchorPosition.TopLeft:
-                    x = point.X;
-                    y = point.Y;
+                    x = relativePoint.X;
+                    y = relativePoint.Y;
                     break;
                 case AnchorPosition.Center:
-                    x = point.X - (rectangle.Width / 2);
-                    y = point.Y - (rectangle.Height / 2);
+                    x = relativePoint.X - (rectangle.Width / 2);
+                    y = relativePoint.Y - (rectangle.Height / 2);
                     break;
                 case AnchorPosition.Left:
-                    x = point.X;
-                    y = point.Y - (rectangle.Height / 2);
+                    x = relativePoint.X;
+                    y = relativePoint.Y - (rectangle.Height / 2);
                     break;
                 case AnchorPosition.Right:
-                    x = rectangle.Width - point.X;
-                    y = point.Y - (rectangle.Height / 2);
+                    x = rectangle.Width - relativePoint.X;
+                    y = relativePoint.Y - (rectangle.Height / 2);
                     break;
                 case AnchorPosition.Top:
-                    x = point.X - (rectangle.Width / 2);
-                    y = point.Y;
+                    x = relativePoint.X - (rectangle.Width / 2);
+                    y = relativePoint.Y;
                     break;
                 case AnchorPosition.Bottom:
-                    x = point.X - (rectangle.Width / 2);
-                    y = rectangle.Height - point.Y;
+                    x = relativePoint.X - (rectangle.Width / 2);
+                    y = rectangle.Height - relativePoint.Y;
                     break;
                 case AnchorPosition.BottomLeft:
-                    x = point.X;
-                    y = rectangle.Height - point.Y;
+                    x = relativePoint.X;
+                    y = rectangle.Height - relativePoint.Y;
                     break;
                 case AnchorPosition.TopRight:
-                    x = rectangle.Width - point.X;
-                    y = point.Y;
+                    x = rectangle.Width - relativePoint.X;
+                    y = relativePoint.Y;
                     break;
                 case AnchorPosition.BottomRight:
-                    x = rectangle.Width - point.X;
-                    y = rectangle.Height - point.Y;
+                    x = rectangle.Width - relativePoint.X;
+                    y = rectangle.Height - relativePoint.Y;
                     break;
                 default:
                     break;

@@ -29,6 +29,15 @@ namespace Triggered.modules.wrapper
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
+        public static Rectangle GetWindowRectangle(IntPtr targetWindow)
+        {
+            RECT windowRect;
+            GetWindowRect(targetWindow, out windowRect);
+            Rectangle rectangle = new Rectangle(windowRect.Left, windowRect.Top, windowRect.Right - windowRect.Left + 1, windowRect.Bottom - windowRect.Top + 1);
+            return rectangle;
+        }
+
+
         /// <summary>
         /// Retrieves the position of the cursor, in screen coordinates.
         /// </summary>
