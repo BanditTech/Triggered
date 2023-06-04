@@ -8,26 +8,26 @@ namespace Triggered.modules.wrapper
     /// <summary>
     /// Wrapper for the user32.dll library
     /// </summary>
-    internal static class User32
+    public static class User32
     {
         /// <summary>
         /// Retrieves the device context (DC) for the entire window, including title bar, menus, and scroll bars.
         /// </summary>
         [DllImport("user32.dll")]
-        internal static extern IntPtr GetWindowDC(IntPtr hWnd);
+        public static extern IntPtr GetWindowDC(IntPtr hWnd);
 
         /// <summary>
         /// Releases the device context (DC) for the specified window.
         /// </summary>
         [DllImport("user32.dll")]
-        internal static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDC);
+        public static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
         /// <summary>
         /// Retrieves the dimensions of the bounding rectangle of the specified window.
         /// </summary>
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+        public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
         /// <summary>
         /// Retrieves the rectangle that represents the position and size of a window.
@@ -46,8 +46,13 @@ namespace Triggered.modules.wrapper
             );
         }
 
+        /// <summary>
+        /// Retrieves the handle of the window located at the specified point on the screen.
+        /// </summary>
+        /// <param name="point">The coordinates of the point on the screen.</param>
+        /// <returns>The handle of the window located at the specified point.</returns>
         [DllImport("user32.dll")]
-        private static extern IntPtr WindowFromPoint(Point point);
+        public static extern IntPtr WindowFromPoint(Point point);
 
         /// <summary>
         /// Retrieves the position of the cursor, in screen coordinates.
@@ -91,23 +96,28 @@ namespace Triggered.modules.wrapper
         /// Enumerates all top-level windows on the screen by passing the handle to each window, in turn, to an application-defined callback function.
         /// </summary>
         [DllImport("user32.dll", SetLastError = true)]
-        internal static extern int EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+        public static extern int EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
         /// <summary>
         /// Retrieves the text of the specified window's title bar (if it has one).
         /// </summary>
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern int GetWindowText(IntPtr hWnd,ref StringBuilder lpString, int nMaxCount);
+        public static extern int GetWindowText(IntPtr hWnd,ref StringBuilder lpString, int nMaxCount);
 
+        /// <summary>
+        /// Retrieves the length of the title text of a window.
+        /// </summary>
+        /// <param name="hWnd">The handle of the window.</param>
+        /// <returns>The length of the window's title text.</returns>
         [DllImport("user32.dll")]
-        internal static extern int GetWindowTextLength(IntPtr hWnd);
+        public static extern int GetWindowTextLength(IntPtr hWnd);
 
         /// <summary>
         /// Retrieves the title of a window given its handle.
         /// </summary>
         /// <param name="hWnd">The handle of the window.</param>
         /// <returns>The title of the window as a string.</returns>
-        internal static string GetWindowTitle(IntPtr hWnd)
+        public static string GetWindowTitle(IntPtr hWnd)
         {
             int length = GetWindowTextLength(hWnd) + 1;
             var titleBuilder = new StringBuilder(length);
@@ -121,7 +131,7 @@ namespace Triggered.modules.wrapper
         /// </summary>
         /// <param name="windowName"></param>
         /// <returns></returns>
-        internal static IntPtr GetWindowHandle(string windowName)
+        public static IntPtr GetWindowHandle(string windowName)
         {
             IntPtr hwnd = IntPtr.Zero;
             EnumWindows((IntPtr wnd, IntPtr param) =>
@@ -143,17 +153,32 @@ namespace Triggered.modules.wrapper
         /// <summary>
         /// Defines the callback function for EnumWindows.
         /// </summary>
-        internal delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+        public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
         /// <summary>
-        /// Defines the coordinates of the upper-left and lower-right corners of a rectangle.
+        /// Represents the coordinates of a rectangle's edges.
         /// </summary>
-        internal struct RECT
+        public struct RECT
         {
-            internal int Left;
-            internal int Top;
-            internal int Right;
-            internal int Bottom;
+            /// <summary>
+            /// The x-coordinate of the left edge of the rectangle.
+            /// </summary>
+            public int Left;
+
+            /// <summary>
+            /// The y-coordinate of the top edge of the rectangle.
+            /// </summary>
+            public int Top;
+
+            /// <summary>
+            /// The x-coordinate of the right edge of the rectangle.
+            /// </summary>
+            public int Right;
+
+            /// <summary>
+            /// The y-coordinate of the bottom edge of the rectangle.
+            /// </summary>
+            public int Bottom;
         }
 
         /// <summary>
@@ -162,7 +187,14 @@ namespace Triggered.modules.wrapper
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
+            /// <summary>
+            /// The x-coordinate of the point.
+            /// </summary>
             public int X;
+
+            /// <summary>
+            /// The y-coordinate of the point.
+            /// </summary>
             public int Y;
         }
     }
