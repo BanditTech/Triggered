@@ -153,7 +153,7 @@ namespace Triggered.modules.wrapper
         /// <param name="targetWindow">The handle of the target window.</param>
         /// <param name="anchorPosition">The anchor position relative to the window.</param>
         /// <returns>The mouse coordinate as a Coordinate object.</returns>
-        internal static Coordinate GetMouseCoordinate(IntPtr targetWindow, AnchorPosition anchorPosition)
+        public static Coordinate GetMouseCoordinate(IntPtr targetWindow, AnchorPosition anchorPosition)
         {
             Point point = GetRelativeMousePosition(targetWindow);
             Rectangle rectangle = GetWindowRectangle(targetWindow);
