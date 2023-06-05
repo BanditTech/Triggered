@@ -1,4 +1,6 @@
-﻿using ImGuiNET;
+﻿using ClickableTransparentOverlay.Win32;
+using ImGuiNET;
+using System;
 using System.Drawing;
 using System.Numerics;
 
@@ -12,7 +14,7 @@ namespace Triggered.modules.wrapper
     {
         private static bool clickStarted = false;
         private static bool clickCapturing = false;
-        private static Vector2 _start;
+        private static User32.POINT _start;
         /// <summary>
         /// The button used for making a selection.
         /// </summary>
@@ -21,44 +23,40 @@ namespace Triggered.modules.wrapper
         public static bool Rectangle(ref Rectangle rect)
         {
             // If true, we need to wait for the initial release of the button. 
-            var mouseDown = ImGui.IsMouseDown(mouse_button);
+            bool mouseDown = Utils.IsKeyPressed(VK.LBUTTON);
             if (!clickCapturing && mouseDown)
                 return false;
             // The button is released and we can begin input blocking.
             if (!clickCapturing)
             {
                 clickCapturing = true;
-                ImGui.GetIO().WantCaptureMouse = true;
             }
-
-            var mousePos = ImGui.GetMousePos();
+            User32.POINT mousePos = new();
+            User32.GetCursorPos(out mousePos);
             // We are dragging the cursor awaiting a release
             if (clickStarted && mouseDown)
                 DrawRectangles(_start, mousePos);
             // We are starting a click event while the bool is false.
-            else if (!clickStarted && ImGui.IsMouseClicked(mouse_button))
+            else if (!clickStarted && mouseDown)
             {
                 clickStarted = true;
                 _start = mousePos;
             }
             // We are dragging and received a release event.
-            else if (clickStarted && ImGui.IsMouseReleased(mouse_button))
+            else if (clickStarted && !mouseDown)
             {
                 // Reset all the local variables and states
                 clickStarted = false;
                 clickCapturing = false;
-                var _end = mousePos;
-                ImGui.GetIO().WantCaptureMouse = false;
                 // Apply the values to the rectangle
-                rect.X = (int)_start.X;
-                rect.Y = (int)_start.Y;
-                rect.Width = (int)(_end.X - _start.X + 1);
-                rect.Height = (int)(_end.Y - _start.Y + 1);
+                rect.X = Math.Min(_start.X, mousePos.X);
+                rect.Y = Math.Min(_start.Y, mousePos.Y);
+                rect.Width = Math.Abs(mousePos.X - _start.X)+1;
+                rect.Height =  Math.Abs(mousePos.Y - _start.Y)+1;
                 _start = default;
                 // Notify completion
                 return true;
             }
-
             return false;
         }
 
@@ -88,11 +86,13 @@ namespace Triggered.modules.wrapper
             return false;
         }
 
-        private static void DrawRectangles(Vector2 start_pos, Vector2 end_pos)
+        private static void DrawRectangles(User32.POINT start_pos, User32.POINT end_pos)
         {
+            Vector2 start = new(start_pos.X,start_pos.Y);
+            Vector2 end = new(end_pos.X,end_pos.Y);
             ImDrawListPtr draw_list = ImGui.GetForegroundDrawList();
-            draw_list.AddRect(start_pos, end_pos, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 130, 216, 255)));
-            draw_list.AddRectFilled(start_pos, end_pos, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 130, 216, 50)));
+            draw_list.AddRect(start, end, 0xFFD88240);
+            draw_list.AddRectFilled(start, end, 0x42D88240);
         }
     }
 }

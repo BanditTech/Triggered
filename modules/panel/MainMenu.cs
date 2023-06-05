@@ -8,6 +8,7 @@ using ImGuiNET;
 using Triggered.modules.demo;
 using Triggered.modules.wrapper;
 using Triggered.modules.options;
+using System.Drawing;
 
 namespace Triggered.modules.panel
 {
@@ -18,6 +19,8 @@ namespace Triggered.modules.panel
         private static Options_Font Font => App.Options.Font;
         private static bool saveProfile = false;
         private static bool loadProfile = false;
+        private static bool makeSelection = false;
+        private static Rectangle rectSelection = new();
         internal static void Render()
         {
             if (!Panel.GetKey<bool>("MainMenu"))
@@ -204,7 +207,19 @@ namespace Triggered.modules.panel
                     CvInvoke.WaitKey();
                 });
             }
+            ImGui.SameLine();
+            if (ImGui.Button("Select Rectangle"))
+            {
+                makeSelection = true;
+            }
             #endregion
+
+            if (makeSelection && Selector.Rectangle(ref rectSelection))
+            {
+                makeSelection = false;
+                App.Log($"Rectangle was produced {rectSelection.Left},{rectSelection.Top} - {rectSelection.Bottom},{rectSelection.Right} - W{rectSelection.Width} H{rectSelection.Height}",2);
+            }
+
 
             #region Menu Bar
             // This is to show the menu bar that will change the config settings at runtime.
