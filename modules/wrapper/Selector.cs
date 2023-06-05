@@ -21,7 +21,8 @@ namespace Triggered.modules.wrapper
         public static bool Rectangle(ref Rectangle rect)
         {
             // If true, we need to wait for the initial release of the button. 
-            if (!clickCapturing && ImGui.IsMouseDown(mouse_button))
+            var mouseDown = ImGui.IsMouseDown(mouse_button);
+            if (!clickCapturing && mouseDown)
                 return false;
             // The button is released and we can begin input blocking.
             if (!clickCapturing)
@@ -29,11 +30,13 @@ namespace Triggered.modules.wrapper
                 clickCapturing = true;
                 ImGui.GetIO().WantCaptureMouse = true;
             }
+
+            var mousePos = ImGui.GetMousePos();
             // We are starting a click event while the bool is false.
             if (!clickStarted && ImGui.IsMouseClicked(mouse_button))
             {
                 clickStarted = true;
-                _start = ImGui.GetMousePos();
+                _start = mousePos;
             }
             // We are dragging and received a release event.
             else if (clickStarted && ImGui.IsMouseReleased(mouse_button))
@@ -41,7 +44,7 @@ namespace Triggered.modules.wrapper
                 // Reset all the local variables and states
                 clickStarted = false;
                 clickCapturing = false;
-                var _end = ImGui.GetMousePos();
+                var _end = mousePos;
                 ImGui.GetIO().WantCaptureMouse = false;
                 // Apply the values to the rectangle
                 rect.X = (int)_start.X;
@@ -53,8 +56,8 @@ namespace Triggered.modules.wrapper
                 return true;
             }
             // We are dragging the cursor awaiting a release
-            if (clickStarted && ImGui.IsMouseDown(mouse_button))
-                DrawRectangles(_start, ImGui.GetMousePos());
+            if (clickStarted && mouseDown)
+                DrawRectangles(_start, mousePos);
 
             return false;
         }
