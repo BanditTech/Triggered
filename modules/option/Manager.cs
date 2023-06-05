@@ -42,7 +42,7 @@ namespace Triggered.modules.options
         /// Allows to itterate this list of Options.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Options> Itterate()
+        public IEnumerable<Options> Iterate()
         {
             // Get all fields in this class that are of type Options
             var optionsFields = this.GetType().GetFields().Where(f => f.FieldType.IsSubclassOf(typeof(Options)));
@@ -59,7 +59,7 @@ namespace Triggered.modules.options
         /// </summary>
         public void Save()
         {
-            foreach (var options in Itterate())
+            foreach (var options in Iterate())
             {
                 options.Save();
             }
@@ -70,7 +70,7 @@ namespace Triggered.modules.options
         /// <param name="type"></param>
         public void Save(Type type)
         {
-            foreach (var options in Itterate())
+            foreach (var options in Iterate())
             {
                 if (options.GetType() == type)
                 {
@@ -84,7 +84,7 @@ namespace Triggered.modules.options
         /// </summary>
         public void Load()
         {
-            foreach (var options in Itterate())
+            foreach (var options in Iterate())
             {
                 options.Load();
             }
@@ -95,7 +95,7 @@ namespace Triggered.modules.options
         /// <param name="type"></param>
         public void Load(Type type)
         {
-            foreach (var options in Itterate())
+            foreach (var options in Iterate())
             {
                 if (options.GetType() == type)
                 {
@@ -109,7 +109,7 @@ namespace Triggered.modules.options
         /// </summary>
         public void SaveChanged()
         {
-            foreach (var options in Itterate())
+            foreach (var options in Iterate())
             {
                 if (options._changed)
                     options.SaveChanged();

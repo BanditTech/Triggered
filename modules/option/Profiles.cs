@@ -18,7 +18,7 @@ namespace Triggered.modules.option
         private string selectedProfile;
         private bool removeConfirmationPopup;
         private Dictionary<string, JObject> savedObjects;
-        private Dictionary<string, bool> selectedOptions = App.Options.Itterate()
+        private Dictionary<string, bool> selectedOptions = App.Options.Iterate()
             .ToDictionary(options => options.Name, options => true);
 
         internal void Initialize()
@@ -50,7 +50,7 @@ namespace Triggered.modules.option
             Dictionary<string, JToken> matchingOptions = selectedOptions
                 .Where(option => option.Value && profile.ContainsKey(option.Key))
                 .ToDictionary(option => option.Key, option => profile[option.Key]);
-            App.Options.Itterate()
+            App.Options.Iterate()
                 .Where(option => matchingOptions.ContainsKey(option.Name))
                 .ToList()
                 .ForEach(option => option.Merge(matchingOptions[option.Name]));
@@ -66,7 +66,7 @@ namespace Triggered.modules.option
 
             // Iterate through all loaded Options objects
             savedObjects.Clear();
-            foreach (Options options in App.Options.Itterate())
+            foreach (Options options in App.Options.Iterate())
             {
                 // Prepare the save object for each Options object
                 JObject saveObject = options.PrepareSaveObject();
@@ -212,7 +212,7 @@ namespace Triggered.modules.option
             }
 
             // Iterate through all loaded Options objects
-            foreach (Options options in App.Options.Itterate())
+            foreach (Options options in App.Options.Iterate())
             {
                 bool isSelected = selectedOptions[options.Name];
                 // Display the checkbox for the current Options object

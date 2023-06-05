@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
+using System.Reflection;
 using Triggered.modules.wrapper;
 
 namespace Triggered.modules.options
@@ -310,6 +311,31 @@ namespace Triggered.modules.options
                 App.Log($"Running save on {Name} because of changed settings.",0);
                 Save();
             }
+        }
+
+        public IEnumerable<object> Iterate()
+        {
+            var optionsFields = keyList
+                .GetType()
+                .GetFields(BindingFlags.Public | BindingFlags.Instance)
+                .SelectMany(field =>
+                    GetFieldsRecursive(field.GetValue(keyList))
+                );
+
+            foreach (var field in optionsFields)
+            {
+                yield return field.GetValue(keyList);
+            }
+        }
+
+        private IEnumerable<FieldInfo> GetFieldsRecursive(object obj)
+        {
+            return obj?.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance)
+                .SelectMany(field =>
+                    field.FieldType.IsClass && field.FieldType != typeof(string)
+                        ? GetFieldsRecursive(field.GetValue(obj))
+                        : new[] { field }
+                ) ?? Enumerable.Empty<FieldInfo>();
         }
     }
 }
