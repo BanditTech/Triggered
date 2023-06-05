@@ -3,6 +3,7 @@ using ImGuiNET;
 using System;
 using System.Drawing;
 using System.Numerics;
+using static Triggered.modules.wrapper.User32;
 
 namespace Triggered.modules.wrapper
 {
@@ -13,7 +14,7 @@ namespace Triggered.modules.wrapper
     public static class Selector
     {
         private static bool clickCapturing = false;
-        private static User32.POINT _start;
+        private static POINT _start;
         private static bool _dragging = false;
         private static bool _release = false;
 
@@ -39,8 +40,8 @@ namespace Triggered.modules.wrapper
             if (clickCapturing && !_dragging && !_release)
                 return false;
 
-            User32.POINT mousePos = new();
-            User32.GetCursorPos(out mousePos);
+            POINT mousePos = new();
+            GetCursorPos(out mousePos);
             // We are dragging the cursor awaiting a release
             if (_dragging)
                 DrawRectangles(_start, mousePos);
@@ -103,31 +104,31 @@ namespace Triggered.modules.wrapper
             public static void NextClick()
             {
                 IntPtr moduleHandle = Kernel32.GetModuleHandle(null);
-                hookHandle = User32.SetWindowsHookEx(User32.WH_MOUSE_LL, MouseHookProc, moduleHandle, 0);
+                hookHandle = SetWindowsHookEx(HookType.WH_MOUSE_LL, MouseHookProc, moduleHandle, 0);
             }
 
             // Mouse hook procedure to block mouse clicks
             private static IntPtr MouseHookProc(int nCode, IntPtr wParam, IntPtr lParam)
             {
-                if (nCode >= 0 && (wParam == User32.WM_LBUTTONDOWN || wParam == User32.WM_LBUTTONUP))
+                if (nCode >= 0 && (wParam == MessageType.WM_LBUTTONDOWN || wParam == MessageType.WM_LBUTTONUP))
                 {
-                    if (wParam == User32.WM_LBUTTONDOWN)
+                    if (wParam == MessageType.WM_LBUTTONDOWN)
                     {
                         _dragging = true;
-                        User32.POINT mousePos = new();
-                        User32.GetCursorPos(out mousePos);
+                        POINT mousePos = new();
+                        GetCursorPos(out mousePos);
                         _start = mousePos;
                     }
-                    else if (wParam == User32.WM_LBUTTONUP)
+                    else if (wParam == MessageType.WM_LBUTTONUP)
                     {
                         _release = true;
                         _dragging = false;
                         // Unhook the mouse hook
-                        User32.UnhookWindowsHookEx(hookHandle);
+                        UnhookWindowsHookEx(hookHandle);
                     }
                     return new IntPtr(1);
                 }
-                return User32.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
+                return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
             }
         }
 

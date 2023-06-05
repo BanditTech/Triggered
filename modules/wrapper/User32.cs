@@ -245,34 +245,148 @@ namespace Triggered.modules.wrapper
         }
 
         /// <summary>
-        /// Specifies the mouse low-level hook type.
+        /// Represents constants for Windows hook types.
         /// </summary>
-        public const int WH_MOUSE_LL = 14;
+        public static class HookType
+        {
+            /// <summary>
+            /// Specifies the message filter hook type.
+            /// </summary>
+            public const int WH_MSGFILTER = -1;
 
-        /// <summary>
-        /// Specifies the mouse move message.
-        /// </summary>
-        public const int WM_MOUSEMOVE = 0x0200;
+            /// <summary>
+            /// Specifies the journal record hook type.
+            /// This hook type is used to record input messages posted to the system message queue.
+            /// </summary>
+            public const int WH_JOURNALRECORD = 0;
 
-        /// <summary>
-        /// Specifies the left button down message.
-        /// </summary>
-        public const int WM_LBUTTONDOWN = 0x0201;
+            /// <summary>
+            /// Specifies the journal playback hook type.
+            /// This hook type is used to play back a series of input messages previously recorded by a WH_JOURNALRECORD hook procedure.
+            /// </summary>
+            public const int WH_JOURNALPLAYBACK = 1;
 
-        /// <summary>
-        /// Specifies the left button up message.
-        /// </summary>
-        public const int WM_LBUTTONUP = 0x0202;
+            /// <summary>
+            /// Specifies the keyboard hook type.
+            /// This hook type enables an application to monitor keystrokes.
+            /// </summary>
+            public const int WH_KEYBOARD = 2;
 
-        /// <summary>
-        /// Specifies the right button down message.
-        /// </summary>
-        public const int WM_RBUTTONDOWN = 0x0204;
+            /// <summary>
+            /// Specifies the get message hook type.
+            /// This hook type enables an application to monitor messages posted to the system message queue.
+            /// </summary>
+            public const int WH_GETMESSAGE = 3;
 
-        /// <summary>
-        /// Specifies the right button up message.
-        /// </summary>
-        public const int WM_RBUTTONUP = 0x0205;
+            /// <summary>
+            /// Specifies the call window procedure hook type.
+            /// This hook type enables an application to monitor messages before they are processed by the receiving window procedure.
+            /// </summary>
+            public const int WH_CALLWNDPROC = 4;
 
+            /// <summary>
+            /// Specifies the CBT (computer-based training) hook type.
+            /// This hook type enables an application to monitor and modify messages and notifications sent to a CBT-based window.
+            /// </summary>
+            public const int WH_CBT = 5;
+
+            /// <summary>
+            /// Specifies the system message filter hook type.
+            /// This hook type enables an application to monitor and modify messages before they are dispatched to the system message queue.
+            /// </summary>
+            public const int WH_SYSMSGFILTER = 6;
+
+            /// <summary>
+            /// Specifies the mouse hook type.
+            /// This hook type enables an application to monitor mouse messages.
+            /// </summary>
+            public const int WH_MOUSE = 7;
+
+            /// <summary>
+            /// Specifies the hardware hook type.
+            /// This hook type enables an application to monitor low-level keyboard and mouse input events.
+            /// </summary>
+            public const int WH_HARDWARE = 8;
+
+            /// <summary>
+            /// Specifies the debug hook type.
+            /// This hook type enables an application to receive debugging messages intended for other applications.
+            /// </summary>
+            public const int WH_DEBUG = 9;
+
+            /// <summary>
+            /// Specifies the shell hook type.
+            /// This hook type enables an application to receive messages notifications for shell events.
+            /// </summary>
+            public const int WH_SHELL = 10;
+
+            /// <summary>
+            /// Specifies the foreground idle hook type.
+            /// This hook type enables an application to perform tasks while the system is idle and no events are being processed.
+            /// </summary>
+            public const int WH_FOREGROUNDIDLE = 11;
+
+            /// <summary>
+            /// Specifies the call window procedure return hook type.
+            /// This hook type enables an application to monitor messages after they have been processed by the receiving window procedure.
+            /// </summary>
+            public const int WH_CALLWNDPROCRET = 12;
+
+            /// <summary>
+            /// Specifies the keyboard low-level hook type.
+            /// This hook type enables an application to monitor low-level keyboard input events.
+            /// </summary>
+            public const int WH_KEYBOARD_LL = 13;
+
+            /// <summary>
+            /// Specifies the mouse low-level hook type.
+            /// This hook type enables an application to monitor low-level mouse input events.
+            /// </summary>
+            public const int WH_MOUSE_LL = 14;
+        }
+
+        public static class MessageType
+        {
+
+            /// <summary>
+            /// Specifies the WM_LBUTTONDOWN message code.
+            /// </summary>
+            public const int WM_LBUTTONDOWN = 0x0201;
+
+            /// <summary>
+            /// Specifies the WM_NCLBUTTONDOWN message code.
+            /// </summary>
+            public const int WM_NCLBUTTONDOWN = 0x00A1;
+
+            /// <summary>
+            /// Specifies the WM_LBUTTONUP message code.
+            /// </summary>
+            public const int WM_LBUTTONUP = 0x0202;
+
+            /// <summary>
+            /// Specifies the WM_NCLBUTTONUP message code.
+            /// </summary>
+            public const int WM_NCLBUTTONUP = 0x00A2;
+
+            /// <summary>
+            /// Specifies the WM_LBUTTONDBLCLK message code.
+            /// </summary>
+            public const int WM_LBUTTONDBLCLK = 0x0203;
+
+            /// <summary>
+            /// Specifies the WM_NCLBUTTONDBLCLK message code.
+            /// </summary>
+            public const int WM_NCLBUTTONDBLCLK = 0x00A3;
+
+            /// <summary>
+            /// Specifies the WM_LBUTTONCLICK message code.
+            /// </summary>
+            public const int WM_LBUTTONCLICK = 0x0206;
+
+            /// <summary>
+            /// Specifies the WM_NCLBUTTONCLICK message code.
+            /// </summary>
+            public const int WM_NCLBUTTONCLICK = 0x00A6;
+        }
     }
 }
