@@ -12,9 +12,11 @@ namespace Triggered.modules.wrapper
     /// </summary>
     public static class Selector
     {
-        private static bool clickStarted = false;
         private static bool clickCapturing = false;
         private static User32.POINT _start;
+        private static bool _dragging = false;
+        private static bool _release = false;
+
         /// <summary>
         /// The button used for making a selection.
         /// </summary>
@@ -26,28 +28,28 @@ namespace Triggered.modules.wrapper
             bool mouseDown = Utils.IsKeyPressed(VK.LBUTTON);
             if (!clickCapturing && mouseDown)
                 return false;
+
             // The button is released and we can begin input blocking.
             if (!clickCapturing)
             {
                 clickCapturing = true;
+                InputBlocker.NextClick();
             }
+            // We can return if we are awaiting our first click.
+            if (clickCapturing && !_dragging && !_release)
+                return false;
+
             User32.POINT mousePos = new();
             User32.GetCursorPos(out mousePos);
             // We are dragging the cursor awaiting a release
-            if (clickStarted && mouseDown)
+            if (_dragging)
                 DrawRectangles(_start, mousePos);
-            // We are starting a click event while the bool is false.
-            else if (!clickStarted && mouseDown)
-            {
-                clickStarted = true;
-                _start = mousePos;
-            }
-            // We are dragging and received a release event.
-            else if (clickStarted && !mouseDown)
+            // We received a release event.
+            else if (_release)
             {
                 // Reset all the local variables and states
-                clickStarted = false;
                 clickCapturing = false;
+                _release = false;
                 // Apply the values to the rectangle
                 rect.X = Math.Min(_start.X, mousePos.X);
                 rect.Y = Math.Min(_start.Y, mousePos.Y);
@@ -63,24 +65,21 @@ namespace Triggered.modules.wrapper
         public static bool Point(ref Vector2 point)
         {
             // If we have not begun the click capture and the mouse is already down, we need to wait for the initial release. 
-            if (!clickCapturing && ImGui.IsMouseDown(mouse_button))
+            if (!clickCapturing && Utils.IsKeyPressed(VK.LBUTTON))
                 return false;
             // The button is released and we can begin input blocking.
             if (!clickCapturing)
             {
                 clickCapturing = true;
-                ImGui.GetIO().WantCaptureMouse = true;
+                InputBlocker.NextClick();
             }
-            // We are starting a click event while the bool is false.
-            if (!clickStarted && ImGui.IsMouseClicked(mouse_button))
-            {
-                clickStarted = true;
-                point = ImGui.GetMousePos();
-            }
-            if (clickStarted && ImGui.IsMouseReleased(mouse_button))
+
+            if (_release)
             { 
                 clickCapturing = false;
-                ImGui.GetIO().WantCaptureMouse = false;
+                _release = false;
+                point.X = _start.X;
+                point.Y = _start.Y;
                 return true; 
             }
             return false;
@@ -91,8 +90,46 @@ namespace Triggered.modules.wrapper
             Vector2 start = new(start_pos.X,start_pos.Y);
             Vector2 end = new(end_pos.X,end_pos.Y);
             ImDrawListPtr draw_list = ImGui.GetForegroundDrawList();
-            draw_list.AddRect(start, end, 0xFFD88240);
-            draw_list.AddRectFilled(start, end, 0x42D88240);
+            draw_list.AddRect(start, end, 0xFFD88280);
+            draw_list.AddRectFilled(start, end, 0x42D88280);
         }
+
+        public static class InputBlocker
+        {
+            // Define the mouse hook ID and callback function
+            private static IntPtr hookHandle;
+
+            // Install the mouse hook and block the next mouse click
+            public static void NextClick()
+            {
+                IntPtr moduleHandle = Kernel32.GetModuleHandle(null);
+                hookHandle = User32.SetWindowsHookEx(User32.WH_MOUSE_LL, MouseHookProc, moduleHandle, 0);
+            }
+
+            // Mouse hook procedure to block mouse clicks
+            private static IntPtr MouseHookProc(int nCode, IntPtr wParam, IntPtr lParam)
+            {
+                if (nCode >= 0 && (wParam == User32.WM_LBUTTONDOWN || wParam == User32.WM_LBUTTONUP))
+                {
+                    if (wParam == User32.WM_LBUTTONDOWN)
+                    {
+                        _dragging = true;
+                        User32.POINT mousePos = new();
+                        User32.GetCursorPos(out mousePos);
+                        _start = mousePos;
+                    }
+                    else if (wParam == User32.WM_LBUTTONUP)
+                    {
+                        _release = true;
+                        _dragging = false;
+                        // Unhook the mouse hook
+                        User32.UnhookWindowsHookEx(hookHandle);
+                    }
+                    return new IntPtr(1);
+                }
+                return User32.CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
+            }
+        }
+
     }
 }

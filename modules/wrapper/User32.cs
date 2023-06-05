@@ -113,6 +113,52 @@ namespace Triggered.modules.wrapper
         public static extern int GetWindowTextLength(IntPtr hWnd);
 
         /// <summary>
+        /// This function installs an application-defined hook procedure into a system hook chain.
+        /// The hook procedure monitors mouse events and provides the ability to intercept and modify them.
+        /// </summary>
+        /// <param name="idHook">The type of hook procedure to be installed.</param>
+        /// <param name="callback">A pointer to the hook procedure.</param>
+        /// <param name="hMod">A handle to the DLL containing the hook procedure.</param>
+        /// <param name="dwThreadId">The identifier of the thread with which the hook procedure is to be associated.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is a handle to the hook procedure.
+        /// If the function fails, the return value is NULL.
+        /// </returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWindowsHookEx(int idHook, MouseHookCallback callback, IntPtr hMod, uint dwThreadId);
+
+        /// <summary>
+        /// Represents the callback method for the mouse hook. This method is called whenever a mouse event occurs.
+        /// </summary>
+        /// <param name="nCode">A code that the hook procedure uses to determine how to process the message.</param>
+        /// <param name="wParam">The identifier of the mouse message.</param>
+        /// <param name="lParam">A pointer to a MOUSEHOOKSTRUCT structure containing information about the mouse event.</param>
+        /// <returns>
+        /// If the hook procedure processed the message, it may return a nonzero value
+        /// to prevent the system from passing the message to the rest of the hook chain or the target window procedure.
+        /// </returns>
+        public delegate IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
+        /// Removes a hook procedure installed in a hook chain by the SetWindowsHookEx function.
+        /// </summary>
+        /// <param name="hhk">A handle to the hook to be removed.</param>
+        /// <returns>If the function succeeds, the return value is true. If the function fails, the return value is false.</returns>
+        [DllImport("user32.dll")]
+        public static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+        /// <summary>
+        /// This function passes the hook information to the next hook procedure in the current hook chain.
+        /// </summary>
+        /// <param name="hhk">A handle to the current hook.</param>
+        /// <param name="nCode">The code that the hook procedure uses to determine how to process the message.</param>
+        /// <param name="wParam">The identifier of the mouse message.</param>
+        /// <param name="lParam">A pointer to a MOUSEHOOKSTRUCT structure containing information about the mouse event.</param>
+        /// <returns>The return value is the result of the next hook procedure in the hook chain.</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
         /// Retrieves the title of a window given its handle.
         /// </summary>
         /// <param name="hWnd">The handle of the window.</param>
@@ -197,5 +243,36 @@ namespace Triggered.modules.wrapper
             /// </summary>
             public int Y;
         }
+
+        /// <summary>
+        /// Specifies the mouse low-level hook type.
+        /// </summary>
+        public const int WH_MOUSE_LL = 14;
+
+        /// <summary>
+        /// Specifies the mouse move message.
+        /// </summary>
+        public const int WM_MOUSEMOVE = 0x0200;
+
+        /// <summary>
+        /// Specifies the left button down message.
+        /// </summary>
+        public const int WM_LBUTTONDOWN = 0x0201;
+
+        /// <summary>
+        /// Specifies the left button up message.
+        /// </summary>
+        public const int WM_LBUTTONUP = 0x0202;
+
+        /// <summary>
+        /// Specifies the right button down message.
+        /// </summary>
+        public const int WM_RBUTTONDOWN = 0x0204;
+
+        /// <summary>
+        /// Specifies the right button up message.
+        /// </summary>
+        public const int WM_RBUTTONUP = 0x0205;
+
     }
 }
