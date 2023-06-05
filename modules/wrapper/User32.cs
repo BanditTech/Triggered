@@ -347,46 +347,45 @@ namespace Triggered.modules.wrapper
 
         public static class MessageType
         {
-
-            /// <summary>
-            /// Specifies the WM_LBUTTONDOWN message code.
-            /// </summary>
+            // Left Mouse Button
             public const int WM_LBUTTONDOWN = 0x0201;
-
-            /// <summary>
-            /// Specifies the WM_NCLBUTTONDOWN message code.
-            /// </summary>
             public const int WM_NCLBUTTONDOWN = 0x00A1;
-
-            /// <summary>
-            /// Specifies the WM_LBUTTONUP message code.
-            /// </summary>
             public const int WM_LBUTTONUP = 0x0202;
-
-            /// <summary>
-            /// Specifies the WM_NCLBUTTONUP message code.
-            /// </summary>
             public const int WM_NCLBUTTONUP = 0x00A2;
-
-            /// <summary>
-            /// Specifies the WM_LBUTTONDBLCLK message code.
-            /// </summary>
             public const int WM_LBUTTONDBLCLK = 0x0203;
-
-            /// <summary>
-            /// Specifies the WM_NCLBUTTONDBLCLK message code.
-            /// </summary>
             public const int WM_NCLBUTTONDBLCLK = 0x00A3;
 
-            /// <summary>
-            /// Specifies the WM_LBUTTONCLICK message code.
-            /// </summary>
-            public const int WM_LBUTTONCLICK = 0x0206;
+            // Right Mouse Button
+            public const int WM_RBUTTONDOWN = 0x0204;
+            public const int WM_NCRBUTTONDOWN = 0x00A4;
+            public const int WM_RBUTTONUP = 0x0205;
+            public const int WM_NCRBUTTONUP = 0x00A5;
+            public const int WM_RBUTTONDBLCLK = 0x0206;
+            public const int WM_NCRBUTTONDBLCLK = 0x00A6;
 
-            /// <summary>
-            /// Specifies the WM_NCLBUTTONCLICK message code.
-            /// </summary>
-            public const int WM_NCLBUTTONCLICK = 0x00A6;
+            // Middle Mouse Button
+            public const int WM_MBUTTONDOWN = 0x0207;
+            public const int WM_NCMBUTTONDOWN = 0x00A7;
+            public const int WM_MBUTTONUP = 0x0208;
+            public const int WM_NCMBUTTONUP = 0x00A8;
+            public const int WM_MBUTTONDBLCLK = 0x0209;
+            public const int WM_NCMBUTTONDBLCLK = 0x00A9;
+
+            // Keyboard Messages
+            public const int WM_KEYDOWN = 0x0100;
+            public const int WM_KEYUP = 0x0101;
+            public const int WM_CHAR = 0x0102;
+
+            // Window Messages
+            public const int WM_CLOSE = 0x0010;
+            public const int WM_DESTROY = 0x0002;
+            public const int WM_SIZE = 0x0005;
+            public const int WM_MOVE = 0x0003;
+
+            // Control Messages
+            public const int WM_COMMAND = 0x0111;
+            public const int WM_NOTIFY = 0x004E;
+            public const int WM_PAINT = 0x000F;
         }
     }
 }
