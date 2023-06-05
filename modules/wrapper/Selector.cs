@@ -32,8 +32,11 @@ namespace Triggered.modules.wrapper
             }
 
             var mousePos = ImGui.GetMousePos();
+            // We are dragging the cursor awaiting a release
+            if (clickStarted && mouseDown)
+                DrawRectangles(_start, mousePos);
             // We are starting a click event while the bool is false.
-            if (!clickStarted && ImGui.IsMouseClicked(mouse_button))
+            else if (!clickStarted && ImGui.IsMouseClicked(mouse_button))
             {
                 clickStarted = true;
                 _start = mousePos;
@@ -55,9 +58,6 @@ namespace Triggered.modules.wrapper
                 // Notify completion
                 return true;
             }
-            // We are dragging the cursor awaiting a release
-            if (clickStarted && mouseDown)
-                DrawRectangles(_start, mousePos);
 
             return false;
         }
