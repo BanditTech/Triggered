@@ -40,8 +40,7 @@ namespace Triggered.modules.wrapper
             if (clickCapturing && !_dragging && !_release)
                 return false;
 
-            POINT mousePos = new();
-            GetCursorPos(out mousePos);
+            GetCursorPos(out var mousePos);
             // We are dragging the cursor awaiting a release
             if (_dragging)
                 DrawRectangles(_start, mousePos);
@@ -115,8 +114,7 @@ namespace Triggered.modules.wrapper
                     if (wParam == MessageType.WM_LBUTTONDOWN)
                     {
                         _dragging = true;
-                        POINT mousePos = new();
-                        GetCursorPos(out mousePos);
+                        GetCursorPos(out var mousePos);
                         _start = mousePos;
                     }
                     else if (wParam == MessageType.WM_LBUTTONUP)
