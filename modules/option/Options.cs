@@ -313,29 +313,5 @@ namespace Triggered.modules.options
             }
         }
 
-        public IEnumerable<object> Iterate()
-        {
-            var optionsFields = keyList
-                .GetType()
-                .GetFields(BindingFlags.Public | BindingFlags.Instance)
-                .SelectMany(field =>
-                    GetFieldsRecursive(field.GetValue(keyList))
-                );
-
-            foreach (var field in optionsFields)
-            {
-                yield return field.GetValue(keyList);
-            }
-        }
-
-        private IEnumerable<FieldInfo> GetFieldsRecursive(object obj)
-        {
-            return obj?.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance)
-                .SelectMany(field =>
-                    field.FieldType.IsClass && field.FieldType != typeof(string)
-                        ? GetFieldsRecursive(field.GetValue(obj))
-                        : new[] { field }
-                ) ?? Enumerable.Empty<FieldInfo>();
-        }
     }
 }
