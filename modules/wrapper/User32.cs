@@ -237,10 +237,19 @@ namespace Triggered.modules.wrapper
             /// </summary>
             public readonly int Height { get => Math.Abs(Top - Bottom) + 1; }
 
+            /// <summary>
+            /// Produce the reference point of this rectangle
+            /// </summary>
             public readonly Point Point => new Point(Math.Min(Left, Right), Math.Min(Top, Bottom));
 
+            /// <summary>
+            /// Produce the sizes of the rectangle.
+            /// </summary>
             public readonly Size Size => new Size(Width, Height);
 
+            /// <summary>
+            /// Produce a Rectangle from this RECT.
+            /// </summary>
             public readonly Rectangle Rectangle => new(Point, Size);
         }
 
@@ -260,7 +269,14 @@ namespace Triggered.modules.wrapper
             /// </summary>
             public int Y;
 
+            /// <summary>
+            /// Produce a Vector2 from this POINT
+            /// </summary>
             public readonly Vector2 Vector2 => new(X, Y);
+            
+            /// <summary>
+            /// Produce a Point from this POINT
+            /// </summary>
             public readonly Point Point => new(X, Y);
         }
 
@@ -365,6 +381,9 @@ namespace Triggered.modules.wrapper
             public const int WH_MOUSE_LL = 14;
         }
 
+        /// <summary>
+        /// Types of messages found in Windows Hook events.
+        /// </summary>
         public static class MessageType
         {
             // Left Mouse Button

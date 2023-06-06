@@ -24,6 +24,15 @@ namespace Triggered.modules.wrapper
         /// </summary>
         public const ImGuiMouseButton mouse_button = ImGuiMouseButton.Left;
 
+        /// <summary>
+        /// Allow the user to Select a rectangle.
+        /// This rectangle will be converted to relative position.
+        /// This relative position is then converted into a Coordinate.
+        /// Start and End Coordinates are then joined to produce the ScaledRectangle
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="anchor"></param>
+        /// <returns>True when complete, false otherwise</returns>
         public static bool ScaledRectangle(ref ScaledRectangle target, AnchorPosition anchor)
         {
             // If true, we need to wait for the initial release of the button. 
@@ -69,6 +78,13 @@ namespace Triggered.modules.wrapper
             return false;
         }
 
+        /// <summary>
+        /// Allow the user to Select a Point.
+        /// This point is then converted into a Coordinate.
+        /// </summary>
+        /// <param name="coord"></param>
+        /// <param name="anchor"></param>
+        /// <returns>True when complete, false otherwise</returns>
         public static bool Coordinate(ref Coordinate coord, AnchorPosition anchor)
         {
             // If true, we need to wait for the initial release of the button. 
@@ -102,6 +118,11 @@ namespace Triggered.modules.wrapper
             return false;
         }
 
+        /// <summary>
+        /// Allow the user to Select a Rectangle.
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <returns>True when complete, false otherwise</returns>
         public static bool Rectangle(ref Rectangle rect)
         {
             // If true, we need to wait for the initial release of the button. 
@@ -141,6 +162,11 @@ namespace Triggered.modules.wrapper
             return false;
         }
 
+        /// <summary>
+        /// Allow the user to Select a Point.
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns>True when complete, false otherwise</returns>
         public static bool Point(ref Vector2 point)
         {
             // If we have not begun the click capture and the mouse is already down, we need to wait for the initial release. 
@@ -164,6 +190,12 @@ namespace Triggered.modules.wrapper
             return false;
         }
 
+        /// <summary>
+        /// Draw two overlapping rectangles.
+        /// One makes the outline, while the other is the body.
+        /// </summary>
+        /// <param name="start_pos"></param>
+        /// <param name="end_pos"></param>
         private static void DrawRectangles(POINT start_pos, POINT end_pos)
         {
             ImDrawListPtr draw_list = ImGui.GetForegroundDrawList();
@@ -171,6 +203,11 @@ namespace Triggered.modules.wrapper
             draw_list.AddRectFilled(start_pos.Vector2, end_pos.Vector2, 0x42D88280);
         }
 
+        /// <summary>
+        /// Blocks the user input for its next action.
+        /// The next click and release will be captured.
+        /// The captured event fires our callback logic.
+        /// </summary>
         public static class InputBlocker
         {
             // Define the mouse hook ID and callback function
@@ -191,8 +228,7 @@ namespace Triggered.modules.wrapper
                     if (wParam == MessageType.WM_LBUTTONDOWN)
                     {
                         _dragging = true;
-                        GetCursorPos(out var mousePos);
-                        _start = mousePos;
+                        GetCursorPos(out var _start);
                     }
                     else if (wParam == MessageType.WM_LBUTTONUP)
                     {
