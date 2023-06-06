@@ -228,7 +228,8 @@ namespace Triggered.modules.wrapper
                     if (wParam == MessageType.WM_LBUTTONDOWN)
                     {
                         _dragging = true;
-                        GetCursorPos(out var _start);
+                        GetCursorPos(out var mousePos);
+                        _start = mousePos;
                     }
                     else if (wParam == MessageType.WM_LBUTTONUP)
                     {
