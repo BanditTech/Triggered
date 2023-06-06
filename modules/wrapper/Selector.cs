@@ -210,17 +210,33 @@ namespace Triggered.modules.wrapper
         /// </summary>
         public static class InputBlocker
         {
-            // Define the mouse hook ID and callback function
+            /// <summary>
+            /// Defines the handle to the hook.
+            /// We save this for removing it later.
+            /// </summary>
             private static IntPtr hookHandle;
 
-            // Install the mouse hook and block the next mouse click
+            /// <summary>
+            /// Installs a mouse hook at a low level.
+            /// This will filter messages related to Left button up and down.
+            /// On the click Up event we release the hook.
+            /// </summary>
             public static void NextClick()
             {
                 IntPtr moduleHandle = Kernel32.GetModuleHandle(null);
                 hookHandle = SetWindowsHookEx(HookType.WH_MOUSE_LL, MouseHookProc, moduleHandle, 0);
             }
 
-            // Mouse hook procedure to block mouse clicks
+            /// <summary>
+            /// Mouse hook procedure that is called when a mouse event occurs.
+            /// </summary>
+            /// <param name="nCode">The hook code. If nCode is less than 0, the procedure must pass the message to the CallNextHookEx function without further processing and return the value returned by CallNextHookEx.</param>
+            /// <param name="wParam">The identifier of the mouse message. It can be one of the following values: MessageType.WM_LBUTTONDOWN, MessageType.WM_LBUTTONUP.</param>
+            /// <param name="lParam">A pointer to an MSLLHOOKSTRUCT structure that contains information about the mouse event.</param>
+            /// <returns>
+            /// An IntPtr value. If nCode is less than 0, the hook procedure must return the value returned by CallNextHookEx.
+            /// If nCode is greater than or equal to 0 and the hook procedure did not process the message, it is recommended that you call CallNextHookEx and return the value it returns.
+            /// </returns>
             private static IntPtr MouseHookProc(int nCode, IntPtr wParam, IntPtr lParam)
             {
                 if (nCode >= 0 && (wParam == MessageType.WM_LBUTTONDOWN || wParam == MessageType.WM_LBUTTONUP))
@@ -235,7 +251,7 @@ namespace Triggered.modules.wrapper
                     {
                         _release = true;
                         _dragging = false;
-                        // Unhook the mouse hook
+                        // Removes our hook from the stack.
                         UnhookWindowsHookEx(hookHandle);
                     }
                     return new IntPtr(1);
