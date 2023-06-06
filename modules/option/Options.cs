@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -330,18 +331,25 @@ namespace Triggered.modules.options
                 yield return (entry.Key, entry.Value);
         }
 
+        /// <summary>
+        /// Iterates over the key-value pairs in the <see cref="keyTypes"/> dictionary
+        /// and dynamically determines the type of the generic method "GetKey" at runtime.
+        /// </summary>
+        /// <returns>
+        /// An enumerable collection of tuples.
+        /// Each tuple contains the key and the corresponding retrieved value.
+        /// </returns>
+        [RequiresDynamicCode("Determines the type of the generic method at runtime")]
         public IEnumerable<(string Keys, object Obj)> IterateObjects()
         {
-            Type inheritedType = GetType();
-            foreach (var entry in keyTypes)
+            var getKeyMethod = GetType().GetMethod("GetKey");
+            foreach (var (key, type) in keyTypes)
             {
-                var key = entry.Key;
-                var type = entry.Value;
-                var getKeyMethod = inheritedType.GetMethod("GetKey").MakeGenericMethod(type);
-                var value = getKeyMethod.Invoke(this, new object[] { key });
-                yield return (entry.Key,value);
+                var value = getKeyMethod
+                    .MakeGenericMethod(type)
+                    .Invoke(this, new object[] { key });
+                yield return (key, value);
             }
         }
-
     }
 }
