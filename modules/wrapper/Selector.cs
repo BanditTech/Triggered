@@ -62,15 +62,12 @@ namespace Triggered.modules.wrapper
                 clickCapturing = false;
                 _release = false;
                 // Apply the values to the rectangle
-                var point = new Point(_start.X, _start.Y);
-                var hWnd = WindowFromPoint(point);
+                var hWnd = WindowFromPoint(_start.Point);
                 ScreenToClient(hWnd, ref _start);
                 ScreenToClient(hWnd, ref mousePos);
-                point = new Point(_start.X, _start.Y);
                 GetWindowRect(hWnd, out var rect);
-                target.Start = CalculateCoordinate(point, rect.Rectangle, anchor);
-                point = new Point(mousePos.X, mousePos.Y);
-                target.End = CalculateCoordinate(point, rect.Rectangle, anchor);
+                target.Start = CalculateCoordinate(_start.Point, rect.Rectangle, anchor);
+                target.End = CalculateCoordinate(mousePos.Point, rect.Rectangle, anchor);
                 _start = default;
                 // Notify completion
                 return true;
