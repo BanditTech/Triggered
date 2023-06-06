@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -258,6 +259,9 @@ namespace Triggered.modules.wrapper
             /// The y-coordinate of the point.
             /// </summary>
             public int Y;
+
+            public readonly Vector2 Vector2 => new(X, Y);
+            public readonly Point Point => new(X, Y);
         }
 
         /// <summary>
