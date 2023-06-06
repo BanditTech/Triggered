@@ -225,6 +225,23 @@ namespace Triggered.modules.wrapper
             /// The y-coordinate of the bottom edge of the rectangle.
             /// </summary>
             public int Bottom;
+
+            /// <summary>
+            /// Define the calculated Width
+            /// </summary>
+            public int Width { get => Math.Abs(Left - Right) + 1; }
+
+            /// <summary>
+            /// Define the calculated Height
+            /// </summary>
+            public int Height { get => Math.Abs(Top - Bottom) + 1; }
+            
+            public Rectangle Rectangle
+            {
+                get => new Rectangle(
+                    new Point(Math.Min(Left, Right), Math.Min(Top, Bottom)),
+                    new Size(Width, Height));
+            }
         }
 
         /// <summary>
