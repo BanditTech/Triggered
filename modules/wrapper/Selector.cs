@@ -164,13 +164,11 @@ namespace Triggered.modules.wrapper
             return false;
         }
 
-        private static void DrawRectangles(User32.POINT start_pos, User32.POINT end_pos)
+        private static void DrawRectangles(POINT start_pos, POINT end_pos)
         {
-            Vector2 start = new(start_pos.X,start_pos.Y);
-            Vector2 end = new(end_pos.X,end_pos.Y);
             ImDrawListPtr draw_list = ImGui.GetForegroundDrawList();
-            draw_list.AddRect(start, end, 0xFFD88280);
-            draw_list.AddRectFilled(start, end, 0x42D88280);
+            draw_list.AddRect(start_pos.Vector2, end_pos.Vector2, 0xFFD88280);
+            draw_list.AddRectFilled(start_pos.Vector2, end_pos.Vector2, 0x42D88280);
         }
 
         public static class InputBlocker
