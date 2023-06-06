@@ -330,7 +330,7 @@ namespace Triggered.modules.options
                 yield return (entry.Key, entry.Value);
         }
 
-        public IEnumerable<object> IterateObjects()
+        public IEnumerable<(string Keys, object Obj)> IterateObjects()
         {
             Type inheritedType = GetType();
             foreach (var entry in keyTypes)
@@ -339,7 +339,7 @@ namespace Triggered.modules.options
                 var type = entry.Value;
                 var getKeyMethod = inheritedType.GetMethod("GetKey").MakeGenericMethod(type);
                 var value = getKeyMethod.Invoke(this, new object[] { key });
-                yield return value;
+                yield return (entry.Key,value);
             }
         }
 
