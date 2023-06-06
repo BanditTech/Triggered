@@ -3,6 +3,7 @@ using ImGuiNET;
 using System;
 using System.Drawing;
 using System.Numerics;
+using static Triggered.modules.wrapper.PointScaler;
 using static Triggered.modules.wrapper.User32;
 
 namespace Triggered.modules.wrapper
@@ -23,6 +24,39 @@ namespace Triggered.modules.wrapper
         /// </summary>
         public const ImGuiMouseButton mouse_button = ImGuiMouseButton.Left;
         
+        public static bool Coordinate(ref Coordinate coord, AnchorPosition anchor)
+        {
+            // If true, we need to wait for the initial release of the button. 
+            bool mouseDown = Utils.IsKeyPressed(VK.LBUTTON);
+            if (!clickCapturing && mouseDown)
+                return false;
+
+            // The button is released and we can begin input blocking.
+            if (!clickCapturing)
+            {
+                clickCapturing = true;
+                InputBlocker.NextClick();
+            }
+            // We can return if we are awaiting our first click.
+            if (_release)
+            {
+                // Reset all the local variables and states
+                clickCapturing = false;
+                _release = false;
+                // Apply the values to the rectangle
+                var point = new Point(_start.X, _start.Y);
+                var hWnd = WindowFromPoint(point);
+                ScreenToClient(hWnd, ref _start);
+                point = new Point(_start.X, _start.Y);
+                GetWindowRect(hWnd,out var rect);
+                coord = CalculateCoordinate(point,rect.Rectangle,anchor);
+                _start = default;
+                // Notify completion
+                return true;
+            }
+            return false;
+        }
+
         public static bool Rectangle(ref Rectangle rect)
         {
             // If true, we need to wait for the initial release of the button. 
