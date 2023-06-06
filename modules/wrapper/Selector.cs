@@ -23,7 +23,52 @@ namespace Triggered.modules.wrapper
         /// The button used for making a selection.
         /// </summary>
         public const ImGuiMouseButton mouse_button = ImGuiMouseButton.Left;
-        
+
+        public static bool ScaledRectangle(ref ScaledRectangle target, AnchorPosition anchor)
+        {
+            // If true, we need to wait for the initial release of the button. 
+            bool mouseDown = Utils.IsKeyPressed(VK.LBUTTON);
+            if (!clickCapturing && mouseDown)
+                return false;
+
+            // The button is released and we can begin input blocking.
+            if (!clickCapturing)
+            {
+                clickCapturing = true;
+                InputBlocker.NextClick();
+            }
+
+            // We can return if we are awaiting our first click.
+            if (clickCapturing && !_dragging && !_release)
+                return false;
+
+            GetCursorPos(out var mousePos);
+            // We are dragging the cursor awaiting a release
+            if (_dragging)
+                DrawRectangles(_start, mousePos);
+            // We received a release event.
+            else if (_release)
+            {
+                // Reset all the local variables and states
+                clickCapturing = false;
+                _release = false;
+                // Apply the values to the rectangle
+                var point = new Point(_start.X, _start.Y);
+                var hWnd = WindowFromPoint(point);
+                ScreenToClient(hWnd, ref _start);
+                ScreenToClient(hWnd, ref mousePos);
+                point = new Point(_start.X, _start.Y);
+                GetWindowRect(hWnd, out var rect);
+                target.Start = CalculateCoordinate(point, rect.Rectangle, anchor);
+                point = new Point(mousePos.X, mousePos.Y);
+                target.End = CalculateCoordinate(point, rect.Rectangle, anchor);
+                _start = default;
+                // Notify completion
+                return true;
+            }
+            return false;
+        }
+
         public static bool Coordinate(ref Coordinate coord, AnchorPosition anchor)
         {
             // If true, we need to wait for the initial release of the button. 

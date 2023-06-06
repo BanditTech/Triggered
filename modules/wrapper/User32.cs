@@ -229,19 +229,18 @@ namespace Triggered.modules.wrapper
             /// <summary>
             /// Define the calculated Width
             /// </summary>
-            public int Width { get => Math.Abs(Left - Right) + 1; }
+            public readonly int Width { get => Math.Abs(Left - Right) + 1; }
 
             /// <summary>
             /// Define the calculated Height
             /// </summary>
-            public int Height { get => Math.Abs(Top - Bottom) + 1; }
-            
-            public Rectangle Rectangle
-            {
-                get => new Rectangle(
-                    new Point(Math.Min(Left, Right), Math.Min(Top, Bottom)),
-                    new Size(Width, Height));
-            }
+            public readonly int Height { get => Math.Abs(Top - Bottom) + 1; }
+
+            public readonly Point Point => new Point(Math.Min(Left, Right), Math.Min(Top, Bottom));
+
+            public readonly Size Size => new Size(Width, Height);
+
+            public readonly Rectangle Rectangle => new(Point, Size);
         }
 
         /// <summary>
