@@ -19,6 +19,11 @@ namespace Triggered.modules.options
         public JObject keyList = new();
 
         /// <summary>
+        /// Associate each setting key with its Type.
+        /// </summary>
+        private Dictionary<string, Type> keyTypes = new();
+
+        /// <summary>
         /// We use the Name key to build the filename
         /// </summary>
         public string Name = "";
@@ -38,6 +43,8 @@ namespace Triggered.modules.options
         /// <exception cref="ArgumentException"></exception>
         public void SetKey(string keys, object value)
         {
+            if (!keyTypes.ContainsKey(keys))
+                keyTypes[keys] = value.GetType();
             int index;
             string[] keyArray = keys.Split('.');
             JToken target = keyList;
@@ -310,6 +317,29 @@ namespace Triggered.modules.options
             {
                 App.Log($"Running save on {Name} because of changed settings.",0);
                 Save();
+            }
+        }
+
+        /// <summary>
+        /// Iterate through the entries of this Options object.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<(string Keys, Type Type)> IterateKeys()
+        {
+            foreach (var entry in keyTypes)
+                yield return (entry.Key, entry.Value);
+        }
+
+        public IEnumerable<object> IterateObjects()
+        {
+            Type inheritedType = GetType();
+            foreach (var entry in keyTypes)
+            {
+                var key = entry.Key;
+                var type = entry.Value;
+                var getKeyMethod = inheritedType.GetMethod("GetKey").MakeGenericMethod(type);
+                var value = getKeyMethod.Invoke(this, new object[] { key });
+                yield return value;
             }
         }
 
