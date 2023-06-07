@@ -22,6 +22,7 @@ namespace Triggered.modules.options
             SetKey("StashSorter", true);
             SetKey("MainMenu", true);
             SetKey("Log", true);
+            SetKey("Locations", false);
 
             // CV Demo panels
             SetKey("CV.BlackWhite", false);

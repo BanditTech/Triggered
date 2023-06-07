@@ -212,6 +212,12 @@ namespace Triggered.modules.panel
             {
                 makeSelection = true;
             }
+            ImGui.SameLine();
+            if (ImGui.Button("Locations"))
+            {
+                Panel.SetKey("Locations", !Panel.GetKey<bool>("Locations"));
+            }
+
             #endregion
 
             if (makeSelection && Selector.Rectangle(ref rectSelection))
@@ -219,7 +225,6 @@ namespace Triggered.modules.panel
                 makeSelection = false;
                 App.Log($"Rectangle was produced {rectSelection.Left},{rectSelection.Top} - {rectSelection.Bottom},{rectSelection.Right} - W{rectSelection.Width} H{rectSelection.Height}",2);
             }
-
 
             #region Menu Bar
             // This is to show the menu bar that will change the config settings at runtime.
