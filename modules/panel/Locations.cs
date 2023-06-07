@@ -79,7 +79,38 @@ namespace Triggered.modules.panel
                 }
                 else if (obj is Coordinate coordinate)
                 {
-                    // do
+                    ImGui.Text($"Coordinate: {displayedKey}");
+                    ImGui.PushID($"{key} Button");
+                    ImGui.Indent(40);
+                    if (ImGui.Button("Select Point"))
+                        _selected = key;
+                    ImGui.PopID();
+                    ImGui.SameLine();
+                    ImGui.Text("Anchor:");
+                    ImGui.SameLine();
+                    ImGui.PushID($"{key} Combo");
+                    ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                    var anchorIndex = Array.IndexOf(anchorValues, coordinate.Anchor);
+                    if (ImGui.Combo("##Anchor{key}", ref anchorIndex, anchorNames, anchorNames.Length))
+                    {
+                        string anchorPositionName = Enum.GetName(anchorPosType, anchorIndex);
+                        AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(anchorPosType, anchorPositionName);
+                        coordinate = new(coordinate.Point, coordinate.Height, newAnchorPosition);
+                        Opts.SetKey(key, coordinate);
+                    }
+                    ImGui.PopID();
+                    if (_selected == key && Selector.Coordinate(ref coordinate, coordinate.Anchor))
+                    {
+                        Opts.SetKey(key, coordinate);
+                        _selected = null;
+                    }
+                    ImGui.Text($"Point:{JSON.Min(coordinate.Point)}, " +
+                        $"ScaleH {coordinate.Height}");
+                    ImGui.SameLine();
+                    ImGui.Text($"");
+
+                    ImGui.Spacing();
+                    ImGui.Unindent(40);
                 }
                 else if (obj is Measurement measurement)
                 {
