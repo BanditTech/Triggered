@@ -66,6 +66,7 @@ namespace Triggered.modules.panel
                     if (_selected == key && Selector.ScaledRectangle(ref scaledRectangle,scaledRectangle.Start.Anchor))
                     { 
                         Opts.SetKey(key,scaledRectangle);
+                        App.Log($"New \"{keySplit.Last()}\" scaled rectangle taken\n{JSON.Min(scaledRectangle)}");
                         _selected = null;
                     }
                     ImGui.Text($"Start:{JSON.Min(scaledRectangle.Start.Point)}, " +
@@ -102,6 +103,7 @@ namespace Triggered.modules.panel
                     if (_selected == key && Selector.Coordinate(ref coordinate, coordinate.Anchor))
                     {
                         Opts.SetKey(key, coordinate);
+                        App.Log($"New \"{keySplit.Last()}\" coordinate taken\n{JSON.Min(coordinate)}");
                         _selected = null;
                     }
                     ImGui.Text($"Point:{JSON.Min(coordinate.Point)}, " +
@@ -114,7 +116,26 @@ namespace Triggered.modules.panel
                 }
                 else if (obj is Measurement measurement)
                 {
-                    // do 
+                    ImGui.Text($"Coordinate: {displayedKey}");
+                    ImGui.PushID($"{key} Button");
+                    ImGui.Indent(40);
+                    if (ImGui.Button("Select Line"))
+                        _selected = key;
+                    ImGui.PopID();
+                    if (_selected == key && Selector.Measurement(ref measurement))
+                    {
+                        Opts.SetKey(key, measurement);
+                        App.Log($"New \"{keySplit.Last()}\" measurement taken\n{JSON.Min(measurement)}");
+                        _selected = null;
+                    }
+                    ImGui.SameLine();
+                    ImGui.Text($"Value:{measurement.Value}, " +
+                        $"ScaleH {measurement.Height}");
+                    ImGui.SameLine();
+                    ImGui.Text($"");
+
+                    ImGui.Spacing();
+                    ImGui.Unindent(40);
                 }
             }
             ImGui.End();
