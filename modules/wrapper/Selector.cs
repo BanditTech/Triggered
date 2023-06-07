@@ -115,6 +115,48 @@ namespace Triggered.modules.wrapper
             return false;
         }
 
+        public static bool Measurement(ref Measurement measurement)
+        {
+            // If true, we need to wait for the initial release of the button. 
+            bool mouseDown = Utils.IsKeyPressed(VK.LBUTTON);
+            if (!clickCapturing && mouseDown)
+                return false;
+
+            // The button is released and we can begin input blocking.
+            if (!clickCapturing)
+            {
+                clickCapturing = true;
+                InputBlocker.NextClick();
+            }
+
+            // We can return if we are awaiting our first click.
+            if (clickCapturing && !_dragging && !_release)
+                return false;
+
+            GetCursorPos(out var mousePos);
+            // We are dragging the cursor awaiting a release
+            if (_dragging)
+                DrawMeasurement(_start, mousePos);
+            // We received a release event.
+            else if (_release)
+            {
+                // Reset all the local variables and states
+                clickCapturing = false;
+                _release = false;
+                // Apply the values to the rectangle
+                var hWnd = WindowFromPoint(_start.Point);
+                var x = Math.Abs(_start.X - mousePos.X) +1;
+                var y = Math.Abs(_start.Y - mousePos.Y) +1;
+                var size = Math.Max(x, y);
+                GetWindowRect(hWnd, out var rect);
+                measurement = new(size,rect.Height);
+                _start = default;
+                // Notify completion
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Allow the user to Select a Rectangle.
         /// </summary>
@@ -198,6 +240,18 @@ namespace Triggered.modules.wrapper
             ImDrawListPtr draw_list = ImGui.GetForegroundDrawList();
             draw_list.AddRect(start_pos.Vector2, end_pos.Vector2, 0xFFD88280);
             draw_list.AddRectFilled(start_pos.Vector2, end_pos.Vector2, 0x42D88280);
+        }
+        private static void DrawMeasurement(POINT start_pos, POINT end_pos)
+        {
+            ImDrawListPtr draw_list = ImGui.GetForegroundDrawList();
+
+            float horizontalDistance = Math.Abs(end_pos.X - start_pos.X);
+            float verticalDistance = Math.Abs(end_pos.Y - start_pos.Y);
+
+            if (horizontalDistance > verticalDistance)
+                draw_list.AddLine(start_pos.Vector2, new Vector2(end_pos.X, start_pos.Y), 0xFFD88280);
+            else
+                draw_list.AddLine(start_pos.Vector2, new Vector2(start_pos.X, end_pos.Y), 0xFFD88280);
         }
 
         /// <summary>
