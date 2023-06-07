@@ -14,6 +14,7 @@ namespace Triggered.modules.panel
         private static Options_Panel Panel => App.Options.Panel;
         private static readonly Type anchorPosType = typeof(AnchorPosition);
         private static readonly string[] anchorNames = Enum.GetNames(anchorPosType);
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Required for dynamic menu creation")]
         private static readonly Array anchorValues = Enum.GetValues(anchorPosType);
 
         [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
@@ -47,13 +48,10 @@ namespace Triggered.modules.panel
                         Opts.SetKey(key,scaledRectangle);
                     }
                     ImGui.PopID();
-                    if (_selected == key)
-                    {
-                        if (Selector.ScaledRectangle(ref scaledRectangle,scaledRectangle.Start.Anchor))
-                        {
-                            Opts.SetKey(key,scaledRectangle);
-                            _selected = null;
-                        }
+                    if (_selected == key && Selector.ScaledRectangle(ref scaledRectangle,scaledRectangle.Start.Anchor))
+                    { 
+                        Opts.SetKey(key,scaledRectangle);
+                        _selected = null;
                     }
                     ImGui.Spacing();
                     ImGui.Unindent(40);
