@@ -230,12 +230,12 @@ namespace Triggered.modules.wrapper
             /// <summary>
             /// Define the calculated Width
             /// </summary>
-            public readonly int Width { get => Math.Abs(Left - Right) + 1; }
+            public readonly int Width { get => Math.Abs(Left - Right); }
 
             /// <summary>
             /// Define the calculated Height
             /// </summary>
-            public readonly int Height { get => Math.Abs(Top - Bottom) + 1; }
+            public readonly int Height { get => Math.Abs(Top - Bottom); }
 
             /// <summary>
             /// Produce the reference point of this rectangle
