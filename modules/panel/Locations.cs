@@ -4,6 +4,7 @@ using ImGuiNET;
 using System.Diagnostics.CodeAnalysis;
 using Triggered.modules.wrapper;
 using System;
+using System.Linq;
 
 namespace Triggered.modules.panel
 {
@@ -16,6 +17,7 @@ namespace Triggered.modules.panel
         private static readonly string[] anchorNames = Enum.GetNames(anchorPosType);
         [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Required for dynamic menu creation")]
         private static readonly Array anchorValues = Enum.GetValues(anchorPosType);
+        private static string currentSection;
 
         [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
         internal static void Render()
@@ -25,9 +27,22 @@ namespace Triggered.modules.panel
             ImGui.Begin("Locations");
             foreach (var (key, obj) in Opts.IterateObjects())
             {
+                var keySplit = key.Split('.');
+                var displayedKey = string.Join(" ",keySplit);
+                if (keySplit.Length > 1 && keySplit[0] != currentSection)
+                {
+                    ImGui.Spacing();
+                    currentSection = keySplit[0];
+                    ImGui.Text(currentSection);
+                    ImGui.Separator();
+                    ImGui.Spacing();
+                }
+                else if (currentSection != null && keySplit.Length <= 1)
+                    currentSection = null;
+
                 if (obj is ScaledRectangle scaledRectangle)
                 {
-                    ImGui.Text($"Scaled Rectangle: {key}");
+                    ImGui.Text($"Scaled Rectangle: {displayedKey}");
                     ImGui.PushID($"{key} Button");
                     ImGui.Indent(40);
                     if (ImGui.Button("Select Area"))
@@ -53,6 +68,14 @@ namespace Triggered.modules.panel
                         Opts.SetKey(key,scaledRectangle);
                         _selected = null;
                     }
+                    ImGui.Text($"Start:{JSON.Min(scaledRectangle.Start.Point)}, " +
+                        $"End:{JSON.Min(scaledRectangle.End.Point)}, " +
+                        $"ScaleH {scaledRectangle.Start.Height}");
+                    ImGui.SameLine();
+                    ImGui.Text($"");
+                    //ImGui.Text("{ "+ $"Start:{JSON.Min(scaledRectangle.Start.Point)}, End:{JSON.Min(scaledRectangle.End.Point)}" + " }");
+
+
                     ImGui.Spacing();
                     ImGui.Unindent(40);
                 }
