@@ -20,7 +20,7 @@
             SetKey("MinimumLogLevel", 1);
             SetKey("ScrollToBottom", true);
             SetKey("WindowMaxLines", 1000);
-            SetKey("Transparency", 0f);
+            SetKey("Transparency", 1f);
 
             TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again

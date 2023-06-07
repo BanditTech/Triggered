@@ -75,11 +75,22 @@ namespace Triggered.modules.panel
                 return;
 
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
+            // Adjust window background transparency
+            float transparency = Opts.GetKey<float>("Transparency");
+            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(ImGui.GetStyle().Colors[(int)ImGuiCol.Border].X,
+                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.Border].Y,
+                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.Border].Z,
+                                                                transparency));
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].X,
+                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].Y,
+                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].Z,
+                                                                transparency));
             if (!ImGui.Begin(title))
             {
                 ImGui.End();
                 return;
             }
+            ImGui.PopStyleColor(2);
             // Clear Text Button
             if (ImGui.Button("Clear"))
                 Clear();
@@ -102,7 +113,6 @@ namespace Triggered.modules.panel
             }
             ImGui.SameLine();
             ImGui.SetNextItemWidth(100);
-            float transparency = Opts.GetKey<float>("Transparency");
             if (ImGui.SliderFloat("##Transparency", ref transparency, 0f, 1f))
                 Opts.SetKey("Transparency", transparency);
             ImGui.Separator();
