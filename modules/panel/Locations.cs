@@ -73,8 +73,6 @@ namespace Triggered.modules.panel
                         $"ScaleH {scaledRectangle.Start.Height}");
                     ImGui.SameLine();
                     ImGui.Text($"");
-                    //ImGui.Text("{ "+ $"Start:{JSON.Min(scaledRectangle.Start.Point)}, End:{JSON.Min(scaledRectangle.End.Point)}" + " }");
-
 
                     ImGui.Spacing();
                     ImGui.Unindent(40);
