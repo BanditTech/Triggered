@@ -9,16 +9,16 @@ namespace Triggered.modules.wrapper
     /// </summary>
     public static class ImGuiNet
     {
-        private static Vector4 defaultColor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+        private static Vector4 defaultColor = new Vector4(0.8f, 0.8f, 0.8f, 1f);
 
         /// <summary>
         /// Displays centered colored text using the default color.
         /// </summary>
         /// <param name="text">The text to be displayed.</param>
         /// <param name="percentage">The position on the screen.</param>
-        public static void CenteredColorText(string text, float percentage = 0f)
+        public static void CenteredColorText(string text, float percentage = 0f, float maxIndent = 0f)
         {
-            CenteredColorText(defaultColor, text, percentage);
+            CenteredColorText(defaultColor, text, percentage, maxIndent);
         }
 
         /// <summary>
@@ -27,18 +27,21 @@ namespace Triggered.modules.wrapper
         /// <param name="color">The color of the text.</param>
         /// <param name="text">The text to be displayed.</param>
         /// <param name="percentage">The position on the screen.</param>
-        public static void CenteredColorText(Vector4 color, string text, float percentage = 0f)
+        public static void CenteredColorText(Vector4 color, string text, float percentage = 0f, float maxIndent = 0f)
         {
             // Assign the default of .5 of the available space
             if (percentage == 0f)
                 percentage = .5f;
-
             // Calculate the width of the text
             Vector2 textSize = ImGui.CalcTextSize(text);
-
-            // Calculate the position to center the text
-            var windowWidth = ImGui.GetContentRegionAvail().X;
-            var calcMiddle = (windowWidth - textSize.X) * percentage;
+            // Calculate the available space
+            var available = ImGui.GetContentRegionAvail().X - textSize.X;
+            if (maxIndent == 0f)
+                maxIndent = available;
+            var calcMiddle = available * percentage;
+            // Correct the calculation if outside area
+            if (calcMiddle > maxIndent)
+                calcMiddle = maxIndent;
             // Display the text
             ImGui.Indent(calcMiddle);
             ImGui.TextColored(color, text);
@@ -50,18 +53,21 @@ namespace Triggered.modules.wrapper
         /// </summary>
         /// <param name="text">The text to be displayed.</param>
         /// <param name="percentage">The position on the screen.</param>
-        public static void CenteredText(string text,float percentage = 0f)
+        public static void CenteredText(string text,float percentage = 0f, float maxIndent = 0f)
         {
-            // Assign the default of half of the available space
+            // Assign the default of .5 of the available space
             if (percentage == 0f)
                 percentage = .5f;
-
             // Calculate the width of the text
             Vector2 textSize = ImGui.CalcTextSize(text);
-
-            // Calculate the position to center the text
-            var windowWidth = ImGui.GetContentRegionAvail().X;
-            var calcMiddle = (windowWidth - textSize.X) * percentage;
+            // Calculate the available space
+            var available = ImGui.GetContentRegionAvail().X - textSize.X;
+            if (maxIndent == 0f)
+                maxIndent = available;
+            var calcMiddle = available * percentage;
+            // Correct the calculation if outside area
+            if (calcMiddle > maxIndent)
+                calcMiddle = maxIndent;
             // Display the text
             ImGui.Indent(calcMiddle);
             ImGui.Text(text);

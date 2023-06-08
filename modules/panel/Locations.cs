@@ -34,9 +34,9 @@ namespace Triggered.modules.panel
                 var displayedKey = string.IsNullOrEmpty(label) ? string.Join(" ",keySplit) : label;
                 if (keySplit.Length > 1 && keySplit[0] != currentSection)
                 {
-                    Spacers(3);
+                    NewSection(1);
                     currentSection = keySplit[0];
-                    CenteredColorText(currentSection, .3f);
+                    CenteredText(currentSection, .3f, 100);
                     NewSection(1);
                 }
                 else if (currentSection != null && keySplit.Length <= 1)
