@@ -337,7 +337,7 @@ namespace Triggered.modules.options
         }
         #endregion
 
-        #region Iterate and Render methods
+        #region Iterate methods
         /// <summary>
         /// Iterate through the entries of this Options object.
         /// </summary>
@@ -367,7 +367,9 @@ namespace Triggered.modules.options
                 yield return (key, value);
             }
         }
+        #endregion
 
+        #region Render
         private static string currentSection;
         private static string _selected;
 
