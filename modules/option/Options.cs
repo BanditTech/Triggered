@@ -17,6 +17,7 @@ namespace Triggered.modules.options
     /// </summary>
     public abstract class Options
     {
+        #region Options properties
         /// <summary>
         /// We save the values within a JObject for flexibility
         /// </summary>
@@ -42,6 +43,7 @@ namespace Triggered.modules.options
         /// Any changes are saved each second.
         /// </summary>
         internal bool _changed = false;
+        #endregion
 
         /// <summary>
         /// Set the object located at keys to the content of value.
@@ -155,41 +157,28 @@ namespace Triggered.modules.options
             }
         }
 
+        #region Save/Load options
         /// <summary>
-        /// Serialize the keyList into a string.
+        /// Allows the inherited classes to save their options to file.
         /// </summary>
-        /// <returns>JSON string</returns>
-        public string ToJson()
+        public void Save()
         {
-            return JSON.Str(keyList);
+            _changed = false;
+            var saveObj = PrepareSaveObject();
+            File.WriteAllText($"save\\{Name}.json", JSON.Str(saveObj));
         }
 
         /// <summary>
-        /// A bandaid function that allows us to build arrays of unknown length.<br/>
-        /// Is run automatically by the class finalizer.
+        /// Allows the inherited classes to merge the saved option subset.
         /// </summary>
-        /// <param name="token">This is usually the keyList</param>
-        public void TrimNullValues(JToken token)
+        public void Load()
         {
-            switch (token.Type)
+            if (File.Exists($"save\\{Name}.json"))
             {
-                case JTokenType.Object:
-                    foreach (JProperty prop in token)
-                    {
-                        TrimNullValues(prop.Value);
-                    }
-                    break;
-                case JTokenType.Array:
-                    JArray arr = (JArray)token;
-                    while (arr.Last?.Type == JTokenType.Null)
-                    {
-                        arr.Last.Remove();
-                    }
-                    foreach (JToken child in arr.Children())
-                    {
-                        TrimNullValues(child);
-                    }
-                    break;
+                string json = File.ReadAllText($"save\\{Name}.json");
+                var obj = (JToken)JSON.Obj(json);
+                Merge(obj);
+                _changed = false;
             }
         }
 
@@ -298,30 +287,6 @@ namespace Triggered.modules.options
         }
 
         /// <summary>
-        /// Allows the inherited classes to save their options to file.
-        /// </summary>
-        public void Save()
-        {
-            _changed = false;
-            var saveObj = PrepareSaveObject();
-            File.WriteAllText($"save\\{Name}.json", JSON.Str(saveObj));
-        }
-
-        /// <summary>
-        /// Allows the inherited classes to merge the saved option subset.
-        /// </summary>
-        public void Load()
-        {
-            if (File.Exists($"save\\{Name}.json"))
-            {
-                string json = File.ReadAllText($"save\\{Name}.json");
-                var obj = (JToken)JSON.Obj(json);
-                Merge(obj);
-                _changed = false;
-            }
-        }
-
-        /// <summary>
         /// We determine if the options have been changed, in order to save to file.
         /// </summary>
         public void SaveChanged()
@@ -334,6 +299,46 @@ namespace Triggered.modules.options
         }
 
         /// <summary>
+        /// Serialize the keyList into a string.
+        /// </summary>
+        /// <returns>JSON string</returns>
+        public string ToJson()
+        {
+            return JSON.Str(keyList);
+        }
+
+        /// <summary>
+        /// A bandaid function that allows us to build arrays of unknown length.<br/>
+        /// Is run automatically by the class finalizer.
+        /// </summary>
+        /// <param name="token">This is usually the keyList</param>
+        public void TrimNullValues(JToken token)
+        {
+            switch (token.Type)
+            {
+                case JTokenType.Object:
+                    foreach (JProperty prop in token)
+                    {
+                        TrimNullValues(prop.Value);
+                    }
+                    break;
+                case JTokenType.Array:
+                    JArray arr = (JArray)token;
+                    while (arr.Last?.Type == JTokenType.Null)
+                    {
+                        arr.Last.Remove();
+                    }
+                    foreach (JToken child in arr.Children())
+                    {
+                        TrimNullValues(child);
+                    }
+                    break;
+            }
+        }
+        #endregion
+
+        #region Iterate and Render methods
+        /// <summary>
         /// Iterate through the entries of this Options object.
         /// </summary>
         /// <returns></returns>
@@ -342,7 +347,6 @@ namespace Triggered.modules.options
             foreach (var entry in keyTypes)
                 yield return (entry.Key, entry.Value);
         }
-
         /// <summary>
         /// Iterates over the key-value pairs in the <see cref="keyTypes"/> dictionary
         /// and dynamically determines the type of the generic method "GetKey" at runtime.
@@ -501,6 +505,6 @@ namespace Triggered.modules.options
             }
             ImGui.End();
         }
-
+        #endregion
     }
 }
