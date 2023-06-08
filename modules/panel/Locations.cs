@@ -34,11 +34,10 @@ namespace Triggered.modules.panel
                 var displayedKey = string.IsNullOrEmpty(label) ? string.Join(" ",keySplit) : label;
                 if (keySplit.Length > 1 && keySplit[0] != currentSection)
                 {
-                    ImGui.Spacing();
+                    Spacers(3);
                     currentSection = keySplit[0];
-                    ImGui.Text(currentSection);
-                    ImGui.Separator();
-                    ImGui.Spacing();
+                    CenteredColorText(currentSection, .3f);
+                    NewSection(1);
                 }
                 else if (currentSection != null && keySplit.Length <= 1)
                     currentSection = null;
