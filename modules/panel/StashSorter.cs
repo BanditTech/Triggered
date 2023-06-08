@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Triggered.modules.wrapper;
 using Triggered.modules.struct_filter;
 using Triggered.modules.options;
+using static Triggered.modules.wrapper.ImGuiNet;
 
 namespace Triggered.modules.panel
 {
@@ -1070,18 +1071,6 @@ namespace Triggered.modules.panel
             if (!_fileOperation)
                 _fileOperation = true;
             return false;
-        }
-        static void Spacers(int count)
-        {
-            for (int i = 0; i < count; i++)
-                ImGui.Spacing();
-        }
-        static void NewSection(int count = 2, bool separate = true)
-        {
-            Spacers(count);
-            if (separate)
-                ImGui.Separator();
-            Spacers(count);
         }
         #endregion
 

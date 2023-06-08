@@ -1,5 +1,6 @@
 ﻿using Triggered.modules.options;
 using static Triggered.modules.wrapper.PointScaler;
+using static Triggered.modules.wrapper.ImGuiNet;
 using ImGuiNET;
 using System.Diagnostics.CodeAnalysis;
 using Triggered.modules.wrapper;
@@ -72,11 +73,7 @@ namespace Triggered.modules.panel
                         ImGui.PopID();
                         ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f), $"Area: ({scaledRectangle.Start.Point.X}, {scaledRectangle.Start.Point.Y}) - ({scaledRectangle.End.Point.X}, {scaledRectangle.End.Point.Y})");
                         ImGui.TextColored(new Vector4(.5f, .5f, 1f, 1f), $"Size: W{scaledRectangle.Width} H{scaledRectangle.Height}");
-                        ImGui.SameLine();
-                        ImGui.Spacing();
-                        ImGui.SameLine();
-                        ImGui.Spacing();
-                        ImGui.SameLine();
+                        SameLineSpacers(3);
                         ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f), $"ScaleH: {scaledRectangle.Start.Height}");
                         ImGui.TreePop();
                     }
@@ -88,7 +85,7 @@ namespace Triggered.modules.panel
                         _selected = null;
                     }
 
-                    ImGui.Spacing();
+                    Spacers(2);
                 }
                 else if (obj is Coordinate coordinate)
                 {

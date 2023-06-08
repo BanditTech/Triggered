@@ -56,5 +56,43 @@ namespace Triggered.modules.wrapper
             ImGui.Text(text);
             ImGui.Unindent(calcMiddle);
         }
+
+        /// <summary>
+        /// Inserts spacing between ImGui elements.
+        /// </summary>
+        /// <param name="count">The number of spacers to insert.</param>
+        public static void Spacers(int count)
+        {
+            for (int i = 0; i < count; i++)
+                ImGui.Spacing();
+        }
+
+        /// <summary>
+        /// Inserts spacing between ImGui elements.
+        /// </summary>
+        /// <param name="count">The number of spacers to insert.</param>
+        public static void SameLineSpacers(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                ImGui.SameLine();
+                ImGui.Spacing();
+            }
+            ImGui.SameLine();
+        }
+
+        /// <summary>
+        /// Creates a new section in the ImGui interface with optional separators and spacers.
+        /// </summary>
+        /// <param name="count">The number of spacers to insert before and after the section.</param>
+        /// <param name="separate">Specifies whether to include a separator between the spacers.</param>
+        public static void NewSection(int count = 2, bool separate = true)
+        {
+            Spacers(count);
+            if (separate)
+                ImGui.Separator();
+            Spacers(count);
+        }
+
     }
 }
