@@ -25,6 +25,11 @@ namespace Triggered.modules.options
         private Dictionary<string, Type> keyTypes = new();
 
         /// <summary>
+        /// Associate each setting key with its Label.
+        /// </summary>
+        internal Dictionary<string, string> keyLabels = new();
+
+        /// <summary>
         /// We use the Name key to build the filename
         /// </summary>
         public string Name = "";
@@ -41,11 +46,15 @@ namespace Triggered.modules.options
         /// </summary>
         /// <param name="keys">string</param>
         /// <param name="value">dynamic</param>
+        /// <param name="label"></param>
         /// <exception cref="ArgumentException"></exception>
-        public void SetKey(string keys, object value)
+        public void SetKey(string keys, object value, string label = "")
         {
             if (!keyTypes.ContainsKey(keys))
+            {
                 keyTypes[keys] = value.GetType();
+                keyLabels[keys] = label;
+            }
             int index;
             string[] keyArray = keys.Split('.');
             JToken target = keyList;

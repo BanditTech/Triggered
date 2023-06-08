@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using Triggered.modules.wrapper;
 using System;
 using System.Linq;
+using System.Numerics;
 
 namespace Triggered.modules.panel
 {
@@ -28,7 +29,8 @@ namespace Triggered.modules.panel
             foreach (var (key, obj) in Opts.IterateObjects())
             {
                 var keySplit = key.Split('.');
-                var displayedKey = string.Join(" ",keySplit);
+                var label = Opts.keyLabels[key];
+                var displayedKey = string.IsNullOrEmpty(label) ? string.Join(" ",keySplit) : label;
                 if (keySplit.Length > 1 && keySplit[0] != currentSection)
                 {
                     ImGui.Spacing();
@@ -42,41 +44,51 @@ namespace Triggered.modules.panel
 
                 if (obj is ScaledRectangle scaledRectangle)
                 {
-                    ImGui.Text($"Scaled Rectangle: {displayedKey}");
-                    ImGui.PushID($"{key} Button");
-                    ImGui.Indent(40);
-                    if (ImGui.Button("Select Area"))
-                        _selected = key;
+                    ImGui.PushID($"{key} Treenode");
+                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(.6f, 1f, .5f, 1f)); // Set text color to red
+                    var treeOpen = ImGui.TreeNode(displayedKey);
+                    ImGui.PopStyleColor();
                     ImGui.PopID();
-                    ImGui.SameLine();
-                    ImGui.Text("Anchor:");
-                    ImGui.SameLine();
-                    ImGui.PushID($"{key} Combo");
-                    ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                    var anchorIndex = Array.IndexOf(anchorValues, scaledRectangle.Start.Anchor);
-                    if (ImGui.Combo("##Anchor{key}",ref anchorIndex, anchorNames, anchorNames.Length))
+                    if (treeOpen)
                     {
-                        string anchorPositionName = Enum.GetName(anchorPosType, anchorIndex);
-                        AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(anchorPosType, anchorPositionName);
-                        scaledRectangle.Start = new(scaledRectangle.Start.Point, scaledRectangle.Start.Height, newAnchorPosition);
-                        scaledRectangle.End = new(scaledRectangle.End.Point, scaledRectangle.End.Height, newAnchorPosition);
-                        Opts.SetKey(key,scaledRectangle);
+                        ImGui.PushID($"{key} Button");
+                        if (ImGui.Button("Select Rectangle"))
+                            _selected = key;
+                        ImGui.PopID();
+                        ImGui.SameLine();
+                        ImGui.Text("Anchor:");
+                        ImGui.SameLine();
+                        var anchorIndex = Array.IndexOf(anchorValues, scaledRectangle.Start.Anchor);
+                        ImGui.PushID($"{key} Combo");
+                        ImGui.SetNextItemWidth(120);
+                        if (ImGui.Combo("##Anchor{key}", ref anchorIndex, anchorNames, anchorNames.Length))
+                        {
+                            string anchorPositionName = Enum.GetName(anchorPosType, anchorIndex);
+                            AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(anchorPosType, anchorPositionName);
+                            scaledRectangle.Start = new(scaledRectangle.Start.Point, scaledRectangle.Start.Height, newAnchorPosition);
+                            scaledRectangle.End = new(scaledRectangle.End.Point, scaledRectangle.End.Height, newAnchorPosition);
+                            Opts.SetKey(key, scaledRectangle);
+                        }
+                        ImGui.PopID();
+                        ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f), $"Area: ({scaledRectangle.Start.Point.X}, {scaledRectangle.Start.Point.Y}) - ({scaledRectangle.End.Point.X}, {scaledRectangle.End.Point.Y})");
+                        ImGui.TextColored(new Vector4(.5f, .5f, 1f, 1f), $"Size: W{scaledRectangle.Width} H{scaledRectangle.Height}");
+                        ImGui.SameLine();
+                        ImGui.Spacing();
+                        ImGui.SameLine();
+                        ImGui.Spacing();
+                        ImGui.SameLine();
+                        ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f), $"ScaleH: {scaledRectangle.Start.Height}");
+                        ImGui.TreePop();
                     }
-                    ImGui.PopID();
+
                     if (_selected == key && Selector.ScaledRectangle(ref scaledRectangle,scaledRectangle.Start.Anchor))
                     { 
                         Opts.SetKey(key,scaledRectangle);
                         App.Log($"New \"{keySplit.Last()}\" scaled rectangle taken\n{JSON.Min(scaledRectangle)}");
                         _selected = null;
                     }
-                    ImGui.Text($"Start:{JSON.Min(scaledRectangle.Start.Point)}, " +
-                        $"End:{JSON.Min(scaledRectangle.End.Point)}, " +
-                        $"ScaleH {scaledRectangle.Start.Height}");
-                    ImGui.SameLine();
-                    ImGui.Text($"");
 
                     ImGui.Spacing();
-                    ImGui.Unindent(40);
                 }
                 else if (obj is Coordinate coordinate)
                 {
@@ -139,6 +151,24 @@ namespace Triggered.modules.panel
                 }
             }
             ImGui.End();
+        }
+        private static Vector4 colorText = new(0.5f, .5f, 0.5f, 1f);
+        public static void CenteredColorText(string text)
+        {
+            CenteredColorText(colorText, text);
+        }
+        public static void CenteredColorText(Vector4 color, string text)
+        {
+            // Calculate the width of the text
+            Vector2 textSize = ImGui.CalcTextSize(text);
+
+            // Calculate the position to center the text
+            var windowWidth = ImGui.GetContentRegionAvail().X;
+            var calcMiddle = (windowWidth - textSize.X) * 0.5f;
+            ImGui.Indent(calcMiddle);
+            // Display the text
+            ImGui.TextColored(color,text);
+            ImGui.Unindent(calcMiddle);
         }
     }
 }

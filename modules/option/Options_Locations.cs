@@ -19,8 +19,8 @@ namespace Triggered.modules.options
         }
         internal override void Default()
         {
-            // Configure Default values
-            SetKey("Resource.Left", new ScaledRectangle(
+            // Resource Area
+            SetKey("Resource.Life", new ScaledRectangle(
                 new Coordinate(
                     new Point(40, 250),
                     1080,
@@ -31,8 +31,8 @@ namespace Triggered.modules.options
                     1080,
                     AnchorPosition.Left
                 )
-            ));
-            SetKey("Resource.Right", new ScaledRectangle(
+            ), "Life Min/Max text area");
+            SetKey("Resource.Mana", new ScaledRectangle(
                 new Coordinate(
                     new Point(250, 250),
                     1080,
@@ -43,23 +43,59 @@ namespace Triggered.modules.options
                     1080,
                     AnchorPosition.Right
                 )
-            ));
+            ), "Mana Min/Max text area");
+            SetKey("Resource.Shield", new ScaledRectangle(
+                new Coordinate(
+                    new Point(250, 250),
+                    1080,
+                    AnchorPosition.Left
+                ),
+                new Coordinate(
+                    new Point(40, 310),
+                    1080,
+                    AnchorPosition.Left
+                )
+            ), "Energy Shield Min/Max text area");
+            SetKey("Resource.Ward", new ScaledRectangle(
+                new Coordinate(
+                    new Point(250, 250),
+                    1080,
+                    AnchorPosition.Left
+                ),
+                new Coordinate(
+                    new Point(40, 310),
+                    1080,
+                    AnchorPosition.Left
+                )
+            ), "Ward Min/Max text area");
+            // Panel Coordinate
             SetKey("Panel.Main", new Coordinate(
                 new Point(250, 250),
                 1080,
                 AnchorPosition.BottomLeft
-            ));
-            SetKey("Panel.Inventory", new Coordinate(
+            ), "Main game interface");
+            SetKey("Panel.Inventory.0", new Coordinate(
                 new Point(250, 250),
                 1080,
                 AnchorPosition.Right
-            ));
-            SetKey("Panel.Stash", new Coordinate(
+            ), "Inventory Coord 1");
+            SetKey("Panel.Inventory.1", new Coordinate(
+                new Point(250, 250),
+                1080,
+                AnchorPosition.Right
+            ), "Inventory Coord 2");
+            SetKey("Panel.Stash.0", new Coordinate(
                 new Point(250, 250),
                 1080,
                 AnchorPosition.Left
-            ));
-            SetKey("Measure.SlotSize", new Measurement(20, 1080));
+            ), "Stash Coord 1");
+            SetKey("Panel.Stash.1", new Coordinate(
+                new Point(250, 250),
+                1080,
+                AnchorPosition.Left
+            ), "Stash Coord 2");
+            // Measurements
+            SetKey("Measure.SlotSize", new Measurement(20, 1080), "Slot Size");
 
             TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again

@@ -106,12 +106,12 @@ namespace Triggered.modules.wrapper
             /// <summary>
             /// Define the calculated Width
             /// </summary>
-            public readonly int Width { get => Math.Abs(Start.Point.X - End.Point.X); }
+            public readonly int Width { get => Math.Abs(Start.Point.X - End.Point.X) + 1; }
 
             /// <summary>
             /// Define the calculated Height
             /// </summary>
-            public readonly int Height { get => Math.Abs(Start.Point.Y - End.Point.Y); }
+            public readonly int Height { get => Math.Abs(Start.Point.Y - End.Point.Y) + 1; }
         }
 
         /// <summary>
