@@ -152,23 +152,5 @@ namespace Triggered.modules.panel
             }
             ImGui.End();
         }
-        private static Vector4 colorText = new(0.5f, .5f, 0.5f, 1f);
-        public static void CenteredColorText(string text)
-        {
-            CenteredColorText(colorText, text);
-        }
-        public static void CenteredColorText(Vector4 color, string text)
-        {
-            // Calculate the width of the text
-            Vector2 textSize = ImGui.CalcTextSize(text);
-
-            // Calculate the position to center the text
-            var windowWidth = ImGui.GetContentRegionAvail().X;
-            var calcMiddle = (windowWidth - textSize.X) * 0.5f;
-            ImGui.Indent(calcMiddle);
-            // Display the text
-            ImGui.TextColored(color,text);
-            ImGui.Unindent(calcMiddle);
-        }
     }
 }
