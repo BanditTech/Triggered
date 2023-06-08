@@ -1,11 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using ImGuiNET;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Numerics;
 using Triggered.modules.wrapper;
+using static Triggered.modules.wrapper.PointScaler;
+using static Triggered.modules.wrapper.ImGuiNet;
 
 namespace Triggered.modules.options
 {
@@ -360,5 +363,144 @@ namespace Triggered.modules.options
                 yield return (key, value);
             }
         }
+
+        private static string currentSection;
+        private static string _selected;
+
+        internal void Render()
+        {
+            if (!App.Options.Panel.GetKey<bool>(Name))
+                return;
+            ImGui.Begin(Name);
+            foreach (var (key, obj) in IterateObjects())
+            {
+                var keySplit = key.Split('.');
+                var label = keyLabels[key];
+                var displayedKey = string.IsNullOrEmpty(label) ? string.Join(" ", keySplit) : label;
+                if (keySplit.Length > 1 && keySplit[0] != currentSection)
+                {
+                    NewSection(1);
+                    currentSection = keySplit[0];
+                    CenteredText(currentSection, .3f, 100);
+                    NewSection(1);
+                }
+                else if (currentSection != null && keySplit.Length <= 1)
+                    currentSection = null;
+
+                ImGui.PushID($"{key} Treenode");
+                ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(.6f, 1f, .5f, 1f));
+                var treeOpen = ImGui.TreeNode(displayedKey);
+                ImGui.PopStyleColor();
+                ImGui.PopID();
+
+                if (obj is ScaledRectangle scaledRectangle)
+                {
+                    if (treeOpen)
+                    {
+                        ImGui.PushID($"{key} Button");
+                        if (ImGui.Button("Select Rectangle"))
+                            _selected = key;
+                        ImGui.PopID();
+                        ImGui.SameLine();
+                        ImGui.Text("Anchor:");
+                        ImGui.SameLine();
+                        var anchorIndex = Array.IndexOf(App.anchorValues, scaledRectangle.Start.Anchor);
+                        ImGui.PushID($"{key} Combo");
+                        ImGui.SetNextItemWidth(130);
+                        if (ImGui.Combo("##Anchor{key}", ref anchorIndex, App.anchorNames, App.anchorNames.Length))
+                        {
+                            string anchorPositionName = Enum.GetName(App.anchorPosType, anchorIndex);
+                            AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(App.anchorPosType, anchorPositionName);
+                            scaledRectangle.Start = new(scaledRectangle.Start.Point, scaledRectangle.Start.Height, newAnchorPosition);
+                            scaledRectangle.End = new(scaledRectangle.End.Point, scaledRectangle.End.Height, newAnchorPosition);
+                            SetKey(key, scaledRectangle);
+                        }
+                        ImGui.PopID();
+                        ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
+                            $"Area: ({scaledRectangle.Start.Point.X}, {scaledRectangle.Start.Point.Y})" +
+                            $" to ({scaledRectangle.End.Point.X}, {scaledRectangle.End.Point.Y})");
+                        ImGui.TextColored(new Vector4(.5f, .5f, 1f, 1f),
+                            $"Size: H{scaledRectangle.Height} W{scaledRectangle.Width}");
+                        SameLineSpacers(3);
+                        ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
+                            $"ScaleH: {scaledRectangle.Start.Height}");
+                        ImGui.TreePop();
+                    }
+
+                    if (_selected == key && Selector.ScaledRectangle(ref scaledRectangle, scaledRectangle.Start.Anchor))
+                    {
+                        SetKey(key, scaledRectangle);
+                        App.Log($"New \"{keySplit.Last()}\" scaled rectangle taken\n{JSON.Min(scaledRectangle)}");
+                        _selected = null;
+                    }
+                    Spacers(2);
+                }
+                else if (obj is Coordinate coordinate)
+                {
+                    if (treeOpen)
+                    {
+                        ImGui.PushID($"{key} Button");
+                        if (ImGui.Button("Select Point"))
+                            _selected = key;
+                        ImGui.PopID();
+                        ImGui.SameLine();
+                        ImGui.Text("Anchor:");
+                        ImGui.SameLine();
+                        ImGui.PushID($"{key} Combo");
+                        ImGui.SetNextItemWidth(130);
+                        var anchorIndex = Array.IndexOf(App.anchorValues, coordinate.Anchor);
+                        if (ImGui.Combo("##Anchor{key}", ref anchorIndex, App.anchorNames, App.anchorNames.Length))
+                        {
+                            string anchorPositionName = Enum.GetName(App.anchorPosType, anchorIndex);
+                            AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(App.anchorPosType, anchorPositionName);
+                            coordinate = new(coordinate.Point, coordinate.Height, newAnchorPosition);
+                            SetKey(key, coordinate);
+                        }
+                        ImGui.PopID();
+                        ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
+                            $"Point: ({coordinate.Point.X}, {coordinate.Point.Y})");
+                        SameLineSpacers(3);
+                        ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
+                            $"ScaleH: {coordinate.Height}");
+                        ImGui.TreePop();
+                    }
+
+                    if (_selected == key && Selector.Coordinate(ref coordinate, coordinate.Anchor))
+                    {
+                        SetKey(key, coordinate);
+                        App.Log($"New \"{keySplit.Last()}\" coordinate taken\n{JSON.Min(coordinate)}");
+                        _selected = null;
+                    }
+                    Spacers(2);
+                }
+                else if (obj is Measurement measurement)
+                {
+                    if (treeOpen)
+                    {
+                        ImGui.PushID($"{key} Button");
+                        if (ImGui.Button("Select Line"))
+                            _selected = key;
+                        ImGui.PopID();
+
+                        ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
+                            $"Value: ({measurement.Value})");
+                        SameLineSpacers(3);
+                        ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
+                            $"ScaleH: {measurement.Height}");
+                        ImGui.TreePop();
+                    }
+
+                    if (_selected == key && Selector.Measurement(ref measurement))
+                    {
+                        SetKey(key, measurement);
+                        App.Log($"New \"{keySplit.Last()}\" measurement taken\n{JSON.Min(measurement)}");
+                        _selected = null;
+                    }
+                    Spacers(2);
+                }
+            }
+            ImGui.End();
+        }
+
     }
 }

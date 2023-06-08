@@ -286,7 +286,7 @@ namespace Triggered.modules.panel
             StashSorter.Render();
             App.logimgui.Draw("Log Window");
             DemoCV.Render();
-            Locations.Render();
+            App.Options.Locations.Render();
         }
     }
 }

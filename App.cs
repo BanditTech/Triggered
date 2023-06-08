@@ -8,6 +8,8 @@ using Triggered.modules.struct_filter;
 using System;
 using ClickableTransparentOverlay;
 using Triggered.modules.option;
+using static Triggered.modules.wrapper.PointScaler;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Triggered
 {
@@ -63,6 +65,12 @@ namespace Triggered
         /// what range
         /// </summary>
         internal static readonly string[] glyphs;
+
+        internal static readonly Type anchorPosType = typeof(AnchorPosition);
+        internal static readonly string[] anchorNames = Enum.GetNames(anchorPosType);
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Required for dynamic menu creation")]
+        internal static readonly Array anchorValues = Enum.GetValues(anchorPosType);
+
 
         /// <summary>
         /// Constructing the App is a good entry point for basic configuration.
