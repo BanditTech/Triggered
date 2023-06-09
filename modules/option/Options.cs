@@ -109,7 +109,7 @@ namespace Triggered.modules.options
             if (!internals.ContainsKey(keys))
             {
                 var jObject = new JObject();
-                    jObject["label"] = label;
+                jObject["label"] = label;
                 internals[keys] = jObject;
             }
             SetKey(keys,value);
@@ -516,20 +516,44 @@ namespace Triggered.modules.options
                 }
                 else if (obj is float floatValue)
                 {
+                    bool isSlider = localInternals["slider"] != null && localInternals["slider"].Value<bool>();
                     var availableSpace = ImGui.GetContentRegionAvail().X;
                     ImGui.SetNextItemWidth(availableSpace);
                     ImGui.PushID($"{key} InputFloat");
-                    if (ImGui.InputFloat($"##{key} InputFloat", ref floatValue))
-                        SetKey(key, floatValue);
+                    if (isSlider)
+                    {
+                        float minFloat = localInternals["minFloat"] != null ? localInternals["minFloat"].Value<float>() : 0f;
+                        float maxFloat = localInternals["maxFloat"] != null ? localInternals["maxFloat"].Value<float>() : 1f;
+                        if (ImGui.SliderFloat($"##{key} InputFloat", ref floatValue, minFloat, maxFloat))
+                            SetKey(key, floatValue);
+                    }
+                    else if (ImGui.InputFloat($"##{key} InputFloat", ref floatValue))
+                            SetKey(key, floatValue);
                     ImGui.PopID();
                 }
                 else if (obj is int intValue)
                 {
+                    bool isSlider = localInternals["slider"] != null && localInternals["slider"].Value<bool>();
+                    bool isCombo = localInternals["combo"] != null && localInternals["combo"].Value<bool>();
                     var availableSpace = ImGui.GetContentRegionAvail().X;
                     ImGui.SetNextItemWidth(availableSpace);
                     ImGui.PushID($"{key} InputInt");
-                    if (ImGui.InputInt($"##{key} InputInt", ref intValue))
-                        SetKey(key, intValue);
+                    if (isSlider)
+                    {
+                        int minInt = localInternals["minInt"] != null ? localInternals["minInt"].Value<int>() : 0;
+                        int maxInt = localInternals["maxInt"] != null ? localInternals["maxInt"].Value<int>() : 100;
+                        if (ImGui.SliderInt($"##{key} SliderInt", ref intValue, minInt, maxInt))
+                            SetKey(key, intValue);
+                    }
+                    else if (isCombo)
+                    {
+                        string[] items = localInternals["items"] != null ? localInternals["items"].ToObject<string[]>().ToArray() : default;
+                        int count = localInternals["count"] != null ? localInternals["count"].Value<int>() : default;
+                        if (ImGui.Combo($"##{key} ComboIndex", ref intValue, items, count))
+                            SetKey(key, intValue);
+                    }
+                    else if (ImGui.InputInt($"##{key} InputInt", ref intValue))
+                            SetKey(key, intValue);
                     ImGui.PopID();
                 }
                 else if (obj is double doubleValue)

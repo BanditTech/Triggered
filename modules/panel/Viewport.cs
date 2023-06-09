@@ -287,6 +287,7 @@ namespace Triggered.modules.panel
             App.logimgui.Draw("Log Window");
             DemoCV.Render();
             App.Options.Locations.Render();
+            App.Options.Log.Render();
         }
     }
 }

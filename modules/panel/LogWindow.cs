@@ -15,12 +15,8 @@ namespace Triggered.modules.panel
     {
         private readonly List<(string text, Vector4 color)> items = new List<(string text, Vector4 color)>();
         private readonly object locker = new object();
-        private static readonly string[] logLevelNames = { "Trace", "Debug", "Info", "Warn", "Error", "Fatal" };
         private static Options_Panel Panel => App.Options.Panel;
         private static Options_Log Opts => App.Options.Log;
-        private static bool _autoscroll = Opts.GetKey<bool>("ScrollToBottom");
-        private static int _maxlines = Opts.GetKey<int>("WindowMaxLines");
-        private static int _minLevel = Opts.GetKey<int>("MinimumLogLevel");
         private readonly Dictionary<string, string> colorMap = new Dictionary<string, string>
         {
             // LogLevel Color Assignments
@@ -59,9 +55,10 @@ namespace Triggered.modules.panel
                 items.Add((log, color));
             }
 
-            if (items.Count > _maxlines)
+            var maxLines = Opts.GetKey<int>("WindowMaxLines");
+            if (items.Count > maxLines)
             {
-                items.RemoveRange(0, items.Count - _maxlines);
+                items.RemoveRange(0, items.Count - maxLines);
             }
         }
 
@@ -94,27 +91,6 @@ namespace Triggered.modules.panel
             // Clear Text Button
             if (ImGui.Button("Clear"))
                 Clear();
-            ImGui.SameLine();
-            // Autoscroll option
-            ImGui.Text("Scrolling:");
-            ImGui.SameLine();
-            if (ImGui.Checkbox("##Auto-scroll", ref _autoscroll))
-                Opts.SetKey("ScrollToBottom", _autoscroll);
-            ImGui.SameLine();
-
-            // Minimum log level
-            ImGui.Text("Min Level:");
-            ImGui.SameLine();
-            ImGui.SetNextItemWidth(100);
-            if (ImGui.Combo("##Min Level", ref _minLevel, logLevelNames, logLevelNames.Length))
-            {
-                Opts.SetKey("MinimumLogLevel", _minLevel);
-                App.Log($"Changing minimum displayed log level to {logLevelNames[_minLevel]}", _minLevel);
-            }
-            ImGui.SameLine();
-            ImGui.SetNextItemWidth(100);
-            if (ImGui.SliderFloat("##Transparency", ref transparency, 0f, 1f))
-                Opts.SetKey("Transparency", transparency);
             ImGui.Separator();
             // We start a scroll area to contain the text data
             ImGui.BeginChild("scrolling", new Vector2(0, 0), false, ImGuiWindowFlags.HorizontalScrollbar);
@@ -128,7 +104,7 @@ namespace Triggered.modules.panel
             foreach (var (text, color) in displayItems)
                 ImGui.TextColored(color, text);
             // Determine if we should scroll down the window.
-            if (_autoscroll && !ImGui.IsWindowHovered())
+            if (Opts.GetKey<bool>("ScrollToBottom") && !ImGui.IsWindowHovered())
                 ImGui.SetScrollHereY(1.0f);
             // We end the scroll area
             ImGui.EndChild();
