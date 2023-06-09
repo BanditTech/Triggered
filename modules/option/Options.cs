@@ -40,6 +40,8 @@ namespace Triggered.modules.options
         /// </summary>
         public string Name = "";
 
+        internal bool pauseCallbacks = false;
+
         /// <summary>
         /// We track any changes that occur to the options.
         /// Any changes are saved each second.
@@ -100,7 +102,7 @@ namespace Triggered.modules.options
                 target[keyArray.Last()] = JToken.FromObject(value);
 
             var internalOptions = internals.ContainsKey(keys) ? internals[keys] : null;
-            if (internalOptions == null)
+            if (internalOptions == null || pauseCallbacks)
                 return;
             if (internalOptions["callback"]?.ToObject<bool>() ?? false)
             {
