@@ -111,8 +111,47 @@ namespace Triggered.modules.options
                 var jObject = new JObject();
                 if (!string.IsNullOrEmpty(label))
                     jObject["label"] = label;
-                else
-                    jObject["label"] = keys;
+                internals[keys] = jObject;
+            }
+            SetKey(keys,value);
+        }
+
+        public void SetKey(string keys, object value, string label, float min, float max)
+        {
+            if (!internals.ContainsKey(keys))
+            {
+                var jObject = new JObject();
+                jObject["label"] = label;
+                jObject["slider"] = true;
+                jObject["minFloat"] = min;
+                jObject["maxFloat"] = max;
+                internals[keys] = jObject;
+            }
+            SetKey(keys,value);
+        }
+        public void SetKey(string keys, object value, string label, int min, int max)
+        {
+            if (!internals.ContainsKey(keys))
+            {
+                var jObject = new JObject();
+                jObject["label"] = label;
+                jObject["slider"] = true;
+                jObject["minInt"] = min;
+                jObject["maxInt"] = max;
+                internals[keys] = jObject;
+            }
+            SetKey(keys,value);
+        }
+
+        public void SetKey(string keys, object value, string label, string[] items)
+        {
+            if (!internals.ContainsKey(keys))
+            {
+                var jObject = new JObject();
+                jObject["label"] = label;
+                jObject["combo"] = true;
+                jObject["items"] = new JArray(items);
+                jObject["count"] = items.Length;
                 internals[keys] = jObject;
             }
             SetKey(keys,value);
