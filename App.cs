@@ -79,6 +79,7 @@ namespace Triggered
         {
             // Create the default folders if they do not exist
             Directory.CreateDirectory("save");
+            Directory.CreateDirectory("expand");
             Directory.CreateDirectory("profile");
             // Load our Options before anything else
             App.Options.Load();

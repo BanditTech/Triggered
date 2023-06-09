@@ -9,6 +9,7 @@ using System.Numerics;
 using Triggered.modules.wrapper;
 using static Triggered.modules.wrapper.PointScaler;
 using static Triggered.modules.wrapper.ImGuiNet;
+using Newtonsoft.Json;
 
 namespace Triggered.modules.options
 {
@@ -451,11 +452,13 @@ namespace Triggered.modules.options
         private string currentSection;
         private string _selected;
         private bool panelOpen = true;
-        private Dictionary<string, bool> expanded = new();
+        private Dictionary<string, bool> expanded;
 
         [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
         internal void Render(bool expand = false)
         {
+            if (expanded == null)
+                InitializeExpanded();
             bool panelOption = App.Options.Panel.GetKey<bool>(Name);
             if (!panelOption)
                 return;
@@ -496,7 +499,11 @@ namespace Triggered.modules.options
                 ImGui.SetNextItemOpen(expanded[key]);
                 bool treeOpen = ImGui.TreeNode(displayedKey);
                 if (treeOpen != expanded[key])
+                {
                     expanded[key] = treeOpen;
+                    string filePath = Path.Combine(AppContext.BaseDirectory, "expand", $"{Name}.json");
+                    File.WriteAllText(filePath, JSON.Min(expanded));
+                }
                 ImGui.PopStyleColor();
                 ImGui.PopID();
                 // We can continue if we will not render the contained information
@@ -734,6 +741,21 @@ namespace Triggered.modules.options
 
 
             ImGui.End();
+        }
+
+        public void InitializeExpanded()
+        {
+            string filePath = Path.Combine(AppContext.BaseDirectory,"expand", $"{Name}.json");
+
+            if (File.Exists(filePath))
+            {
+                string jsonContent = File.ReadAllText(filePath);
+                expanded = JsonConvert.DeserializeObject<Dictionary<string, bool>>(jsonContent);
+            }
+            else
+            {
+                expanded = new Dictionary<string, bool>();
+            }
         }
         #endregion
     }
