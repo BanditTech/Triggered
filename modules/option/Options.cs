@@ -31,7 +31,7 @@ namespace Triggered.modules.options
         /// <summary>
         /// Associate each setting key with its Label.
         /// </summary>
-        internal Dictionary<string, string> keyLabels = new();
+        private Dictionary<string, JObject> internals = new();
 
         /// <summary>
         /// We use the Name key to build the filename
@@ -45,6 +45,7 @@ namespace Triggered.modules.options
         internal bool _changed = false;
         #endregion
 
+        #region SetKey Overloads
         /// <summary>
         /// Set the object located at keys to the content of value.
         /// This uses dot notation to navigate the object structure.
@@ -53,13 +54,11 @@ namespace Triggered.modules.options
         /// <param name="value">dynamic</param>
         /// <param name="label"></param>
         /// <exception cref="ArgumentException"></exception>
-        public void SetKey(string keys, object value, string label = "")
+        public void SetKey(string keys, object value)
         {
             if (!keyTypes.ContainsKey(keys))
-            {
                 keyTypes[keys] = value.GetType();
-                keyLabels[keys] = label;
-            }
+
             int index;
             string[] keyArray = keys.Split('.');
             JToken target = keyList;
@@ -97,6 +96,39 @@ namespace Triggered.modules.options
             }
             else
                 target[keyArray.Last()] = JToken.FromObject(value);
+        }
+
+        /// <summary>
+        /// Override to allow setting a label
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <param name="value"></param>
+        /// <param name="label"></param>
+        public void SetKey(string keys, object value, string label)
+        {
+            if (!internals.ContainsKey(keys))
+            {
+                var jObject = new JObject();
+                if (!string.IsNullOrEmpty(label))
+                    jObject["Label"] = label;
+                else
+                    jObject["Label"] = keys;
+                internals[keys] = jObject;
+            }
+            SetKey(keys,value);
+        }
+
+        /// <summary>
+        /// Set the entire internals object at once
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <param name="value"></param>
+        /// <param name="internals"></param>
+        public void SetKey(string keys, object value, JObject internals)
+        {
+            if (!this.internals.ContainsKey(keys))
+                this.internals[keys] = internals;
+            SetKey(keys,value);
         }
 
         /// <summary>
@@ -156,6 +188,12 @@ namespace Triggered.modules.options
                     throw new ArgumentException("Unsupported JTokenType");
             }
         }
+
+        public JObject GetInternals(string keys)
+        {
+            return internals[keys];
+        }
+        #endregion
 
         #region Save/Load options
         /// <summary>
@@ -372,19 +410,32 @@ namespace Triggered.modules.options
         #region Render
         private static string currentSection;
         private static string _selected;
+        private static bool panelOpen = true;
 
         [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
         internal void Render()
         {
-            if (!App.Options.Panel.GetKey<bool>(Name))
+            bool panelOption = App.Options.Panel.GetKey<bool>(Name);
+            if (!panelOption)
                 return;
-            ImGui.Begin(Name);
+            if (!panelOpen)
+            {
+                panelOpen = true;
+                App.Options.Panel.SetKey(Name, false);
+                return;
+            }
+            ImGui.Begin(Name, ref panelOpen);
+
             foreach (var (key, obj) in IterateObjects())
             {
-                bool treeOpen = false;
+                // Split the key string into its sections
                 var keySplit = key.Split('.');
-                var label = keyLabels[key];
+                // Retreive the internal settings for this option
+                JObject localInternals = internals[key];
+                var label = localInternals["label"] != null ? localInternals["label"].Value<string>() : "";
+                // If we do not have a provided Label we produce one
                 var displayedKey = string.IsNullOrEmpty(label) ? string.Join(" ", keySplit) : label;
+                // Determine if we should produce a section header
                 if (keySplit.Length > 1 && keySplit[0] != currentSection)
                 {
                     NewSection(1);
@@ -397,7 +448,7 @@ namespace Triggered.modules.options
                 // Produce a treeNode of the option label
                 ImGui.PushID($"{key} Treenode");
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(.6f, 1f, .5f, 1f));
-                treeOpen = ImGui.TreeNode(displayedKey);
+                bool treeOpen = ImGui.TreeNode(displayedKey);
                 ImGui.PopStyleColor();
                 ImGui.PopID();
                 // We can continue if we will not render the contained information
@@ -409,6 +460,7 @@ namespace Triggered.modules.options
 
                 // We have an open treeNode, so we render all editable fields
                 // Depending on the object type, we can produce a GUI to edit it
+                // Use internal config to pick the type of GUI element to make
 
                 // Value type objects
                 if (obj is string stringValue)
@@ -550,8 +602,9 @@ namespace Triggered.modules.options
                 // Color objects
                 else if (obj is Vector3 vector3)
                 {
-                    bool isEdit = key.Contains("edit", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("edit", StringComparison.OrdinalIgnoreCase);
-                    bool isHSV = key.Contains("hsv", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("hsv", StringComparison.OrdinalIgnoreCase);
+                    bool isEdit = localInternals["edit"] != null && localInternals["edit"].Value<bool>();
+                    bool isHSV = localInternals["hsv"] != null && localInternals["hsv"].Value<bool>();
+
                     ImGuiColorEditFlags flags = ImGuiColorEditFlags.None;
                     if (isHSV)
                     {
@@ -576,8 +629,9 @@ namespace Triggered.modules.options
                 }
                 else if (obj is Vector4 vector4)
                 {
-                    bool isEdit = key.Contains("edit", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("edit", StringComparison.OrdinalIgnoreCase);
-                    bool isHSV = key.Contains("hsv", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("hsv", StringComparison.OrdinalIgnoreCase);
+                    bool isEdit = localInternals["edit"] != null && localInternals["edit"].Value<bool>();
+                    bool isHSV = localInternals["hsv"] != null && localInternals["hsv"].Value<bool>();
+
                     ImGuiColorEditFlags flags = ImGuiColorEditFlags.None;
                     if (isHSV)
                     {
@@ -605,6 +659,8 @@ namespace Triggered.modules.options
                 ImGui.TreePop();
                 Spacers(2);
             }
+
+
             ImGui.End();
         }
         #endregion
