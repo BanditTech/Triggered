@@ -373,6 +373,7 @@ namespace Triggered.modules.options
         private static string currentSection;
         private static string _selected;
 
+        [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
         internal void Render()
         {
             if (!App.Options.Panel.GetKey<bool>(Name))
@@ -380,6 +381,7 @@ namespace Triggered.modules.options
             ImGui.Begin(Name);
             foreach (var (key, obj) in IterateObjects())
             {
+                bool treeOpen = false;
                 var keySplit = key.Split('.');
                 var label = keyLabels[key];
                 var displayedKey = string.IsNullOrEmpty(label) ? string.Join(" ", keySplit) : label;
@@ -395,43 +397,56 @@ namespace Triggered.modules.options
 
                 ImGui.PushID($"{key} Treenode");
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(.6f, 1f, .5f, 1f));
-                var treeOpen = ImGui.TreeNode(displayedKey);
+                treeOpen = ImGui.TreeNode(displayedKey);
                 ImGui.PopStyleColor();
                 ImGui.PopID();
-
-                if (obj is ScaledRectangle scaledRectangle)
+                // We can continue if we will not render the contained information
+                if (!treeOpen)
                 {
-                    if (treeOpen)
+                    Spacers(2);
+                    continue;
+                }
+                // Value type objects
+                if (obj is string str)
+                {
+                    var availableSpace = ImGui.GetContentRegionAvail().X;
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(availableSpace);
+                    ImGui.PushID($"{key} InputText");
+                    if (ImGui.InputText($"##{key} InputText",ref str, 256))
+                        SetKey(key,str);
+                    ImGui.PopID();
+                }
+                // Locations objects
+                else if (obj is ScaledRectangle scaledRectangle)
+                {
+                    ImGui.PushID($"{key} Button");
+                    if (ImGui.Button("Select Rectangle"))
+                        _selected = key;
+                    ImGui.PopID();
+                    ImGui.SameLine();
+                    ImGui.Text("Anchor:");
+                    ImGui.SameLine();
+                    var anchorIndex = Array.IndexOf(App.anchorValues, scaledRectangle.Start.Anchor);
+                    ImGui.PushID($"{key} Combo");
+                    ImGui.SetNextItemWidth(130);
+                    if (ImGui.Combo("##Anchor{key}", ref anchorIndex, App.anchorNames, App.anchorNames.Length))
                     {
-                        ImGui.PushID($"{key} Button");
-                        if (ImGui.Button("Select Rectangle"))
-                            _selected = key;
-                        ImGui.PopID();
-                        ImGui.SameLine();
-                        ImGui.Text("Anchor:");
-                        ImGui.SameLine();
-                        var anchorIndex = Array.IndexOf(App.anchorValues, scaledRectangle.Start.Anchor);
-                        ImGui.PushID($"{key} Combo");
-                        ImGui.SetNextItemWidth(130);
-                        if (ImGui.Combo("##Anchor{key}", ref anchorIndex, App.anchorNames, App.anchorNames.Length))
-                        {
-                            string anchorPositionName = Enum.GetName(App.anchorPosType, anchorIndex);
-                            AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(App.anchorPosType, anchorPositionName);
-                            scaledRectangle.Start = new(scaledRectangle.Start.Point, scaledRectangle.Start.Height, newAnchorPosition);
-                            scaledRectangle.End = new(scaledRectangle.End.Point, scaledRectangle.End.Height, newAnchorPosition);
-                            SetKey(key, scaledRectangle);
-                        }
-                        ImGui.PopID();
-                        ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
-                            $"Area: ({scaledRectangle.Start.Point.X}, {scaledRectangle.Start.Point.Y})" +
-                            $" to ({scaledRectangle.End.Point.X}, {scaledRectangle.End.Point.Y})");
-                        ImGui.TextColored(new Vector4(.5f, .5f, 1f, 1f),
-                            $"Size: H{scaledRectangle.Height} W{scaledRectangle.Width}");
-                        SameLineSpacers(3);
-                        ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
-                            $"ScaleH: {scaledRectangle.Start.Height}");
-                        ImGui.TreePop();
+                        string anchorPositionName = Enum.GetName(App.anchorPosType, anchorIndex);
+                        AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(App.anchorPosType, anchorPositionName);
+                        scaledRectangle.Start = new(scaledRectangle.Start.Point, scaledRectangle.Start.Height, newAnchorPosition);
+                        scaledRectangle.End = new(scaledRectangle.End.Point, scaledRectangle.End.Height, newAnchorPosition);
+                        SetKey(key, scaledRectangle);
                     }
+                    ImGui.PopID();
+                    ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
+                        $"Area: ({scaledRectangle.Start.Point.X}, {scaledRectangle.Start.Point.Y})" +
+                        $" to ({scaledRectangle.End.Point.X}, {scaledRectangle.End.Point.Y})");
+                    ImGui.TextColored(new Vector4(.5f, .5f, 1f, 1f),
+                        $"Size: H{scaledRectangle.Height} W{scaledRectangle.Width}");
+                    SameLineSpacers(3);
+                    ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
+                        $"ScaleH: {scaledRectangle.Start.Height}");
 
                     if (_selected == key && Selector.ScaledRectangle(ref scaledRectangle, scaledRectangle.Start.Anchor))
                     {
@@ -439,37 +454,32 @@ namespace Triggered.modules.options
                         App.Log($"New \"{keySplit.Last()}\" scaled rectangle taken\n{JSON.Min(scaledRectangle)}");
                         _selected = null;
                     }
-                    Spacers(2);
                 }
                 else if (obj is Coordinate coordinate)
                 {
-                    if (treeOpen)
+                    ImGui.PushID($"{key} Button");
+                    if (ImGui.Button("Select Point"))
+                        _selected = key;
+                    ImGui.PopID();
+                    ImGui.SameLine();
+                    ImGui.Text("Anchor:");
+                    ImGui.SameLine();
+                    ImGui.PushID($"{key} Combo");
+                    ImGui.SetNextItemWidth(130);
+                    var anchorIndex = Array.IndexOf(App.anchorValues, coordinate.Anchor);
+                    if (ImGui.Combo("##Anchor{key}", ref anchorIndex, App.anchorNames, App.anchorNames.Length))
                     {
-                        ImGui.PushID($"{key} Button");
-                        if (ImGui.Button("Select Point"))
-                            _selected = key;
-                        ImGui.PopID();
-                        ImGui.SameLine();
-                        ImGui.Text("Anchor:");
-                        ImGui.SameLine();
-                        ImGui.PushID($"{key} Combo");
-                        ImGui.SetNextItemWidth(130);
-                        var anchorIndex = Array.IndexOf(App.anchorValues, coordinate.Anchor);
-                        if (ImGui.Combo("##Anchor{key}", ref anchorIndex, App.anchorNames, App.anchorNames.Length))
-                        {
-                            string anchorPositionName = Enum.GetName(App.anchorPosType, anchorIndex);
-                            AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(App.anchorPosType, anchorPositionName);
-                            coordinate = new(coordinate.Point, coordinate.Height, newAnchorPosition);
-                            SetKey(key, coordinate);
-                        }
-                        ImGui.PopID();
-                        ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
-                            $"Point: ({coordinate.Point.X}, {coordinate.Point.Y})");
-                        SameLineSpacers(3);
-                        ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
-                            $"ScaleH: {coordinate.Height}");
-                        ImGui.TreePop();
+                        string anchorPositionName = Enum.GetName(App.anchorPosType, anchorIndex);
+                        AnchorPosition newAnchorPosition = (AnchorPosition)Enum.Parse(App.anchorPosType, anchorPositionName);
+                        coordinate = new(coordinate.Point, coordinate.Height, newAnchorPosition);
+                        SetKey(key, coordinate);
                     }
+                    ImGui.PopID();
+                    ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
+                        $"Point: ({coordinate.Point.X}, {coordinate.Point.Y})");
+                    SameLineSpacers(3);
+                    ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
+                        $"ScaleH: {coordinate.Height}");
 
                     if (_selected == key && Selector.Coordinate(ref coordinate, coordinate.Anchor))
                     {
@@ -477,24 +487,19 @@ namespace Triggered.modules.options
                         App.Log($"New \"{keySplit.Last()}\" coordinate taken\n{JSON.Min(coordinate)}");
                         _selected = null;
                     }
-                    Spacers(2);
                 }
                 else if (obj is Measurement measurement)
                 {
-                    if (treeOpen)
-                    {
-                        ImGui.PushID($"{key} Button");
-                        if (ImGui.Button("Select Line"))
-                            _selected = key;
-                        ImGui.PopID();
+                    ImGui.PushID($"{key} Button");
+                    if (ImGui.Button("Select Line"))
+                        _selected = key;
+                    ImGui.PopID();
 
-                        ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
-                            $"Value: ({measurement.Value})");
-                        SameLineSpacers(3);
-                        ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
-                            $"ScaleH: {measurement.Height}");
-                        ImGui.TreePop();
-                    }
+                    ImGui.TextColored(new Vector4(.6f, 1f, .8f, 1f),
+                        $"Value: ({measurement.Value})");
+                    SameLineSpacers(3);
+                    ImGui.TextColored(new Vector4(1f, .5f, 1f, 1f),
+                        $"ScaleH: {measurement.Height}");
 
                     if (_selected == key && Selector.Measurement(ref measurement))
                     {
@@ -502,8 +507,11 @@ namespace Triggered.modules.options
                         App.Log($"New \"{keySplit.Last()}\" measurement taken\n{JSON.Min(measurement)}");
                         _selected = null;
                     }
-                    Spacers(2);
                 }
+
+                // Close our treeNode of this option
+                ImGui.TreePop();
+                Spacers(2);
             }
             ImGui.End();
         }
