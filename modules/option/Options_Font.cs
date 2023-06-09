@@ -17,10 +17,20 @@
 
         internal override void Default()
         {
-            SetKey("Selection", 13);
+            SetKey("Selection",
+                13,
+                "Font",
+                App.fonts);
             SetKey("Name", "Ubuntu");
-            SetKey("Size", 18);
-            SetKey("Range", 0);
+            SetKey("Size",
+                18,
+                "Size",
+                6,                
+                30);
+            SetKey("Range",
+                0,
+                "Glyph Range",
+                App.glyphs);
 
             TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again
