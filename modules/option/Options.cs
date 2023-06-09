@@ -411,14 +411,13 @@ namespace Triggered.modules.options
                 // Depending on the object type, we can produce a GUI to edit it
 
                 // Value type objects
-                if (obj is string str)
+                if (obj is string stringValue)
                 {
                     var availableSpace = ImGui.GetContentRegionAvail().X;
-                    ImGui.SameLine();
                     ImGui.SetNextItemWidth(availableSpace);
                     ImGui.PushID($"{key} InputText");
-                    if (ImGui.InputText($"##{key} InputText",ref str, 256))
-                        SetKey(key,str);
+                    if (ImGui.InputText($"##{key} InputText",ref stringValue, 256))
+                        SetKey(key,stringValue);
                     ImGui.PopID();
                 }
                 else if (obj is float floatValue)
