@@ -36,13 +36,15 @@ namespace Triggered.modules.options
                 18,
                 "Size",
                 6,                
-                30
+                30,
+                Callbacks.SetFont
             );
             SetKey(
                 "Range",
                 0,
                 "Glyph Range",
-                App.glyphs
+                App.glyphs,
+                Callbacks.SetFont
             );
 
             TrimNullValues(keyList);

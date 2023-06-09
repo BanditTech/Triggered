@@ -9,6 +9,7 @@ using ImGuiNET;
 using Triggered.modules.demo;
 using Triggered.modules.options;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Triggered.modules.panel
 {
@@ -159,6 +160,7 @@ namespace Triggered.modules.panel
         /// <summary>
         /// Render a viewport for which to render further children menu.
         /// </summary>
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Dynamic code warning")]
         protected override void Render()
         {
             CheckHotkeys();
@@ -280,6 +282,7 @@ namespace Triggered.modules.panel
         /// <summary>
         /// Renders the child elements, including the main menu, stash sorter, log window, and demo CV.
         /// </summary>
+        [RequiresDynamicCode("Calls Triggered.modules.options.Options.Render(Boolean)")]
         private static void RenderChildren()
         {
             MainMenu.Render();

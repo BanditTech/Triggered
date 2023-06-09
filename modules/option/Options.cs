@@ -123,7 +123,12 @@ namespace Triggered.modules.options
 
                         if (methodInfo != null)
                         {
-                            methodInfo.Invoke(null, new object[] { value });
+                            if (parameterTypeNames.Count > 1)
+                                throw new InvalidOperationException();
+                            else if (parameterTypeNames.Count == 1)
+                                methodInfo.Invoke(null, new object[] { value });
+                            else
+                                methodInfo.Invoke(null, null);
                         }
                     }
                 }

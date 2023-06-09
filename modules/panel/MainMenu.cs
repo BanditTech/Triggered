@@ -14,9 +14,7 @@ namespace Triggered.modules.panel
 {
     internal static  class MainMenu
     {
-        private static Options_Viewport Viewport => App.Options.Viewport;
         private static Options_Panel Panel => App.Options.Panel;
-        private static Options_Font Font => App.Options.Font;
         private static bool saveProfile = false;
         private static bool loadProfile = false;
         private static bool makeSelection = false;
@@ -38,38 +36,6 @@ namespace Triggered.modules.panel
                     Program.viewport.Close();
                 return;
             }
-
-            #region Font Configuration
-            var fontIndex = Font.GetKey<int>("Selection");
-            var fontSize = Font.GetKey<int>("Size");
-            var fontRange = Font.GetKey<int>("Range");
-            bool _adjusted = false;
-            if (ImGui.Combo("Font", ref fontIndex, App.fonts, App.fonts.Length))
-            {
-                Font.SetKey("Selection", fontIndex);
-                string fontName = App.fonts[fontIndex];
-                Font.SetKey("Name", fontName);
-                _adjusted = true;
-            }
-            ImGui.SameLine();
-            if (ImGui.InputInt("Size", ref fontSize))
-            {
-                Font.SetKey("Size", fontSize);
-                _adjusted = true;
-            }
-            if (ImGui.Combo("Glyph Range", ref fontRange, App.glyphs, App.glyphs.Length))
-            {
-                Font.SetKey("Range", fontRange);
-                _adjusted = true;
-            }
-            if (_adjusted)
-            {
-                string fontName = App.fonts[fontIndex];
-                string fontPath = Path.Combine(AppContext.BaseDirectory, "fonts", $"{fontName}.ttf");
-                Program.viewport.ReplaceFont(fontPath, fontSize, (FontGlyphRangeType)fontRange);
-            }
-            ImGui.Separator();
-            #endregion
 
             var displayLog = Panel.GetKey<bool>("LogWindow");
             if (ImGui.Checkbox("Show/Hide the Log", ref displayLog))
