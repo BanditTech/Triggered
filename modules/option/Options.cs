@@ -330,7 +330,7 @@ namespace Triggered.modules.options
         /// <param name="import">JToken</param>
         public void Merge(JToken import)
         {
-            Default();
+            RunDefault();
             var internalTarget = keyList;
             var importTarget = import;
             var mergeSettings = new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace };
@@ -342,6 +342,13 @@ namespace Triggered.modules.options
         /// Set the default values for the options object
         /// </summary>
         internal abstract void Default();
+
+        internal void RunDefault()
+        {
+            pauseCallbacks = true;
+            Default();
+            pauseCallbacks = false;
+        }
 
         /// <summary>
         /// Prepare a stripped down file which only contains changes from default

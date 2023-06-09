@@ -12,7 +12,7 @@
         {
             // Assign the name we will use to save the file
             Name = "Viewport";
-            Default();
+            RunDefault();
         }
 
         internal override void Default()

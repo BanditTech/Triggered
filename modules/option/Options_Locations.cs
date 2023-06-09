@@ -15,7 +15,7 @@ namespace Triggered.modules.options
         {
             // Assign the name we will use to save the file
             Name = "Locations";
-            Default();
+            RunDefault();
         }
         internal override void Default()
         {

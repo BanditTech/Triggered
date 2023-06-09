@@ -14,12 +14,11 @@ namespace Triggered.modules.options
         {
             // Assign the name we will use to save the file
             Name = "Font";
-            Default();
+            RunDefault();
         }
 
         internal override void Default()
         {
-            pauseCallbacks = true;
             SetKey(
                 "Selection",
                 13,
@@ -45,7 +44,6 @@ namespace Triggered.modules.options
                 "Glyph Range",
                 App.glyphs
             );
-            pauseCallbacks = false;
 
             TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again
