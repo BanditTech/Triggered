@@ -17,6 +17,7 @@ namespace Triggered.modules.panel
         private readonly object locker = new object();
         private static Options_Panel Panel => App.Options.Panel;
         private static Options_Log Opts => App.Options.Log;
+        private static bool panelOpen = true;
         private readonly Dictionary<string, string> colorMap = new Dictionary<string, string>
         {
             // LogLevel Color Assignments
@@ -68,30 +69,35 @@ namespace Triggered.modules.panel
         /// <param name="title"></param>
         public void Draw(string title)
         {
-            if (!Panel.GetKey<bool>("Log"))
+            if (!Panel.GetKey<bool>("LogWindow"))
                 return;
+            if (!panelOpen)
+            {
+                panelOpen = true;
+                Panel.SetKey("LogWindow",false);
+                return;
+            }
 
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(400, 200), ImGuiCond.FirstUseEver);
             // Adjust window background transparency
             float transparency = Opts.GetKey<float>("Transparency");
-            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(ImGui.GetStyle().Colors[(int)ImGuiCol.Border].X,
-                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.Border].Y,
-                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.Border].Z,
-                                                                transparency));
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].X,
-                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].Y,
-                                                                ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].Z,
-                                                                transparency));
-            if (!ImGui.Begin(title))
+            ImGui.PushStyleColor(ImGuiCol.Border,
+                new Vector4(ImGui.GetStyle().Colors[(int)ImGuiCol.Border].X,
+                            ImGui.GetStyle().Colors[(int)ImGuiCol.Border].Y,
+                            ImGui.GetStyle().Colors[(int)ImGuiCol.Border].Z,
+                            transparency));
+            ImGui.PushStyleColor(ImGuiCol.WindowBg,
+                new Vector4(ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].X,
+                            ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].Y,
+                            ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg].Z,
+                            transparency));
+            var open = ImGui.Begin(title, ref panelOpen);
+            ImGui.PopStyleColor(2);
+            if (!open)
             {
                 ImGui.End();
                 return;
             }
-            ImGui.PopStyleColor(2);
-            // Clear Text Button
-            if (ImGui.Button("Clear"))
-                Clear();
-            ImGui.Separator();
             // We start a scroll area to contain the text data
             ImGui.BeginChild("scrolling", new Vector2(0, 0), false, ImGuiWindowFlags.HorizontalScrollbar);
             // In order to avoid async data issues, we make a locked duplicate

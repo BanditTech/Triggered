@@ -71,9 +71,9 @@ namespace Triggered.modules.panel
             ImGui.Separator();
             #endregion
 
-            var displayLog = Panel.GetKey<bool>("Log");
+            var displayLog = Panel.GetKey<bool>("LogWindow");
             if (ImGui.Checkbox("Show/Hide the Log", ref displayLog))
-                Panel.SetKey("Log", displayLog);
+                Panel.SetKey("LogWindow", displayLog);
             var displayStashSorter = Panel.GetKey<bool>("StashSorter");
             if (ImGui.Checkbox("Show/Hide the Stash Sorter", ref displayStashSorter))
                 Panel.SetKey("StashSorter", displayStashSorter);

@@ -21,7 +21,8 @@ namespace Triggered.modules.options
             // Core Panels
             SetKey("StashSorter", true);
             SetKey("MainMenu", true);
-            SetKey("Log", true);
+            SetKey("LogWindow", true);
+            SetKey("Log", false);
             SetKey("Locations", false);
 
             // CV Demo panels
