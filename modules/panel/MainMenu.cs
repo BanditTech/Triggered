@@ -227,32 +227,21 @@ namespace Triggered.modules.panel
             }
 
             #region Menu Bar
-            // This is to show the menu bar that will change the config settings at runtime.
-            // If you copied this demo function into your own code and removed ImGuiWindowFlags_MenuBar at the top of the function,
-            // you should remove the below if-statement as well.
             if (ImGui.BeginMenuBar())
             {
+                // Display a menu item to close this example.
+                if (ImGui.MenuItem("Close", null, false, true))
+                    App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
                 if (ImGui.BeginMenu("Options"))
                 {
-                    // Disabling fullscreen would allow the window to be moved to the front of other windows,
-                    // which we can't undo at the moment without finer window depth/z control.
-                    var fullscreen = Viewport.GetKey<bool>("Fullscreen");
-                    if (ImGui.MenuItem("Fullscreen", null, ref fullscreen))
-                        Viewport.SetKey("Fullscreen", fullscreen);
-                    var padding = Viewport.GetKey<bool>("Padding");
-                    if (ImGui.MenuItem("Padding", null, ref padding))
-                        Viewport.SetKey("Padding", padding);
-                    var vsync = Viewport.GetKey<bool>("VSync");
-                    if (ImGui.MenuItem("VSync", null, ref vsync))
-                    {
-                        Program.viewport.VSync = vsync;
-                        Viewport.SetKey("VSync", vsync);
-                    }
-                    ImGui.Separator();
 
-                    // Display a menu item to close this example.
-                    if (ImGui.MenuItem("Close", null, false, true))
-                        App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
+                    var log = Panel.GetKey<bool>("Log");
+                    if (ImGui.MenuItem("Log", null, ref log))
+                        Panel.SetKey("Log", log);
+                    var locations = Panel.GetKey<bool>("Locations");
+                    if (ImGui.MenuItem("Locations", null, ref locations))
+                        Panel.SetKey("Locations", locations);
+
                     ImGui.EndMenu();
                 }
                 if (ImGui.BeginMenu("Profile"))

@@ -451,9 +451,10 @@ namespace Triggered.modules.options
         private string currentSection;
         private string _selected;
         private bool panelOpen = true;
+        private Dictionary<string, bool> expanded = new();
 
         [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
-        internal void Render()
+        internal void Render(bool expand = false)
         {
             bool panelOption = App.Options.Panel.GetKey<bool>(Name);
             if (!panelOption)
@@ -490,7 +491,12 @@ namespace Triggered.modules.options
                 // Produce a treeNode of the option label
                 ImGui.PushID($"{key} Treenode");
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(.6f, 1f, .5f, 1f));
+                if (!expanded.ContainsKey(key))
+                    expanded[key] = expand;
+                ImGui.SetNextItemOpen(expanded[key]);
                 bool treeOpen = ImGui.TreeNode(displayedKey);
+                if (treeOpen != expanded[key])
+                    expanded[key] = treeOpen;
                 ImGui.PopStyleColor();
                 ImGui.PopID();
                 // We can continue if we will not render the contained information

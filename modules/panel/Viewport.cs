@@ -129,7 +129,7 @@ namespace Triggered.modules.panel
         protected override Task PostInitialized()
         {
             // VSync
-            this.VSync = Opts.GetKey<bool>("VSync");
+            this.VSync = true;
             // Font
             int fontSize = Font.GetKey<int>("Size");
             int fontRange = Font.GetKey<int>("Range");
@@ -287,7 +287,7 @@ namespace Triggered.modules.panel
             App.logimgui.Draw("Log Window");
             DemoCV.Render();
             App.Options.Locations.Render();
-            App.Options.Log.Render();
+            App.Options.Log.Render(true);
         }
     }
 }
