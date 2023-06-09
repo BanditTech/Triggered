@@ -439,6 +439,15 @@ namespace Triggered.modules.options
                         SetKey(key, intValue);
                     ImGui.PopID();
                 }
+                else if (obj is double doubleValue)
+                {
+                    var availableSpace = ImGui.GetContentRegionAvail().X;
+                    ImGui.SetNextItemWidth(availableSpace);
+                    ImGui.PushID($"{key} InputDouble");
+                    if (ImGui.InputDouble($"##{key} InputDouble", ref doubleValue))
+                        SetKey(key, doubleValue);
+                    ImGui.PopID();
+                }
                 // Locations objects
                 else if (obj is ScaledRectangle scaledRectangle)
                 {
