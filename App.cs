@@ -96,15 +96,13 @@ namespace Triggered
             Options = new();
             // Load our Options before anything else
             Options.Load();
-            // Produce a profiles object
-            App.Profiles = new();
             // Now we can start our ImGui LogWindow
             logimgui = new LogWindow();
             // NLog requires some setup to begin logging to file
             LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
             logger = LogManager.GetCurrentClassLogger();
-
-
+            // Produce a profiles object
+            Profiles = new();
             Profiles.Initialize();
         }
 
@@ -123,7 +121,7 @@ namespace Triggered
         /// <param name="level">NLog LogLevel</param>
         public static void Log(string log, LogLevel level)
         {
-            var selectedLogLevelIndex = Options.Log.GetKey<int>("MinimumLogLevel");
+            var selectedLogLevelIndex = Options != null ? Options.Log.GetKey<int>("MinimumLogLevel") : 0;
             // Only send message to the log window above Debug level
             if (level.Ordinal >= selectedLogLevelIndex)
             {

@@ -241,6 +241,9 @@ namespace Triggered.modules.panel
                     var locations = Panel.GetKey<bool>("Locations");
                     if (ImGui.MenuItem("Locations", null, ref locations))
                         Panel.SetKey("Locations", locations);
+                    var font = Panel.GetKey<bool>("Font");
+                    if (ImGui.MenuItem("Font", null, ref font))
+                        Panel.SetKey("Font", font);
 
                     ImGui.EndMenu();
                 }

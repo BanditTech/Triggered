@@ -288,6 +288,7 @@ namespace Triggered.modules.panel
             DemoCV.Render();
             App.Options.Locations.Render();
             App.Options.Log.Render(true);
+            App.Options.Font.Render(true);
         }
     }
 }

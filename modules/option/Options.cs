@@ -104,6 +104,8 @@ namespace Triggered.modules.options
                 return;
             if (internalOptions["callback"]?.ToObject<bool>() ?? false)
             {
+                if (App.Options != null && App.logger != null)
+                    App.Log("Attempting to fire callback",3);
                 string methodName = internalOptions["method"]?.ToObject<string>();
                 string assemblyFullName = internalOptions["assembly"]?.ToObject<string>();
                 string targetTypeFullName = internalOptions["targetType"]?.ToObject<string>();
@@ -112,15 +114,23 @@ namespace Triggered.modules.options
                 if (!string.IsNullOrEmpty(methodName) && !string.IsNullOrEmpty(assemblyFullName) &&
                     !string.IsNullOrEmpty(targetTypeFullName) && parameterTypeNames != null)
                 {
+                    if (App.Options != null && App.logger != null)
+                        App.Log("Callback values were all not null",3);
                     Assembly assembly = Assembly.Load(assemblyFullName);
                     Type targetType = assembly.GetType(targetTypeFullName);
 
                     if (targetType != null)
                     {
+                        if (App.Options != null && App.logger != null)
+                            App.Log("targetType was not null",3);
                         MethodInfo methodInfo = targetType.GetMethod(methodName, parameterTypeNames.Select(p => Type.GetType(p.ToString())).ToArray());
 
                         if (methodInfo != null)
+                        {
+                            if (App.Options != null && App.logger != null)
+                                App.Log("methodInfo was not null",3);
                             methodInfo.Invoke(null, new object[] { value });
+                        }
                     }
                 }
             }
@@ -535,8 +545,11 @@ namespace Triggered.modules.options
                 // Split the key string into its sections
                 var keySplit = key.Split('.');
                 // Retreive the internal settings for this option
-                JObject localInternals = internals[key];
+                JObject localInternals = internals.ContainsKey(key) ? internals[key] : new();
                 var label = localInternals["label"] != null ? localInternals["label"].Value<string>() : "";
+                var hidden = localInternals["hidden"] != null && localInternals["hidden"].Value<bool>();
+                if (hidden)
+                    continue;
                 // If we do not have a provided Label we produce one
                 var displayedKey = string.IsNullOrEmpty(label) ? string.Join(" ", keySplit) : label;
                 // Determine if we should produce a section header
@@ -549,6 +562,7 @@ namespace Triggered.modules.options
                 }
                 else if (currentSection != null && keySplit.Length <= 1)
                     currentSection = null;
+
                 // Produce a treeNode of the option label
                 ImGui.PushID($"{key} Treenode");
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(.6f, 1f, .5f, 1f));
@@ -564,6 +578,7 @@ namespace Triggered.modules.options
                 }
                 ImGui.PopStyleColor();
                 ImGui.PopID();
+
                 // We can continue if we will not render the contained information
                 if (!treeOpen)
                 {
