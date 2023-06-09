@@ -1,14 +1,5 @@
-﻿using System.IO;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using ClickableTransparentOverlay;
-using Emgu.CV;
-using ImGuiNET;
-using Triggered.modules.demo;
-using Triggered.modules.wrapper;
+﻿using ImGuiNET;
 using Triggered.modules.options;
-using System.Drawing;
 
 namespace Triggered.modules.panel
 {
@@ -17,6 +8,7 @@ namespace Triggered.modules.panel
         private static Options_Panel Panel => App.Options.Panel;
         private static bool saveProfile = false;
         private static bool loadProfile = false;
+        private static System.Numerics.Vector4 color = new(.5f, .8f, .8f, 1f);
         internal static void Render()
         {
             if (!Panel.GetKey<bool>("MainMenu"))
@@ -35,7 +27,7 @@ namespace Triggered.modules.panel
                 return;
             }
 
-            ImGui.Text("F12 button: toggle menu.");
+            ImGui.TextColored(color,"F12 button: toggle GUI");
             ImGui.Separator();
 
             #region Menu Bar

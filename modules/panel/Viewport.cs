@@ -174,11 +174,20 @@ namespace Triggered.modules.panel
         /// </summary>
         private static void CheckHotkeys()
         {
-            if (Utils.IsKeyPressedAndNotTimeout(VK.F12)) //F12.
-                Panel.SetKey("MainMenu", !Panel.GetKey<bool>("MainMenu"));
-
-            if (Utils.IsKeyPressedAndNotTimeout(VK.F11)) //F11.
-                Panel.SetKey("StashSorter", !Panel.GetKey<bool>("StashSorter"));
+            if (Utils.IsKeyPressedAndNotTimeout(VK.F12))
+            {
+                var renderChildren = Panel.GetKey<bool>("RenderChildren");
+                var renderMainMenu = Panel.GetKey<bool>("MainMenu");
+                if (renderChildren && renderMainMenu)
+                {
+                    Panel.SetKey("RenderChildren", false);
+                    Panel.SetKey("MainMenu", false);
+                }
+                else if (!renderChildren)
+                    Panel.SetKey("RenderChildren", true);
+                else
+                    Panel.SetKey("MainMenu", true);
+            }
         }
 
         /// <summary>
@@ -285,6 +294,8 @@ namespace Triggered.modules.panel
         [RequiresDynamicCode("Calls Triggered.modules.options.Options.Render(Boolean)")]
         private static void RenderChildren()
         {
+            if (!Panel.GetKey<bool>("RenderChildren"))
+                return;
             MainMenu.Render();
             StashSorter.Render();
             App.logimgui.Draw("Log Window");

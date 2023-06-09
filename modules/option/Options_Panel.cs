@@ -19,6 +19,7 @@ namespace Triggered.modules.options
         internal override void Default()
         {
             // Core Panels
+            SetKey("RenderChildren", true);
             SetKey("StashSorter", true);
             SetKey("MainMenu", true);
             SetKey("LogWindow", true);
