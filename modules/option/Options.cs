@@ -104,8 +104,6 @@ namespace Triggered.modules.options
                 return;
             if (internalOptions["callback"]?.ToObject<bool>() ?? false)
             {
-                if (App.Options != null && App.logger != null)
-                    App.Log("Attempting to fire callback",3);
                 string methodName = internalOptions["method"]?.ToObject<string>();
                 string assemblyFullName = internalOptions["assembly"]?.ToObject<string>();
                 string targetTypeFullName = internalOptions["targetType"]?.ToObject<string>();
@@ -114,21 +112,15 @@ namespace Triggered.modules.options
                 if (!string.IsNullOrEmpty(methodName) && !string.IsNullOrEmpty(assemblyFullName) &&
                     !string.IsNullOrEmpty(targetTypeFullName) && parameterTypeNames != null)
                 {
-                    if (App.Options != null && App.logger != null)
-                        App.Log("Callback values were all not null",3);
                     Assembly assembly = Assembly.Load(assemblyFullName);
                     Type targetType = assembly.GetType(targetTypeFullName);
 
                     if (targetType != null)
                     {
-                        if (App.Options != null && App.logger != null)
-                            App.Log("targetType was not null",3);
                         MethodInfo methodInfo = targetType.GetMethod(methodName, parameterTypeNames.Select(p => Type.GetType(p.ToString())).ToArray());
 
                         if (methodInfo != null)
                         {
-                            if (App.Options != null && App.logger != null)
-                                App.Log("methodInfo was not null",3);
                             methodInfo.Invoke(null, new object[] { value });
                         }
                     }
