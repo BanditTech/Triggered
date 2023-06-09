@@ -548,6 +548,59 @@ namespace Triggered.modules.options
                         _selected = null;
                     }
                 }
+                // Color objects
+                else if (obj is Vector3 vector3)
+                {
+                    bool isEdit = key.Contains("edit", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("edit", StringComparison.OrdinalIgnoreCase);
+                    bool isHSV = key.Contains("hsv", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("hsv", StringComparison.OrdinalIgnoreCase);
+                    ImGuiColorEditFlags flags = ImGuiColorEditFlags.None;
+                    if (isHSV)
+                    {
+                        flags |= ImGuiColorEditFlags.DisplayHSV;
+                        flags |= ImGuiColorEditFlags.InputHSV;
+                    }
+
+                    if (isEdit)
+                    {
+                        ImGui.PushID($"{key} ColorEdit");
+                        if (ImGui.ColorEdit3($"##{key} ColorEdit", ref vector3,flags))
+                            SetKey(key,vector3);
+                        ImGui.PopID();
+                    }
+                    else
+                    {
+                        ImGui.PushID($"{key} ColorPicker");
+                        if (ImGui.ColorPicker3($"##{key} ColorPicker", ref vector3,flags))
+                            SetKey(key,vector3);
+                        ImGui.PopID();
+                    }
+                }
+                else if (obj is Vector4 vector4)
+                {
+                    bool isEdit = key.Contains("edit", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("edit", StringComparison.OrdinalIgnoreCase);
+                    bool isHSV = key.Contains("hsv", StringComparison.OrdinalIgnoreCase) || displayedKey.Contains("hsv", StringComparison.OrdinalIgnoreCase);
+                    ImGuiColorEditFlags flags = ImGuiColorEditFlags.None;
+                    if (isHSV)
+                    {
+                        flags |= ImGuiColorEditFlags.DisplayHSV;
+                        flags |= ImGuiColorEditFlags.InputHSV;
+                    }
+
+                    if (isEdit)
+                    {
+                        ImGui.PushID($"{key} ColorEdit");
+                        if (ImGui.ColorEdit4($"##{key} ColorEdit", ref vector4,flags))
+                            SetKey(key,vector4);
+                        ImGui.PopID();
+                    }
+                    else
+                    {
+                        ImGui.PushID($"{key} ColorPicker");
+                        if (ImGui.ColorPicker4($"##{key} ColorPicker", ref vector4,flags))
+                            SetKey(key,vector4);
+                        ImGui.PopID();
+                    }
+                }
 
                 // Close the option's treeNode.
                 ImGui.TreePop();
