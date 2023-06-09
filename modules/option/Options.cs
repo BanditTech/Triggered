@@ -109,7 +109,6 @@ namespace Triggered.modules.options
             if (!internals.ContainsKey(keys))
             {
                 var jObject = new JObject();
-                if (!string.IsNullOrEmpty(label))
                     jObject["label"] = label;
                 internals[keys] = jObject;
             }
@@ -169,7 +168,9 @@ namespace Triggered.modules.options
                 this.internals[keys] = internals;
             SetKey(keys,value);
         }
+        #endregion
 
+        #region GetKey and GetInternals
         /// <summary>
         /// Navigate the object structure using the dot notation keys string.<br/>
         /// You must state the type of the value which you are retrieving.
@@ -447,9 +448,9 @@ namespace Triggered.modules.options
         #endregion
 
         #region Render
-        private static string currentSection;
-        private static string _selected;
-        private static bool panelOpen = true;
+        private string currentSection;
+        private string _selected;
+        private bool panelOpen = true;
 
         [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
         internal void Render()
@@ -463,7 +464,9 @@ namespace Triggered.modules.options
                 App.Options.Panel.SetKey(Name, false);
                 return;
             }
+            ImGui.PushID($"{Name} option panel");
             ImGui.Begin(Name, ref panelOpen);
+            ImGui.PopID();
 
             foreach (var (key, obj) in IterateObjects())
             {
