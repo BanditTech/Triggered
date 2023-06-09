@@ -110,9 +110,9 @@ namespace Triggered.modules.options
             {
                 var jObject = new JObject();
                 if (!string.IsNullOrEmpty(label))
-                    jObject["Label"] = label;
+                    jObject["label"] = label;
                 else
-                    jObject["Label"] = keys;
+                    jObject["label"] = keys;
                 internals[keys] = jObject;
             }
             SetKey(keys,value);
