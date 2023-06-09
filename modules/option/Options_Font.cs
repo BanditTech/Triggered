@@ -1,4 +1,6 @@
-﻿namespace Triggered.modules.options
+﻿using Triggered.modules.wrapper;
+
+namespace Triggered.modules.options
 {
     /// <summary>
     /// Options class for the Viewport.
@@ -17,20 +19,31 @@
 
         internal override void Default()
         {
-            SetKey("Selection",
+            SetKey(
+                "Selection",
                 13,
                 "Font",
-                App.fonts);
-            SetKey("Name", "Ubuntu");
-            SetKey("Size",
+                App.fonts,
+                Callbacks.FontIndexEdit
+            );
+            SetKey(
+                "Name",
+                "Ubuntu",
+                true
+            );
+            SetKey(
+                "Size",
                 18,
                 "Size",
                 6,                
-                30);
-            SetKey("Range",
+                30
+            );
+            SetKey(
+                "Range",
                 0,
                 "Glyph Range",
-                App.glyphs);
+                App.glyphs
+            );
 
             TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again

@@ -10,6 +10,7 @@ using Triggered.modules.wrapper;
 using static Triggered.modules.wrapper.PointScaler;
 using static Triggered.modules.wrapper.ImGuiNet;
 using Newtonsoft.Json;
+using System.Reflection;
 
 namespace Triggered.modules.options
 {
@@ -97,6 +98,32 @@ namespace Triggered.modules.options
             }
             else
                 target[keyArray.Last()] = JToken.FromObject(value);
+
+            var internalOptions = internals[keys];
+            bool hasCallback = internalOptions?["callback"]?.ToObject<bool>() ?? false;
+
+            if (hasCallback)
+            {
+                string methodName = internalOptions["method"]?.ToObject<string>();
+                string assemblyFullName = internalOptions["assembly"]?.ToObject<string>();
+                string targetTypeFullName = internalOptions["targetType"]?.ToObject<string>();
+                JArray parameterTypeNames = internalOptions["parameterTypes"] as JArray;
+
+                if (!string.IsNullOrEmpty(methodName) && !string.IsNullOrEmpty(assemblyFullName) &&
+                    !string.IsNullOrEmpty(targetTypeFullName) && parameterTypeNames != null)
+                {
+                    Assembly assembly = Assembly.Load(assemblyFullName);
+                    Type targetType = assembly.GetType(targetTypeFullName);
+
+                    if (targetType != null)
+                    {
+                        MethodInfo methodInfo = targetType.GetMethod(methodName, parameterTypeNames.Select(p => Type.GetType(p.ToString())).ToArray());
+
+                        if (methodInfo != null)
+                            methodInfo.Invoke(null, new object[] { value });
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -105,18 +132,30 @@ namespace Triggered.modules.options
         /// <param name="keys"></param>
         /// <param name="value"></param>
         /// <param name="label"></param>
-        public void SetKey(string keys, object value, string label)
+        public void SetKey(string keys, object value, string label, Delegate callback = null)
         {
             if (!internals.ContainsKey(keys))
             {
                 var jObject = new JObject();
                 jObject["label"] = label;
+
+                SetCallback(ref jObject, callback);
+                internals[keys] = jObject;
+            }
+            SetKey(keys,value);
+        }
+        public void SetKey(string keys, object value, bool hidden)
+        {
+            if (!internals.ContainsKey(keys))
+            {
+                var jObject = new JObject();
+                jObject["hidden"] = hidden;
                 internals[keys] = jObject;
             }
             SetKey(keys,value);
         }
 
-        public void SetKey(string keys, object value, string label, float min, float max)
+        public void SetKey(string keys, object value, string label, float min, float max, Delegate callback = null)
         {
             if (!internals.ContainsKey(keys))
             {
@@ -125,11 +164,13 @@ namespace Triggered.modules.options
                 jObject["slider"] = true;
                 jObject["minFloat"] = min;
                 jObject["maxFloat"] = max;
+
+                SetCallback(ref jObject, callback);
                 internals[keys] = jObject;
             }
             SetKey(keys,value);
         }
-        public void SetKey(string keys, object value, string label, int min, int max)
+        public void SetKey(string keys, object value, string label, int min, int max, Delegate callback = null)
         {
             if (!internals.ContainsKey(keys))
             {
@@ -138,12 +179,14 @@ namespace Triggered.modules.options
                 jObject["slider"] = true;
                 jObject["minInt"] = min;
                 jObject["maxInt"] = max;
+
+                SetCallback(ref jObject, callback);
                 internals[keys] = jObject;
             }
             SetKey(keys,value);
         }
 
-        public void SetKey(string keys, object value, string label, string[] items)
+        public void SetKey(string keys, object value, string label, string[] items, Delegate callback = null)
         {
             if (!internals.ContainsKey(keys))
             {
@@ -152,6 +195,8 @@ namespace Triggered.modules.options
                 jObject["combo"] = true;
                 jObject["items"] = new JArray(items);
                 jObject["count"] = items.Length;
+
+                SetCallback(ref jObject,callback);
                 internals[keys] = jObject;
             }
             SetKey(keys,value);
@@ -168,6 +213,19 @@ namespace Triggered.modules.options
             if (!this.internals.ContainsKey(keys))
                 this.internals[keys] = internals;
             SetKey(keys,value);
+        }
+
+        public void SetCallback(ref JObject jObject, Delegate callback = null)
+        {
+            if (callback == null)
+                return;
+            MethodInfo methodInfo = callback.Method;
+            Type declaringType = methodInfo.DeclaringType;
+            jObject["callback"] = true;
+            jObject["method"] = methodInfo.Name;
+            jObject["assembly"] = declaringType.Assembly.FullName;
+            jObject["targetType"] = declaringType.FullName;
+            jObject["parameterTypes"] = new JArray(methodInfo.GetParameters().Select(p => p.ParameterType.FullName));
         }
         #endregion
 
