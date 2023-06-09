@@ -99,10 +99,10 @@ namespace Triggered.modules.options
             else
                 target[keyArray.Last()] = JToken.FromObject(value);
 
-            var internalOptions = internals[keys];
-            bool hasCallback = internalOptions?["callback"]?.ToObject<bool>() ?? false;
-
-            if (hasCallback)
+            var internalOptions = internals.ContainsKey(keys) ? internals[keys] : null;
+            if (internalOptions == null)
+                return;
+            if (internalOptions["callback"]?.ToObject<bool>() ?? false)
             {
                 string methodName = internalOptions["method"]?.ToObject<string>();
                 string assemblyFullName = internalOptions["assembly"]?.ToObject<string>();

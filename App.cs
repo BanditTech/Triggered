@@ -47,14 +47,14 @@ namespace Triggered
         /// <summary>
         /// Options are loaded as a group using a Manager.
         /// </summary>
-        public static modules.options.Manager Options = new();
+        public static modules.options.Manager Options;
 
         /// <summary>
         /// The current values for Player resources and location.
         /// </summary>
         public static Player Player = new();
 
-        public static Profiles Profiles = new();
+        public static Profiles Profiles;
 
         /// <summary>
         /// Font files available
@@ -81,17 +81,9 @@ namespace Triggered
             Directory.CreateDirectory("save");
             Directory.CreateDirectory("expand");
             Directory.CreateDirectory("profile");
-            // Load our Options before anything else
-            App.Options.Load();
-            // Now we can start our ImGui LogWindow
-            logimgui = new LogWindow();
-            // NLog requires some setup to begin logging to file
-            LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
-            logger = LogManager.GetCurrentClassLogger();
 
             // Gather a list of ttf files in our fonts directory
             string[] fontFiles = Directory.GetFiles("fonts","*.ttf");
-            // Create a list to store the font names
             List<string> fontNames = new List<string>();
             foreach (string fontFile in fontFiles)
             {
@@ -99,8 +91,19 @@ namespace Triggered
                 fontNames.Add(fontName);
             }
             fonts = fontNames.ToArray();
-
             glyphs = Enum.GetNames(typeof(FontGlyphRangeType));
+            // create our options manager
+            Options = new();
+            // Load our Options before anything else
+            Options.Load();
+            // Produce a profiles object
+            App.Profiles = new();
+            // Now we can start our ImGui LogWindow
+            logimgui = new LogWindow();
+            // NLog requires some setup to begin logging to file
+            LogManager.Configuration = new XmlLoggingConfiguration("nlog.config");
+            logger = LogManager.GetCurrentClassLogger();
+
 
             Profiles.Initialize();
         }
