@@ -394,7 +394,7 @@ namespace Triggered.modules.options
                 }
                 else if (currentSection != null && keySplit.Length <= 1)
                     currentSection = null;
-
+                // Produce a treeNode of the option label
                 ImGui.PushID($"{key} Treenode");
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(.6f, 1f, .5f, 1f));
                 treeOpen = ImGui.TreeNode(displayedKey);
@@ -406,6 +406,10 @@ namespace Triggered.modules.options
                     Spacers(2);
                     continue;
                 }
+
+                // We have an open treeNode, so we render all editable fields
+                // Depending on the object type, we can produce a GUI to edit it
+
                 // Value type objects
                 if (obj is string str)
                 {
@@ -509,7 +513,7 @@ namespace Triggered.modules.options
                     }
                 }
 
-                // Close our treeNode of this option
+                // Close the option's treeNode.
                 ImGui.TreePop();
                 Spacers(2);
             }
