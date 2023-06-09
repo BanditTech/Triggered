@@ -448,6 +448,15 @@ namespace Triggered.modules.options
                         SetKey(key, doubleValue);
                     ImGui.PopID();
                 }
+                else if (obj is bool boolValue)
+                {
+                    var availableSpace = ImGui.GetContentRegionAvail().X;
+                    ImGui.SetNextItemWidth(availableSpace);
+                    ImGui.PushID($"{key} Checkbox");
+                    if (ImGui.Checkbox($"##{key} Checkbox", ref boolValue))
+                        SetKey(key, boolValue);
+                    ImGui.PopID();
+                }
                 // Locations objects
                 else if (obj is ScaledRectangle scaledRectangle)
                 {
