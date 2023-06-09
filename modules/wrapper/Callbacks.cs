@@ -1,11 +1,15 @@
 ﻿namespace Triggered.modules.wrapper
 {
-    internal static class Callbacks
+    public static class Callbacks
     {
-        internal static void FontIndexEdit(int index)
+        public static void FontIndexEdit(int index)
         {
-            App.Log("Callback fired");
-            App.Options.Font.SetKey("Name", App.fonts[index]);
+            if (App.Options == null || App.logger == null || App.fonts == null)
+                return;
+
+            App.Log("Callback successfully fired");
+            if (App.Options.Font.GetKey<string>("Name") != App.fonts[index])
+                App.Options.Font.SetKey("Name", App.fonts[index]);
         }
     }
 }
