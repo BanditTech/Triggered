@@ -46,10 +46,6 @@ namespace Triggered.modules.options
                 App.glyphs,
                 Callbacks.SetFont
             );
-
-            TrimNullValues(keyList);
-            // Reset the changed flag to avoid saving again
-            _changed = false;
         }
     }
 }

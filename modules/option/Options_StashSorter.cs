@@ -18,10 +18,6 @@
         {
             // Determines which group is being edited inside the Stash Sorter list
             SetKey("SelectedGroup", 0);
-
-            TrimNullValues(keyList);
-            // Reset the changed flag to avoid saving again
-            _changed = false;
         }
     }
 }

@@ -20,10 +20,6 @@
             SetKey("Fullscreen", true);
             SetKey("Padding", false);
             SetKey("VSync", true);
-
-            TrimNullValues(keyList);
-            // Reset the changed flag to avoid saving again
-            _changed = false;
         }
     }
 }

@@ -36,10 +36,6 @@
                 "Background Transparency",
                 0.01f,
                 1f);
-
-            TrimNullValues(keyList);
-            // Reset the changed flag to avoid saving again
-            _changed = false;
         }
     }
 }

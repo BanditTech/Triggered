@@ -352,6 +352,8 @@ namespace Triggered.modules.options
         {
             pauseCallbacks = true;
             Default();
+            TrimNullValues(keyList);
+            _changed = false;
             pauseCallbacks = false;
         }
 

@@ -38,10 +38,6 @@ namespace Triggered.modules.options
             SetKey("CV.Rectangle", false);
             SetKey("CV.OCR", false);
             SetKey("CV.WindowHandle", false);
-
-            TrimNullValues(keyList);
-            // Reset the changed flag to avoid saving again
-            _changed = false;
         }
     }
 }

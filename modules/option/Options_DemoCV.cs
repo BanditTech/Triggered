@@ -59,10 +59,6 @@ namespace Triggered.modules.options
             SetKey("rectangleArea", 250);
             SetKey("cannyThreshold", 180.0f);
             SetKey("cannyThresholdLinking", 120.0f);
-
-            TrimNullValues(keyList);
-            // Reset the changed flag to avoid saving again
-            _changed = false;
         }
     }
 }

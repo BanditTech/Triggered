@@ -100,10 +100,6 @@ namespace Triggered.modules.options
             SetKey("Measure.SlotSize",
                 new Measurement(20, 1080),
                 "Slot Size");
-
-            TrimNullValues(keyList);
-            // Reset the changed flag to avoid saving again
-            _changed = false;
         }
     }
 }
