@@ -20,7 +20,15 @@ namespace Triggered.modules.struct_node
         /// <summary>
         /// Energy Shield value in a range of 0f to 1f
         /// </summary>
-        public float EnergyShield => App.Player.EnergyShield;
+        public float Shield => App.Player.Shield;
+        /// <summary>
+        /// Rage value in a range of 0f to 1f
+        /// </summary>
+        public float Rage => App.Player.Rage;
+        /// <summary>
+        /// Ward value in a range of 0f to 1f
+        /// </summary>
+        public float Ward => App.Player.Ward;
         internal override List<(int, string)> Tags { get; set; } = new();
 
         public NPlayer(int nodeId = 0) : base(nodeId)
@@ -29,7 +37,9 @@ namespace Triggered.modules.struct_node
             SetTags(GetNewNodeId(Id), "Output,T(string),Location");
             SetTags(GetNewNodeId(Id), "Output,T(float),Health");
             SetTags(GetNewNodeId(Id), "Output,T(float),Mana");
-            SetTags(GetNewNodeId(Id), "Output,T(float),Energy Shield");
+            SetTags(GetNewNodeId(Id), "Output,T(float),Shield");
+            SetTags(GetNewNodeId(Id), "Output,T(float),Ward");
+            SetTags(GetNewNodeId(Id), "Output,T(float),Rage");
         }
     }
 }
