@@ -8,6 +8,7 @@ using ClickableTransparentOverlay.Win32;
 using ImGuiNET;
 using Triggered.modules.demo;
 using Triggered.modules.options;
+using Triggered.modules.wrapper;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 
@@ -92,8 +93,8 @@ namespace Triggered.modules.panel
         protected override void Render()
         {
             CheckHotkeys();
+            Brain.Processing();
             RenderViewPort();
-            Brain.Process();
             RenderChildren();
         }
 

@@ -99,6 +99,10 @@ namespace Triggered.modules.wrapper
         [DllImport("user32.dll", SetLastError = true)]
         public static extern int EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
+        [DllImport("user32.dll")]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+
         /// <summary>
         /// Retrieves the text of the specified window's title bar (if it has one).
         /// </summary>

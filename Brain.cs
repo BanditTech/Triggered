@@ -1,4 +1,9 @@
-﻿namespace Triggered
+﻿using Emgu.CV;
+using System;
+using System.Diagnostics;
+using static Triggered.modules.wrapper.OpenCV;
+
+namespace Triggered.modules.wrapper
 {
     /// <summary>
     /// Logical processing organ.
@@ -9,13 +14,19 @@
         private static float Mana => App.Player.Mana;
         private static float EnergyShield => App.Player.EnergyShield;
         private static string Location => App.Player.Location;
-
+        public static Mat Vision { get; set; }
         /// <summary>
         /// Logical processing.
         /// </summary>
-        public static void Process()
+        public static void Processing()
         {
-            // Ponder our logic
+            var hwnd = Windows.GetProcessHandle();
+            if (hwnd != IntPtr.Zero)
+            {
+                if (Vision != null)
+                    Vision.Dispose();
+                Vision = GetWindowMat(hwnd);
+            }
         }
     }
 }
