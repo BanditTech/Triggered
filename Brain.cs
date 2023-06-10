@@ -79,7 +79,7 @@ namespace Triggered.modules.wrapper
         {
             if (!Observe())
                 return;
-
+            NeuralCascade();
         }
         private static bool Observe()
         {
