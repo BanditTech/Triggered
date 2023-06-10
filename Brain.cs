@@ -1,6 +1,8 @@
 ﻿using Emgu.CV;
+using Emgu.CV.OCR;
 using System;
 using System.Diagnostics;
+using System.IO;
 using static Triggered.modules.wrapper.OpenCV;
 
 namespace Triggered.modules.wrapper
@@ -16,6 +18,15 @@ namespace Triggered.modules.wrapper
         private static float Ward => App.Player.Ward;
         private static float Rage => App.Player.Rage;
         private static string Location => App.Player.Location;
+        private static readonly Tesseract OCR = new();
+
+        /// <summary>
+        /// Finish initiating our Tesseract engine
+        /// </summary>
+        static Brain()
+        {
+            OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
+        }
 
         /// <summary>
         /// In the realm of machine vision, algorithms unveil hidden truths,
