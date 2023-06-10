@@ -68,6 +68,7 @@ namespace Triggered.modules.options
                     AnchorPosition.Left
                 )
             ), "Ward Min/Max text area");
+
             // Panel Coordinate
             SetKey("Panel.Main", new Coordinate(
                 new Point(250, 250),
@@ -94,8 +95,11 @@ namespace Triggered.modules.options
                 1080,
                 AnchorPosition.Left
             ), "Stash Coord 2");
+
             // Measurements
-            SetKey("Measure.SlotSize", new Measurement(20, 1080), "Slot Size");
+            SetKey("Measure.SlotSize",
+                new Measurement(20, 1080),
+                "Slot Size");
 
             TrimNullValues(keyList);
             // Reset the changed flag to avoid saving again
