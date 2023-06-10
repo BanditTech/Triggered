@@ -92,8 +92,8 @@ namespace Triggered.modules.panel
         protected override void Render()
         {
             CheckHotkeys();
-            Brain.Process();
             RenderViewPort();
+            Brain.Process();
             RenderChildren();
         }
 
@@ -231,6 +231,7 @@ namespace Triggered.modules.panel
             App.Options.Locations.Render();
             App.Options.Log.Render(true);
             App.Options.Font.Render(true);
+            App.Options.Viewport.Render(true);
         }
     }
 }

@@ -47,6 +47,9 @@ namespace Triggered.modules.panel
                     var font = Panel.GetKey<bool>("Font");
                     if (ImGui.MenuItem("Font", null, ref font))
                         Panel.SetKey("Font", font);
+                    var viewport = Panel.GetKey<bool>("Viewport");
+                    if (ImGui.MenuItem("Viewport", null, ref viewport))
+                        Panel.SetKey("Viewport", viewport);
 
                     ImGui.EndMenu();
                 }

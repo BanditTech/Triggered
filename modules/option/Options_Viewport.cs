@@ -17,9 +17,12 @@
 
         internal override void Default()
         {
-            SetKey("Fullscreen", true);
-            SetKey("Padding", false);
-            SetKey("VSync", true);
+            SetKey("Fullscreen",
+                true,
+                "Viewport fills entire screen");
+            SetKey("Padding",
+                false,
+                "Padding on window edges");
         }
     }
 }
