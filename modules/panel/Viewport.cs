@@ -93,8 +93,8 @@ namespace Triggered.modules.panel
         protected override void Render()
         {
             CheckHotkeys();
-            Brain.Processing();
             RenderViewPort();
+            Brain.Processing();
             RenderChildren();
         }
 
