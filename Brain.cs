@@ -18,7 +18,9 @@ namespace Triggered.modules.wrapper
         private static float Ward => App.Player.Ward;
         private static float Rage => App.Player.Rage;
         private static string Location => App.Player.Location;
+
         private static readonly Tesseract OCR = new();
+        private static IntPtr targetProcess = IntPtr.Zero;
 
         /// <summary>
         /// Finish initiating our Tesseract engine
@@ -43,12 +45,13 @@ namespace Triggered.modules.wrapper
         /// </summary>
         public static void Processing()
         {
-            var hwnd = Windows.GetProcessHandle();
-            if (hwnd != IntPtr.Zero)
+            if (targetProcess == IntPtr.Zero)
+                targetProcess = Windows.GetProcessHandle();
+            if (targetProcess != IntPtr.Zero)
             {
                 if (Vision != null)
                     Vision.Dispose();
-                Vision = GetWindowMat(hwnd);
+                Vision = GetWindowMat(targetProcess);
             }
         }
     }
