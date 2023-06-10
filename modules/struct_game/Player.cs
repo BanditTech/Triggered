@@ -23,7 +23,17 @@
         /// <summary>
         /// The currently determined Energy Shield.
         /// </summary>
-        public float EnergyShield { get; set; } = 1f;
+        public float Shield { get; set; } = 1f;
+
+        /// <summary>
+        /// The currently determined Ward.
+        /// </summary>
+        public float Ward { get; set; } = 1f;
+
+        /// <summary>
+        /// The currently determined Rage.
+        /// </summary>
+        public float Rage { get; set; } = 1f;
 
         /// <summary>
         /// String array of all found buff samples.
