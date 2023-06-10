@@ -68,8 +68,7 @@ namespace Triggered
 
         internal static readonly Type anchorPosType = typeof(AnchorPosition);
         internal static readonly string[] anchorNames = Enum.GetNames(anchorPosType);
-        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Required for dynamic menu creation")]
-        internal static readonly Array anchorValues = Enum.GetValues(anchorPosType);
+        internal static readonly Array anchorValues = Enum.GetValuesAsUnderlyingType(anchorPosType);
 
 
         /// <summary>

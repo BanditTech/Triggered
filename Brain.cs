@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using static Triggered.modules.wrapper.OpenCV;
+using static Triggered.modules.wrapper.PointScaler;
 
 namespace Triggered.modules.wrapper
 {
@@ -60,6 +62,8 @@ namespace Triggered.modules.wrapper
         static Brain()
         {
             OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
+            foreach (Sense sense in Enum.GetValuesAsUnderlyingType(typeof(Sense)))
+                Senses.Add(new(sense, new(InterpretSense)));
         }
 
         /// <summary>
@@ -98,11 +102,11 @@ namespace Triggered.modules.wrapper
         {
             List<Task> tasks = new List<Task>();
 
-            foreach (var feeling in Senses)
+            foreach (var sense in Senses)
             {
                 Task task = Task.Run(() =>
                 {
-                    feeling.handler.Invoke(feeling.type);
+                    sense.Handler.Invoke(sense.Type);
                 });
 
                 tasks.Add(task);
@@ -110,19 +114,35 @@ namespace Triggered.modules.wrapper
 
             Task.WaitAll(tasks.ToArray());
         }
-        public enum FeelingType
+        public enum Sense
         {
-            Health,
+            Life,
             Mana,
             Shield,
             Ward,
-            Rage,
-            Location
+            Rage
         }
         public class Feeling
         {
-            public FeelingType type { get; set; }
-            public Action<object> handler { get; set; }
+            public Sense Type { get; set; }
+            public Action<object> Handler { get; set; }
+            public Feeling(Sense type, Action<object> handler)
+            {
+                Type = type;
+                Handler = handler;
+            }
+        }
+        private static void InterpretSense(object data)
+        {
+            if (data is Sense type)
+            {
+                // Get the name of the property based on the FeelingType
+                string propertyName = type.ToString();
+                PropertyInfo property = typeof(Brain).GetProperty(propertyName);
+                var newValue = property.GetValue(null);
+                ScaledRectangle area = App.Options.Locations.GetKey<ScaledRectangle>($"Resource.{propertyName}");
+                property.SetValue(null,newValue);
+            }
         }
     }
 }

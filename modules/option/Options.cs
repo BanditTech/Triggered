@@ -510,7 +510,6 @@ namespace Triggered.modules.options
         /// An enumerable collection of tuples.
         /// Each tuple contains the key and the corresponding retrieved value.
         /// </returns>
-        [RequiresDynamicCode("Determines the type of the generic method at runtime")]
         public IEnumerable<(string Keys, object Obj)> IterateObjects()
         {
             var getKeyMethod = GetType().GetMethod("GetKey");
@@ -530,7 +529,10 @@ namespace Triggered.modules.options
         private bool panelOpen = true;
         private Dictionary<string, bool> expanded;
 
-        [RequiresDynamicCode("Calls Triggered.modules.options.Options.IterateObjects()")]
+        /// <summary>
+        /// Generic render method to display an Options table.
+        /// </summary>
+        /// <param name="expand">Decide if we auto expand the options on first launch.</param>
         internal void Render(bool expand = false)
         {
             if (expanded == null)
@@ -824,6 +826,11 @@ namespace Triggered.modules.options
             ImGui.End();
         }
 
+        /// <summary>
+        /// Initializes the expanded dictionary from a JSON file, this is used in the render method.
+        /// If the file exists, it reads the JSON content and deserializes it into the expanded dictionary.
+        /// If the file does not exist, it creates a new empty dictionary.
+        /// </summary>
         public void InitializeExpanded()
         {
             string filePath = Path.Combine(AppContext.BaseDirectory,"expand", $"{Name}.json");
