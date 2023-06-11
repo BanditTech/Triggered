@@ -405,7 +405,7 @@ namespace Triggered.modules.wrapper
 
             if (!valid)
             {
-                App.Log($"{point.X}, {point.Y} is outside of bounds ({rectangle.Width},{rectangle.Height})");
+                App.Log($"{point.X}, {point.Y} is outside of bounds ({rectangle.Width},{rectangle.Height})",3);
                 // Adjust X coordinate
                 if (smallX)
                     point.X = 0;
