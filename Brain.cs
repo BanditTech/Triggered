@@ -2,7 +2,6 @@
 using Emgu.CV.OCR;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -54,7 +53,6 @@ namespace Triggered.modules.wrapper
 
         private static readonly Tesseract OCR = new();
         private static IntPtr targetProcess = IntPtr.Zero;
-        private static List<Feeling> Senses = new List<Feeling>();
 
         /// <summary>
         /// Finish initiating our Tesseract engine
@@ -85,6 +83,11 @@ namespace Triggered.modules.wrapper
                 return;
             NeuralCascade();
         }
+        
+        /// <summary>
+        /// Make observation of our target.
+        /// </summary>
+        /// <returns></returns>
         private static bool Observe()
         {
             if (targetProcess == IntPtr.Zero)
@@ -98,6 +101,10 @@ namespace Triggered.modules.wrapper
             }
             return false;
         }
+        
+        /// <summary>
+        /// Initiate neural activity on threshold activation.
+        /// </summary>
         private static void NeuralCascade()
         {
             List<Task> tasks = new List<Task>();
@@ -114,6 +121,9 @@ namespace Triggered.modules.wrapper
 
             Task.WaitAll(tasks.ToArray());
         }
+        
+        #region Senses
+        private static List<Sensation> Senses = new List<Sensation>();
         public enum Sense
         {
             Life,
@@ -122,11 +132,11 @@ namespace Triggered.modules.wrapper
             Ward,
             Rage
         }
-        public class Feeling
+        public class Sensation
         {
             public Sense Type { get; set; }
             public Action<object> Handler { get; set; }
-            public Feeling(Sense type, Action<object> handler)
+            public Sensation(Sense type, Action<object> handler)
             {
                 Type = type;
                 Handler = handler;
@@ -139,10 +149,16 @@ namespace Triggered.modules.wrapper
                 // Get the name of the property based on the FeelingType
                 string propertyName = type.ToString();
                 PropertyInfo property = typeof(Brain).GetProperty(propertyName);
-                var newValue = property.GetValue(null);
-                ScaledRectangle area = App.Options.Locations.GetKey<ScaledRectangle>($"Resource.{propertyName}");
-                property.SetValue(null,newValue);
+                ScaledRectangle origin = App.Options.Locations.GetKey<ScaledRectangle>($"Resource.{propertyName}");
+                var targetRect = User32.GetWindowRectangle(targetProcess);
+                var area = origin.Relative(targetRect);
+
+
+
+                float conclusion = default;
+                property.SetValue(null, conclusion);
             }
         }
+        #endregion
     }
 }
