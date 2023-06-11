@@ -16,12 +16,8 @@ namespace Triggered.modules.wrapper
     public static class Brain
     {
         /// <summary>
-        /// In the realm of machine vision, algorithms unveil hidden truths,
-        /// Perceiving details through unblinking eyes, where beauty and knowledge fuse.
-        /// With digital sight, they paint visual tales,
-        /// Where innovation thrives and wisdom prevails.
-        /// In this realm of code and light, a symphony unfolds,
-        /// Pixels dance, revealing insights untold.
+        /// Through digital optics, they script visual tales,
+        /// Where innovation thrives and wisdom never fails.
         /// </summary>
         public static Mat Vision { get; set; }
 
