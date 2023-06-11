@@ -35,6 +35,16 @@ namespace Triggered.modules.wrapper
                 Value = value;
                 Height = height;
             }
+
+            /// <summary>
+            /// Produce the relative Measurement.
+            /// </summary>
+            /// <param name="target"></param>
+            /// <returns></returns>
+            public int Relative(Rectangle target)
+            {
+                return CalculateMeasurement(this, target);
+            }
         }
 
         /// <summary>
@@ -75,6 +85,16 @@ namespace Triggered.modules.wrapper
                 Height = height;
                 Anchor = anchor;
             }
+
+            /// <summary>
+            /// Produce the relative Point.
+            /// </summary>
+            /// <param name="target"></param>
+            /// <returns></returns>
+            public Point Relative(Rectangle target)
+            {
+                return CalculatePoint(this, target);
+            }
         }
 
         /// <summary>
@@ -113,6 +133,11 @@ namespace Triggered.modules.wrapper
             /// </summary>
             public readonly int Height { get => Math.Abs(Start.Point.Y - End.Point.Y) + 1; }
 
+            /// <summary>
+            /// Produce the relative Rectangle.
+            /// </summary>
+            /// <param name="target"></param>
+            /// <returns></returns>
             public Rectangle Relative(Rectangle target)
             {
                 return CalculateRectangle(this,target);
