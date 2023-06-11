@@ -20,9 +20,8 @@ namespace Triggered.modules.wrapper
         /// Where innovation thrives and wisdom never fails.
         /// </summary>
         public static Mat Vision { get; set; }
-
-        private static readonly Tesseract OCR = new();
         private static IntPtr targetProcess = IntPtr.Zero;
+        private static readonly Tesseract OCR = new();
 
         /// <summary>
         /// Finalize the components of the Brain.
@@ -36,6 +35,7 @@ namespace Triggered.modules.wrapper
                 Senses.Add(new(sense, new(Analysis)));
         }
 
+        #region Logical Processes
         /// <summary>
         /// Logical processing.
         /// </summary>
@@ -46,7 +46,7 @@ namespace Triggered.modules.wrapper
             // We have passed our threshold of input
             NeuralCascade();
         }
-        
+
         /// <summary>
         /// Make observation of our target.
         /// </summary>
@@ -64,7 +64,7 @@ namespace Triggered.modules.wrapper
             }
             return false;
         }
-        
+
         /// <summary>
         /// Initiate neural activity on threshold activation.
         /// </summary>
@@ -83,7 +83,10 @@ namespace Triggered.modules.wrapper
             }
 
             Task.WaitAll(tasks.ToArray());
+
+
         }
+        #endregion
 
         #region Senses
         /// <summary>
