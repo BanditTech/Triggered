@@ -16,7 +16,7 @@ namespace Triggered.modules.wrapper
     public static class Brain
     {
         /// <summary>
-        /// Through digital optics, they script visual tales,
+        /// With digital lenses, they compose visual tales,
         /// Where innovation thrives and wisdom never fails.
         /// </summary>
         public static Mat Vision { get; set; }
