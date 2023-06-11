@@ -352,7 +352,11 @@ namespace Triggered.modules.wrapper
         {
             // Begin with validated points
             var start = CalculatePoint(origin.Start,rectangle);
-            return new(start.X, start.Y, origin.Width, origin.Height);
+            var end = CalculatePoint(origin.End, rectangle);
+            // Ensure that we begin from the top left corner
+            var X = start.X < end.X ? start.X : end.X;
+            var Y = start.Y < end.Y ? start.Y : end.Y;
+            return new(X, Y, origin.Width, origin.Height);
         }
 
         /// <summary>
