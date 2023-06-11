@@ -112,6 +112,11 @@ namespace Triggered.modules.wrapper
             /// Define the calculated Height
             /// </summary>
             public readonly int Height { get => Math.Abs(Start.Point.Y - End.Point.Y) + 1; }
+
+            public Rectangle Relative(Rectangle target)
+            {
+                return CalculateRectangle(this,target);
+            }
         }
 
         /// <summary>
@@ -240,40 +245,40 @@ namespace Triggered.modules.wrapper
             switch (anchorPosition)
             {
                 case AnchorPosition.Center:
-                    x = rectangle.Left + (rectangle.Width / 2);
-                    y = rectangle.Top + (rectangle.Height / 2);
+                    x = rectangle.Width / 2;
+                    y = rectangle.Height / 2;
                     break;
                 case AnchorPosition.Left:
-                    x = rectangle.Left;
-                    y = rectangle.Top + (rectangle.Height / 2);
+                    x = 0;
+                    y = rectangle.Height / 2;
                     break;
                 case AnchorPosition.Right:
-                    x = rectangle.Right;
-                    y = rectangle.Top + (rectangle.Height / 2);
+                    x = rectangle.Width;
+                    y = rectangle.Height / 2;
                     break;
                 case AnchorPosition.Top:
-                    x = rectangle.Left + (rectangle.Width / 2);
-                    y = rectangle.Top;
+                    x = rectangle.Width / 2;
+                    y = 0;
                     break;
                 case AnchorPosition.Bottom:
-                    x = rectangle.Left + (rectangle.Width / 2);
-                    y = rectangle.Bottom;
+                    x = rectangle.Width / 2;
+                    y = rectangle.Height;
                     break;
                 case AnchorPosition.TopLeft:
-                    x = rectangle.Left;
-                    y = rectangle.Top;
+                    x = 0;
+                    y = 0;
                     break;
                 case AnchorPosition.TopRight:
-                    x = rectangle.Right;
-                    y = rectangle.Top;
+                    x = rectangle.Width;
+                    y = 0;
                     break;
                 case AnchorPosition.BottomLeft:
-                    x = rectangle.Left;
-                    y = rectangle.Bottom;
+                    x = 0;
+                    y = rectangle.Height;
                     break;
                 case AnchorPosition.BottomRight:
-                    x = rectangle.Right;
-                    y = rectangle.Bottom;
+                    x = rectangle.Width;
+                    y = rectangle.Height;
                     break;
             }
 
@@ -319,7 +324,7 @@ namespace Triggered.modules.wrapper
                 default:
                     throw new ArgumentException("Invalid anchor position");
             }
-            
+
             // Ensure we return within the bounds
             ValidatePoint(ref anchorPoint,rectangle);
             return anchorPoint;
@@ -347,15 +352,7 @@ namespace Triggered.modules.wrapper
         {
             // Begin with validated points
             var start = CalculatePoint(origin.Start,rectangle);
-            var end = CalculatePoint(origin.End,rectangle);
-            Rectangle output = new();
-            // Ensure that we begin from the top left corner
-            output.X = start.X < end.X ? start.X : end.X;
-            output.Y = start.Y < end.Y ? start.Y : end.Y;
-            // Ensure we always calculate the correct value
-            output.Width = Math.Abs(end.X - start.X) + 1;
-            output.Height = Math.Abs(end.Y - start.Y) + 1;
-            return output;
+            return new(start.X, start.Y, origin.Width, origin.Height);
         }
 
         /// <summary>
