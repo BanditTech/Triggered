@@ -90,36 +90,54 @@ namespace Triggered.modules.wrapper
         }
 
         #region Senses
+        /// <summary>
+        /// Local reference to Life
+        /// </summary>
         public static float Life
         {
             get { return App.Player.Life; }
             set { App.Player.Life = value; }
         }
 
+        /// <summary>
+        /// Local reference to Mana
+        /// </summary>
         public static float Mana
         {
             get { return App.Player.Mana; }
             set { App.Player.Mana = value; }
         }
 
+        /// <summary>
+        /// Local reference to Shield
+        /// </summary>
         public static float Shield
         {
             get { return App.Player.Shield; }
             set { App.Player.Shield = value; }
         }
 
+        /// <summary>
+        /// Local reference to Ward
+        /// </summary>
         public static float Ward
         {
             get { return App.Player.Ward; }
             set { App.Player.Ward = value; }
         }
 
+        /// <summary>
+        /// Local reference to Rage
+        /// </summary>
         public static float Rage
         {
             get { return App.Player.Rage; }
             set { App.Player.Rage = value; }
         }
 
+        /// <summary>
+        /// Local reference to Location
+        /// </summary>
         public static string Location
         {
             get { return App.Player.Location; }
@@ -190,6 +208,10 @@ namespace Triggered.modules.wrapper
             }
         }
 
+        /// <summary>
+        /// Determine the type of Sense and how to comprehend it
+        /// </summary>
+        /// <param name="data"></param>
         private static void Analysis(object data)
         {
             if (data is Sense sense)
@@ -201,6 +223,10 @@ namespace Triggered.modules.wrapper
             }
         }
 
+        /// <summary>
+        /// Comprehension of a Sense using our Vision.
+        /// </summary>
+        /// <param name="sense"></param>
         private static void Cognition(Sense sense)
         {
             // Get the name of the property based on the Sensation type
@@ -216,6 +242,9 @@ namespace Triggered.modules.wrapper
             property.SetValue(null, conclusion);
         }
 
+        /// <summary>
+        /// Gain perception of our location without sight.
+        /// </summary>
         private static void Proprioception()
         {
             // load the file object if not loaded
