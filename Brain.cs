@@ -15,55 +15,6 @@ namespace Triggered.modules.wrapper
     /// </summary>
     public static class Brain
     {
-        private static float Life
-        {
-            get { return App.Player.Life; }
-            set { App.Player.Life = value; }
-        }
-
-        private static float Mana
-        {
-            get { return App.Player.Mana; }
-            set { App.Player.Mana = value; }
-        }
-
-        private static float Shield
-        {
-            get { return App.Player.Shield; }
-            set { App.Player.Shield = value; }
-        }
-
-        private static float Ward
-        {
-            get { return App.Player.Ward; }
-            set { App.Player.Ward = value; }
-        }
-
-        private static float Rage
-        {
-            get { return App.Player.Rage; }
-            set { App.Player.Rage = value; }
-        }
-
-        private static string Location
-        {
-            get { return App.Player.Location; }
-            set { App.Player.Location = value; }
-        }
-
-        private static readonly Tesseract OCR = new();
-        private static IntPtr targetProcess = IntPtr.Zero;
-
-        /// <summary>
-        /// Finish initiating our Tesseract engine
-        /// </summary>
-        static Brain()
-        {
-            OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
-            foreach (Sense sense in Enum.GetValuesAsUnderlyingType(typeof(Sense)))
-                Senses.Add(new(sense, new(Analysis)));
-        }
-
         /// <summary>
         /// In the realm of machine vision, algorithms unveil hidden truths,
         /// Perceiving details through unblinking eyes, where beauty and knowledge fuse.
@@ -73,6 +24,21 @@ namespace Triggered.modules.wrapper
         /// Pixels dance, revealing insights untold.
         /// </summary>
         public static Mat Vision { get; set; }
+
+        private static readonly Tesseract OCR = new();
+        private static IntPtr targetProcess = IntPtr.Zero;
+
+        /// <summary>
+        /// Finalize the components of the Brain.
+        /// Initiate the Tesseract engine with its language model.
+        /// Add Sensations to the Senses list for each sense.
+        /// </summary>
+        static Brain()
+        {
+            OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
+            foreach (Sense sense in Enum.GetValuesAsUnderlyingType(typeof(Sense)))
+                Senses.Add(new(sense, new(Analysis)));
+        }
 
         /// <summary>
         /// Logical processing.
@@ -122,8 +88,44 @@ namespace Triggered.modules.wrapper
 
             Task.WaitAll(tasks.ToArray());
         }
-        
+
         #region Senses
+        public static float Life
+        {
+            get { return App.Player.Life; }
+            set { App.Player.Life = value; }
+        }
+
+        public static float Mana
+        {
+            get { return App.Player.Mana; }
+            set { App.Player.Mana = value; }
+        }
+
+        public static float Shield
+        {
+            get { return App.Player.Shield; }
+            set { App.Player.Shield = value; }
+        }
+
+        public static float Ward
+        {
+            get { return App.Player.Ward; }
+            set { App.Player.Ward = value; }
+        }
+
+        public static float Rage
+        {
+            get { return App.Player.Rage; }
+            set { App.Player.Rage = value; }
+        }
+
+        public static string Location
+        {
+            get { return App.Player.Location; }
+            set { App.Player.Location = value; }
+        }
+
         private static List<Sensation> Senses = new List<Sensation>();
 
         /// <summary>
