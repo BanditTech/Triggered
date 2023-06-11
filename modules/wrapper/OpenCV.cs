@@ -246,6 +246,11 @@ namespace Triggered.modules.wrapper
             }
         }
 
+        /// <summary>
+        /// Retrieves the number of rows from the bottom of the image where the first white pixel is encountered.
+        /// </summary>
+        /// <param name="bwMask">The binary mask image (Mat) to process.</param>
+        /// <returns>The number of matching rows from the bottom of the image.</returns>
         public static int GetMatchingRowsFromBottom(Mat bwMask)
         {
             // Convert grayMask to Image
@@ -276,6 +281,12 @@ namespace Triggered.modules.wrapper
             }
         }
 
+        /// <summary>
+        /// Finds the positions (bounding rectangles) of multiple target strings within an array of Tesseract.Character objects.
+        /// </summary>
+        /// <param name="characters">An array of Tesseract.Character objects representing the individual characters.</param>
+        /// <param name="targetStrings">A list of target strings to search for.</param>
+        /// <returns>A dictionary containing the target strings as keys and their corresponding bounding rectangles as values.</returns>
         public static Dictionary<string, Rectangle> FindTextPositions(Tesseract.Character[] characters, List<string> targetStrings)
         {
             Dictionary<string, Rectangle> textPositions = new();
@@ -292,6 +303,12 @@ namespace Triggered.modules.wrapper
             return textPositions;
         }
 
+        /// <summary>
+        /// Finds the bounding rectangle encompassing the characters that form the specified target text.
+        /// </summary>
+        /// <param name="characters">An array of Tesseract.Character objects representing the individual characters.</param>
+        /// <param name="target">The target text to search for.</param>
+        /// <returns>The bounding rectangle that encompasses the characters forming the target text, or the default rectangle if not found.</returns>
         public static Rectangle FindTextBounds(Tesseract.Character[] characters, string target)
         {
             List<Rectangle> boundingBoxes = new();
@@ -324,8 +341,14 @@ namespace Triggered.modules.wrapper
             return default;
         }
 
-
-        private static bool ValidateProximity(List<Tesseract.Character> characters, int maxVerticalDistance = 10, int maxHorizontalDistance = 50)
+        /// <summary>
+        /// Validates the proximity of characters in a list based on maximum vertical and horizontal distances.
+        /// </summary>
+        /// <param name="characters">A list of Tesseract.Character objects representing the characters to validate.</param>
+        /// <param name="maxVerticalDistance">The maximum allowed vertical distance between consecutive characters.</param>
+        /// <param name="maxHorizontalDistance">The maximum allowed horizontal distance between consecutive characters.</param>
+        /// <returns>True if the characters meet the proximity criteria, False otherwise.</returns>
+        public static bool ValidateProximity(List<Tesseract.Character> characters, int maxVerticalDistance = 10, int maxHorizontalDistance = 50)
         {
             if (characters.Count < 2)
                 return true;
