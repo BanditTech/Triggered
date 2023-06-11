@@ -61,7 +61,7 @@ namespace Triggered.modules.wrapper
         {
             OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
             foreach (Sense sense in Enum.GetValuesAsUnderlyingType(typeof(Sense)))
-                Senses.Add(new(sense, new(InterpretSense)));
+                Senses.Add(new(sense, new(Analysis)));
         }
 
         /// <summary>
@@ -125,40 +125,105 @@ namespace Triggered.modules.wrapper
         
         #region Senses
         private static List<Sensation> Senses = new List<Sensation>();
+
+        /// <summary>
+        /// Represents different in-game resources (senses) in our Brain.
+        /// </summary>
         public enum Sense
         {
+            /// <summary>
+            /// Life resource.
+            /// </summary>
             Life,
+
+            /// <summary>
+            /// Mana resource.
+            /// </summary>
             Mana,
+
+            /// <summary>
+            /// Shield resource.
+            /// </summary>
             Shield,
+
+            /// <summary>
+            /// Ward resource.
+            /// </summary>
             Ward,
-            Rage
+
+            /// <summary>
+            /// Rage resource.
+            /// </summary>
+            Rage,
+            /// <summary>
+            /// Location Tracking.
+            /// </summary>
+            Location
         }
+
+        /// <summary>
+        /// Represents a sensation associated with a specific sense in a brain system.
+        /// </summary>
         public class Sensation
         {
+            /// <summary>
+            /// Gets or sets the type of sense associated with the sensation.
+            /// </summary>
             public Sense Type { get; set; }
+
+            /// <summary>
+            /// Gets or sets the handler action that processes the sensation.
+            /// </summary>
             public Action<object> Handler { get; set; }
+
+            /// <summary>
+            /// Initializes a new instance of the Sensation class with the specified sense type and handler action.
+            /// </summary>
+            /// <param name="type">The type of sense associated with the sensation.</param>
+            /// <param name="handler">The handler action that processes the sensation.</param>
             public Sensation(Sense type, Action<object> handler)
             {
                 Type = type;
                 Handler = handler;
             }
         }
-        private static void InterpretSense(object data)
+
+        private static void Analysis(object data)
         {
-            if (data is Sense type)
+            if (data is Sense sense)
             {
-                // Get the name of the property based on the FeelingType
-                string propertyName = type.ToString();
-                PropertyInfo property = typeof(Brain).GetProperty(propertyName);
-                ScaledRectangle origin = App.Options.Locations.GetKey<ScaledRectangle>($"Resource.{propertyName}");
-                var targetRect = User32.GetWindowRectangle(targetProcess);
-                var area = origin.Relative(targetRect);
-
-
-
-                float conclusion = default;
-                property.SetValue(null, conclusion);
+                if (sense == Sense.Location)
+                    Proprioception();
+                else
+                    Cognition(sense);
             }
+        }
+
+        private static void Cognition(Sense sense)
+        {
+            // Get the name of the property based on the Sensation type
+            string propertyName = sense.ToString();
+            PropertyInfo property = typeof(Brain).GetProperty(propertyName);
+            ScaledRectangle origin = App.Options.Locations.GetKey<ScaledRectangle>($"Resource.{propertyName}");
+            var targetRect = User32.GetWindowRectangle(targetProcess);
+            var area = origin.Relative(targetRect);
+            Mat regionOfInterest = new Mat(Vision, area);
+            // come up with the conclusion from the region of interest
+            regionOfInterest.Dispose();
+            float conclusion = default;
+            property.SetValue(null, conclusion);
+        }
+
+        private static void Proprioception()
+        {
+            // load the file object if not loaded
+            // read to the end of file on init
+            // Store the file pos if required by C#
+            // Each call reads from Pos to EOF
+            // Split the content by /r/n
+            // Regex match in series to determine location change
+            // Same for level up text
+            // See if there is any other useful data from the client.txt
         }
         #endregion
     }
