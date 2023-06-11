@@ -392,23 +392,29 @@ namespace Triggered.modules.wrapper
         /// <param name="rectangle"></param>
         public static bool ValidatePoint(ref Point point, Rectangle rectangle)
         {
-            if (!rectangle.Contains(point))
+            bool smallX = point.X < 0;
+            bool smallY = point.Y < 0;
+            bool bigX = point.X > rectangle.Width;
+            bool bigY = point.Y > rectangle.Height;
+
+            bool valid = !smallX && !smallY && !bigX && !bigY;
+
+            if (!valid)
             {
-                // Log discrepancy
-                App.Log($"{point.X}, {point.Y} is outside of bounds ({rectangle.Left},{rectangle.Top}) ({rectangle.Right},{rectangle.Bottom})");
+                App.Log($"{point.X}, {point.Y} is outside of bounds ({rectangle.Width},{rectangle.Height})");
                 // Adjust X coordinate
-                if (point.X < rectangle.Left)
-                    point.X = rectangle.Left;
-                else if (point.X > rectangle.Right)
-                    point.X = rectangle.Right;
+                if (smallX)
+                    point.X = 0;
+                else if (bigX)
+                    point.X = rectangle.Width;
                 // Adjust Y coordinate
-                if (point.Y < rectangle.Top)
+                if (smallY)
                     point.Y = rectangle.Top;
-                else if (point.Y > rectangle.Bottom)
-                    point.Y = rectangle.Bottom;
-                return false;
+                else if (bigY)
+                    point.Y = rectangle.Height;
             }
-            return true;
+
+            return valid;
         }
     }
 }
