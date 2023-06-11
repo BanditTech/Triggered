@@ -83,8 +83,6 @@ namespace Triggered.modules.wrapper
             }
 
             Task.WaitAll(tasks.ToArray());
-
-
         }
         #endregion
 
