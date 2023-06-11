@@ -39,8 +39,8 @@ namespace Triggered.modules.wrapper
             /// <summary>
             /// Produce the relative Measurement.
             /// </summary>
-            /// <param name="target"></param>
-            /// <returns></returns>
+            /// <param name="target">The target window bounding Rectangle</param>
+            /// <returns>A Measurement relative to the target Rectangle</returns>
             public int Relative(Rectangle target)
             {
                 return CalculateMeasurement(this, target);
@@ -89,8 +89,8 @@ namespace Triggered.modules.wrapper
             /// <summary>
             /// Produce the relative Point.
             /// </summary>
-            /// <param name="target"></param>
-            /// <returns></returns>
+            /// <param name="target">The target window bounding Rectangle</param>
+            /// <returns>A Point relative to the target Rectangle</returns>
             public Point Relative(Rectangle target)
             {
                 return CalculatePoint(this, target);
@@ -136,8 +136,8 @@ namespace Triggered.modules.wrapper
             /// <summary>
             /// Produce the relative Rectangle.
             /// </summary>
-            /// <param name="target"></param>
-            /// <returns></returns>
+            /// <param name="target">The target window bounding Rectangle</param>
+            /// <returns>A Rectangle relative to the target Rectangle</returns>
             public Rectangle Relative(Rectangle target)
             {
                 return CalculateRectangle(this,target);

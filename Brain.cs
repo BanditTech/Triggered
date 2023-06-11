@@ -15,10 +15,10 @@ namespace Triggered.modules.wrapper
     /// </summary>
     public static class Brain
     {
-        private static float Health
+        private static float Life
         {
-            get { return App.Player.Health; }
-            set { App.Player.Health = value; }
+            get { return App.Player.Life; }
+            set { App.Player.Life = value; }
         }
 
         private static float Mana
@@ -81,6 +81,7 @@ namespace Triggered.modules.wrapper
         {
             if (!Observe())
                 return;
+            // We have passed our threshold of input
             NeuralCascade();
         }
         

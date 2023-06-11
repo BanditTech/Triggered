@@ -12,7 +12,7 @@ namespace Triggered.modules.struct_node
         /// <summary>
         /// Health value in a range of 0f to 1f
         /// </summary>
-        public float Health => App.Player.Health;
+        public float Health => App.Player.Life;
         /// <summary>
         /// Mana value in a range of 0f to 1f
         /// </summary>

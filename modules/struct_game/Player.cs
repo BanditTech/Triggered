@@ -13,7 +13,7 @@
         /// <summary>
         /// The currently determined health.
         /// </summary>
-        public float Health { get; set; } = 1f;
+        public float Life { get; set; } = 1f;
 
         /// <summary>
         /// The currently determined Mana.

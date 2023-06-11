@@ -68,6 +68,18 @@ namespace Triggered.modules.options
                     AnchorPosition.Left
                 )
             ), "Ward Min/Max text area");
+            SetKey("Resource.Rage", new ScaledRectangle(
+                new Coordinate(
+                    new Point(250, 250),
+                    1080,
+                    AnchorPosition.Left
+                ),
+                new Coordinate(
+                    new Point(40, 310),
+                    1080,
+                    AnchorPosition.Left
+                )
+            ), "Rage Min/Max text area");
 
             // Panel Coordinate
             SetKey("Panel.Main", new Coordinate(
