@@ -231,6 +231,7 @@ namespace Triggered.modules.panel
             App.Options.Log.Render(true);
             App.Options.Font.Render(true);
             App.Options.Viewport.Render(true);
+            App.Options.Colors.Render(true);
         }
     }
 }

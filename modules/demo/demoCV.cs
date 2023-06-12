@@ -672,7 +672,7 @@ namespace Triggered.modules.demo
 
         public static void RenderHWND()
         {
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 200), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new(400, 200), ImGuiCond.FirstUseEver);
             ImGui.Begin("Demo HWND");
 
             // This sets up an options for the DemoCV methods.

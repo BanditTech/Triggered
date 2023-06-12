@@ -27,6 +27,7 @@ namespace Triggered.modules.options
             SetKey("Locations", false);
             SetKey("Font", false);
             SetKey("Viewport", false);
+            SetKey("Colors", false);
 
             // CV Demo panels
             SetKey("CV.BlackWhite", false);

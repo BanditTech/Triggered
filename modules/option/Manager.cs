@@ -39,6 +39,10 @@ namespace Triggered.modules.options
         /// </summary>
         public Options_Locations Locations = new();
         /// <summary>
+        /// Locations Options object
+        /// </summary>
+        public Options_Colors Colors = new();
+        /// <summary>
         /// Allows to itterate this list of Options.
         /// </summary>
         /// <returns></returns>

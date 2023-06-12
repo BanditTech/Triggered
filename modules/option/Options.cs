@@ -824,6 +824,7 @@ namespace Triggered.modules.options
 
 
             ImGui.End();
+            currentSection = null;
         }
 
         /// <summary>

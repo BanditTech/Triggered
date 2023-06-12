@@ -38,29 +38,32 @@ namespace Triggered.modules.panel
                     App.IsRunning = false; // Changing this variable to false will close the parent window, therefore closing the Dockspace as well.
                 if (ImGui.BeginMenu("Options"))
                 {
-                    var log = Panel.GetKey<bool>("Log");
-                    if (ImGui.MenuItem("Log", null, ref log))
-                        Panel.SetKey("Log", log);
-                    var locations = Panel.GetKey<bool>("Locations");
-                    if (ImGui.MenuItem("Locations", null, ref locations))
-                        Panel.SetKey("Locations", locations);
                     var font = Panel.GetKey<bool>("Font");
                     if (ImGui.MenuItem("Font", null, ref font))
                         Panel.SetKey("Font", font);
+                    var locations = Panel.GetKey<bool>("Locations");
+                    if (ImGui.MenuItem("Locations", null, ref locations))
+                        Panel.SetKey("Locations", locations);
+                    var log = Panel.GetKey<bool>("Log");
+                    if (ImGui.MenuItem("Log", null, ref log))
+                        Panel.SetKey("Log", log);
                     var viewport = Panel.GetKey<bool>("Viewport");
                     if (ImGui.MenuItem("Viewport", null, ref viewport))
                         Panel.SetKey("Viewport", viewport);
+                    var colors = Panel.GetKey<bool>("Colors");
+                    if (ImGui.MenuItem("Colors", null, ref colors))
+                        Panel.SetKey("Colors", colors);
 
                     ImGui.EndMenu();
                 }
                 if (ImGui.BeginMenu("Window"))
                 {
-                    var stashSorter = Panel.GetKey<bool>("StashSorter");
-                    if (ImGui.MenuItem("StashSorter", null, ref stashSorter))
-                        Panel.SetKey("StashSorter", stashSorter);
                     var log = Panel.GetKey<bool>("LogWindow");
                     if (ImGui.MenuItem("Log Window", null, ref log))
                         Panel.SetKey("LogWindow", log);
+                    var stashSorter = Panel.GetKey<bool>("StashSorter");
+                    if (ImGui.MenuItem("StashSorter", null, ref stashSorter))
+                        Panel.SetKey("StashSorter", stashSorter);
 
                     ImGui.EndMenu();
                 }
