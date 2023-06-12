@@ -38,9 +38,9 @@ namespace Triggered.modules.wrapper
                 if (sense == Sense.Location)
                     continue;
                 // Construct our Kalman filters
-                Recollection[sense] = new Dictionary<string, KalmanFilter>();
-                Recollection[sense]["current"] = new KalmanFilter();
-                Recollection[sense]["maximum"] = new KalmanFilter();
+                Recollection[sense] = new();
+                Recollection[sense]["current"] = new();
+                Recollection[sense]["maximum"] = new();
             }
         }
 
