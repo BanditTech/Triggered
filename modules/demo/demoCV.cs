@@ -41,8 +41,6 @@ namespace Triggered.modules.demo
                 RenderHSVSubset();
             if (Panel.GetKey<bool>("CV.OCR"))
                 RenderOCR();
-            if (Panel.GetKey<bool>("CV.WindowHandle"))
-                RenderHWND();
         }
 
         /// <summary>
@@ -647,42 +645,5 @@ namespace Triggered.modules.demo
 
             ImGui.End();
         }
-
-        public static void DemoHWND()
-        {
-            string win1 = "Capture Window";
-            // We create our named window
-            CvInvoke.NamedWindow(win1, WindowFlags.FreeRatio);
-            // Exit the loop when you press the Escape Key
-            while (CvInvoke.WaitKey(1) != (int)Keys.Escape)
-            {
-                string name = Opts.GetKey<string>("HWND.Name");
-                // Capture the Window
-                Mat screenMat = GetWindowMat(name);
-                if (screenMat == null)
-                    continue;
-                // Display the Masked image
-                DisplayImage(win1, screenMat);
-                // Release Memory
-                screenMat.Dispose();
-            }
-            CvInvoke.DestroyWindow(win1);
-            Panel.SetKey("CV.WindowHandle", false);
-        }
-
-        public static void RenderHWND()
-        {
-            ImGui.SetNextWindowSize(new(400, 200), ImGuiCond.FirstUseEver);
-            ImGui.Begin("Demo HWND");
-
-            // This sets up an options for the DemoCV methods.
-            // Get the current values from options
-            string name = Opts.GetKey<string>("HWND.Name");
-            if (ImGui.InputText("Window",ref name, 256))
-                Opts.SetKey("HWND.Name", name);
-
-            ImGui.End();
-        }
-
     }
 }

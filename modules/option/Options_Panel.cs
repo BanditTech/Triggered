@@ -30,16 +30,10 @@ namespace Triggered.modules.options
             SetKey("Colors", false);
 
             // CV Demo panels
-            SetKey("CV.BlackWhite", false);
-            SetKey("CV.Color", false);
-            SetKey("CV.IndividualColor", false);
-            SetKey("CV.HSV", false);
-            SetKey("CV.DualHSV", false);
             SetKey("CV.SubsetHSV", false);
             SetKey("CV.Shape", false);
             SetKey("CV.Rectangle", false);
             SetKey("CV.OCR", false);
-            SetKey("CV.WindowHandle", false);
         }
     }
 }

@@ -18,26 +18,6 @@ namespace Triggered.modules.options
         }
         internal override void Default()
         {
-            // Black/White values
-            SetKey("minFilterBlackWhite", 67);
-            SetKey("maxFilterBlackWhite", 187);
-            // Color Values
-            SetKey("filterColorRGB", new Vector3(0f, 0f, 1f));
-            SetKey("filterup", 0.5f);
-            SetKey("filterdown", 0.5f);
-            // Individual Color Values
-            SetKey("filterColorIndRGB", new Vector3(0f, 1f, 0f));
-            SetKey("filterR", 0.5f);
-            SetKey("filterG", 0.5f);
-            SetKey("filterB", 0.5f);
-            // HSV Color Values
-            SetKey("filterColorHSV", new Vector3(0.5f, 0.5f, 0.5f));
-            SetKey("filterH", 0.5f);
-            SetKey("filterS", 0.5f);
-            SetKey("filterV", 0.5f);
-            // HSV Dual Color Values
-            SetKey("filterColorHSVMin", new Vector3(0.4f, 0f, 0f));
-            SetKey("filterColorHSVMax", new Vector3(0.5f, 1f, 1f));
             // OCR Values
             SetKey("OCR.Min", new Vector3(0.4f, 0f, 0f));
             SetKey("OCR.Max", new Vector3(0.5f, 1f, 1f));
@@ -45,8 +25,6 @@ namespace Triggered.modules.options
             SetKey("OCR.Y", 100);
             SetKey("OCR.W", 100);
             SetKey("OCR.H", 100);
-            // HWND Values
-            SetKey("HWND.Name","Path of Exile");
             // HSV Subset Values
             SetKey("filterSubsetHSVMin", new Vector3(0.4f, 0f, 0f));
             SetKey("filterSubsetHSVMax", new Vector3(0.5f, 1f, 1f));

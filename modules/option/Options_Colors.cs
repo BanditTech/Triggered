@@ -25,6 +25,9 @@ namespace Triggered.modules.options
             SetKey("Resource.Max",
                 new Vector4(1f,1f,1f,1f),
                 "Filter Maximum");
+            SetKey("Resource.Display",
+                false,
+                "Display Window");
         }
     }
 }
