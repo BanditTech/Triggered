@@ -23,6 +23,7 @@ namespace Triggered.modules.wrapper
         private static IntPtr targetProcess = IntPtr.Zero;
         private static readonly Tesseract OCR = new();
 
+
         /// <summary>
         /// Finalize the components of the Brain.
         /// Initiate the Tesseract engine with its language model.
@@ -32,7 +33,15 @@ namespace Triggered.modules.wrapper
         {
             OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
             foreach (Sense sense in Enum.GetValuesAsUnderlyingType(typeof(Sense)))
+            {
                 Senses.Add(new(sense, new(Analysis)));
+                if (sense == Sense.Location)
+                    continue;
+                // Construct our Kalman filters
+                Recollection[sense] = new Dictionary<string, KalmanFilter>();
+                Recollection[sense]["current"] = new KalmanFilter();
+                Recollection[sense]["maximum"] = new KalmanFilter();
+            }
         }
 
         #region Logical Processes
@@ -141,7 +150,8 @@ namespace Triggered.modules.wrapper
             set { App.Player.Location = value; }
         }
 
-        private static List<Sensation> Senses = new List<Sensation>();
+        private static List<Sensation> Senses = new();
+        private static readonly Dictionary<Sense, Dictionary<string, KalmanFilter>> Recollection = new();
 
         /// <summary>
         /// Represents different in-game resources (senses) in our Brain.
@@ -233,6 +243,8 @@ namespace Triggered.modules.wrapper
             var targetRect = User32.GetWindowRectangle(targetProcess);
             var area = origin.Relative(targetRect);
             Mat regionOfInterest = new Mat(Vision, area);
+            var kalmanCurrent = Recollection[sense]["current"];
+            var kalmanMaximum = Recollection[sense]["maximum"];
             // come up with the conclusion from the region of interest
             regionOfInterest.Dispose();
             float conclusion = default;
