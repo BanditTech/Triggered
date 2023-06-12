@@ -1,12 +1,16 @@
 ﻿using Emgu.CV;
 using Emgu.CV.OCR;
 using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using static Triggered.modules.wrapper.OpenCV;
 using static Triggered.modules.wrapper.PointScaler;
+using System.Numerics;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace Triggered.modules.wrapper
 {
@@ -21,17 +25,15 @@ namespace Triggered.modules.wrapper
         /// </summary>
         public static Mat Vision { get; set; }
         private static IntPtr targetProcess = IntPtr.Zero;
-        private static readonly Tesseract OCR = new();
 
 
         /// <summary>
         /// Finalize the components of the Brain.
-        /// Initiate the Tesseract engine with its language model.
         /// Add Sensations to the Senses list for each sense.
+        /// Initiate the Tesseract engine with its language model.
         /// </summary>
         static Brain()
         {
-            OCR.Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
             foreach (Sense sense in Enum.GetValuesAsUnderlyingType(typeof(Sense)))
             {
                 Senses.Add(new(sense, new(Analysis)));
@@ -41,6 +43,9 @@ namespace Triggered.modules.wrapper
                 Recollection[sense] = new();
                 Recollection[sense]["current"] = new();
                 Recollection[sense]["maximum"] = new();
+
+                Translate[sense] = new Tesseract();
+                Translate[sense].Init(Path.Join(AppContext.BaseDirectory, "lib", "Tesseract", "tessdata"), "fast", OcrEngineMode.LstmOnly);
             }
         }
 
@@ -152,6 +157,7 @@ namespace Triggered.modules.wrapper
 
         private static List<Sensation> Senses = new();
         private static readonly Dictionary<Sense, Dictionary<string, KalmanFilter>> Recollection = new();
+        private static readonly Dictionary<Sense, Tesseract> Translate = new();
 
         /// <summary>
         /// Represents different in-game resources (senses) in our Brain.
@@ -236,18 +242,66 @@ namespace Triggered.modules.wrapper
         /// <param name="sense"></param>
         private static void Cognition(Sense sense)
         {
+            // Gather internal resources
+            KalmanFilter kalmanCurrent = Recollection[sense]["current"];
+            KalmanFilter kalmanMaximum = Recollection[sense]["maximum"];
+            Vector3 lower = App.Options.Colors.GetKey<Vector3>("Resource.Min");
+            Vector3 upper = App.Options.Colors.GetKey<Vector3>("Resource.Max");
+            bool show = App.Options.Colors.GetKey<bool>("Resource.ShowTest");
+            Tesseract translator = Translate[sense];
+
             // Get the name of the property based on the Sensation type
             string propertyName = sense.ToString();
             PropertyInfo property = typeof(Brain).GetProperty(propertyName);
             ScaledRectangle origin = App.Options.Locations.GetKey<ScaledRectangle>($"Resource.{propertyName}");
-            var targetRect = User32.GetWindowRectangle(targetProcess);
-            var area = origin.Relative(targetRect);
-            Mat regionOfInterest = new Mat(Vision, area);
-            var kalmanCurrent = Recollection[sense]["current"];
-            var kalmanMaximum = Recollection[sense]["maximum"];
-            // come up with the conclusion from the region of interest
-            regionOfInterest.Dispose();
-            float conclusion = default;
+            Rectangle targetRect = User32.GetWindowRectangle(targetProcess);
+            Rectangle area = origin.Relative(targetRect);
+
+            using Mat regionOfInterest = new(Vision, area);
+            using Mat filtered = GetFilteredMat(regionOfInterest, lower, upper, false, true);
+            using Mat masked = GetBlackWhiteMaskMat(filtered);
+            using Mat invert = new();
+            // We now have a masked image which represents the matching pixels
+            if (show && sense == Sense.Life)
+            {
+                using Mat copied = new();
+                regionOfInterest.CopyTo(copied, masked);
+                DisplayImage("Resource Test", copied);
+            }
+            // Invert to black text on white background
+            CvInvoke.BitwiseNot(masked, invert);
+            translator.SetImage(invert);
+            string result = translator.GetUTF8Text().Trim();
+
+            if (result == "")
+                return;
+
+            // Remove small discrepencies
+            result = Regex.Replace(result,   "  ", " ");
+            result = Regex.Replace(result, "[,.]",  "");
+            result = Regex.Replace(result,    "{", "/");
+            result = Regex.Replace(result,   "//", "/");
+
+            string[] split = result.Split("/",StringSplitOptions.TrimEntries);
+            // Without a divisor we do not have our two parts, we have no way to continue
+            if (split.Length != 2)
+                return;
+            // We need both sides of the fraction to contain only digits
+            if (!split[0].All(char.IsDigit) || !split[1].All(char.IsDigit)) 
+                return;
+
+            float current = float.Parse(split[0]);
+            float maximum = float.Parse(split[1]);
+
+            // Something is wrong and we have incorrect data
+            if (current > maximum)
+                return;
+
+            float filteredCurrent = kalmanCurrent.Filter(current);
+            float filteredMaximum = kalmanMaximum.Filter(maximum);
+
+            float conclusion = filteredCurrent / filteredMaximum;
+            App.Log($"Cognition reached a conclusion of {conclusion} for {propertyName}",0);
             property.SetValue(null, conclusion);
         }
 

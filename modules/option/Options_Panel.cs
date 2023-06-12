@@ -31,7 +31,6 @@ namespace Triggered.modules.options
 
             // CV Demo panels
             SetKey("CV.SubsetHSV", false);
-            SetKey("CV.Shape", false);
             SetKey("CV.Rectangle", false);
             SetKey("CV.OCR", false);
         }

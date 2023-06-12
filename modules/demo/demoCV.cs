@@ -33,8 +33,6 @@ namespace Triggered.modules.demo
         /// </summary>
         public static void Render()
         {
-            if (Panel.GetKey<bool>("CV.Shape"))
-                RenderShapeDetection();
             if (Panel.GetKey<bool>("CV.Rectangle"))
                 RenderShapeRectangle();
             if (Panel.GetKey<bool>("CV.SubsetHSV"))
@@ -336,14 +334,6 @@ namespace Triggered.modules.demo
                 App.Log($"Rectangle Detection took: {watch.ElapsedMilliseconds}ms",0);
                 return triangleRectangleImage;
             }
-        }
-
-        /// <summary>
-        /// ImGui menu for adjusting the Min/Max match values.
-        /// </summary>
-        public static void RenderShapeDetection()
-        {
-            // There are no settings for this
         }
 
         /// <summary>
